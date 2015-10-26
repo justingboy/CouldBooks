@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">云端书城</string>
+    <string name="hello_world">Hello world!</string>
+    
+    <string name="main_selected">精选</string>
+    <string name="main_classify">分类</string>
+    <string name="main_search">搜索</string>
+    <string name="main_bookshelf">书架</string>
+    <string name="main_more">更多</string>
+
+</resources>

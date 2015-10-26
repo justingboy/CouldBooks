@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.0"
+        />
+
+    <View
+        android:id="@+id/main_bottom_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/main_bottom_textcolor" />
+
+    <RadioGroup
+        android:id="@+id/main_bottom_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <RadioButton
+            android:id="@+id/main_bottom_choice"
+            style="@style/main_tab_bottom"
+            android:checked="true"
+            android:drawableTop="@drawable/main_bottom_choice_selector"
+            android:text="@string/main_selected" />
+
+        <RadioButton
+            android:id="@+id/main_bottom_classify"
+            style="@style/main_tab_bottom"
+            android:drawableTop="@drawable/main_bottom_classify_selector"
+            android:text="@string/main_classify" />
+
+        <RadioButton
+            android:id="@+id/main_bottom_search"
+            style="@style/main_tab_bottom"
+            android:drawableTop="@drawable/main_bottom_search_selector"
+            android:text="@string/main_search" />
+
+        <RadioButton
+            android:id="@+id/main_bottom_bookshelf"
+            style="@style/main_tab_bottom"
+            android:drawableTop="@drawable/main_bottom_bookself_selector"
+            android:text="@string/main_bookshelf" />
+
+        <RadioButton
+            android:id="@+id/main_bottom_more"
+            style="@style/main_tab_bottom"
+            android:drawableTop="@drawable/main_bottom_more_selector"
+            android:text="@string/main_more" />
+    </RadioGroup>
+
+</LinearLayout>

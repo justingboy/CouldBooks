@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <color name="status_bar_bg">#3BBD73</color>
+     <color name="main_bottom_textcolor">#B4B3BD</color>
+     <color name="main_bottom_textcolor_press">#50C34F</color>
+     
+     
+</resources>
