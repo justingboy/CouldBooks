@@ -4,11 +4,12 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.SparseArray;
@@ -24,17 +25,20 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.CompoundButton;
 import android.widget.Spinner;
 
-import com.himoo.ydsc.config.SPContants;
+import com.handmark.pulltorefresh.library.PullToRefreshGridView;
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.mvc.BaseModel;
 import com.himoo.ydsc.mvc.ServiceListener;
 import com.himoo.ydsc.util.MyLogger;
+import com.himoo.ydsc.util.TimestampUtils;
+import com.lidroid.xutils.ViewUtils;
 
 /**
  * Fragment的基类
  * 
- * @author asus1 无需为view设置监听操作，只需要声明一个int[]类型的ids变量，把所有要监听的控件id放到该数组中即可，同时需要继承该类
- *         对BasePager提供了支持
+ * 无需为view设置监听操作，只需要声明一个int[]类型的ids变量，把所有要监听的控件id放到该数组中即可，同时需要继承该类
+ * 对BasePager提供了支持
  */
 public abstract class BaseFragment extends Fragment implements OnClickListener,
 		OnLongClickListener, OnItemClickListener, OnItemLongClickListener,
@@ -50,22 +54,29 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 		super.onCreate(savedInstanceState);
 		Log = MyLogger.kLog();
 		manager = getFragmentManager();
-		sp = getActivity().getSharedPreferences(SPContants.CONFIG,
+		sp = getActivity().getSharedPreferences(SpConstant.CONFIG,
 				Context.MODE_PRIVATE);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		view = onCreateView(inflater, sp, savedInstanceState,
+		view = onCreateView(inflater, container, sp, savedInstanceState,
 				PageManager.getInstance(this));
 		return view;
 	}
 
 	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onViewCreated(view, savedInstanceState);
+		ViewUtils.inject(this);
+	}
+
+	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		findViews();
+		initData();
 		setListener();
 	}
 
@@ -78,11 +89,7 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 		pager.setArguments(data);
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		initData();
-	}
+	
 
 	@Override
 	public void onDestroy() {
@@ -93,7 +100,6 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 	/**
 	 * 监听事件重写了，只需要你手动声明一个以ids为变量名的int[] 该方法会自动为在这个数组里的控件设置上事件监听
 	 */
-	@SuppressWarnings("deprecation")
 	private void setListener() {
 		try {
 			Field field = getClass().getField("ids");
@@ -101,7 +107,7 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 			if (ids != null && ids.length > 0)
 				for (int id : ids) {
 					View view = findViewById(id);
-					if (view instanceof ViewPager) {
+			/*		if (view instanceof ViewPager) {
 						((ViewPager) view).setOnPageChangeListener(this);
 						continue;
 					}
@@ -119,9 +125,9 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 						((AdapterView<?>) view)
 								.setOnItemLongClickListener(this);
 						continue;
-					}
+					}*/
 					view.setOnClickListener(this);
-					view.setOnLongClickListener(this);
+//					view.setOnLongClickListener(this);
 				}
 		} catch (Exception e) {
 
@@ -129,10 +135,8 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 	}
 
 	public abstract View onCreateView(LayoutInflater inflater,
-			SharedPreferences sp, Bundle savedInstanceState,
-			PageManager pageManager);
-
-	public abstract void findViews();
+			ViewGroup container, SharedPreferences sp,
+			Bundle savedInstanceState, PageManager pageManager);
 
 	public abstract void initData();
 
@@ -223,5 +227,29 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 
 	@Override
 	public void handlerIntent(File file, int dataInstruction) {
+	}
+
+	/**
+	 * 初始化上次刷新时间
+	 * 
+	 * @param saveLastRefreshkey
+	 * @param mPullRefreshGridView
+	 */
+	protected void initLastRefreshTime(String saveLastRefreshkey,
+			PullToRefreshGridView mPullRefreshGridView) {
+		String label = "最后更新 ： ";
+		if (com.himoo.ydsc.util.SharedPreferences.getInstance()
+				.getString(saveLastRefreshkey, "").equals("")) {
+			label += TimestampUtils.getTimeState(saveLastRefreshkey);
+
+		} else {
+			label += TimestampUtils.getTimeState(
+					com.himoo.ydsc.util.SharedPreferences.getInstance()
+							.getString(saveLastRefreshkey, ""),
+					"yyyy-MM-dd HH:mm:ss");
+			;
+		}
+		// Update the LastUpdatedLabel
+		mPullRefreshGridView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 	}
 }

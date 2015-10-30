@@ -55,9 +55,9 @@ public class AppUtils {
 	public String getActivityName() {
 		ActivityManager manager = (ActivityManager) context
 				.getSystemService(Context.ACTIVITY_SERVICE);
+		@SuppressWarnings("deprecation")
 		RunningTaskInfo info = manager.getRunningTasks(1).get(0);
 		String shortClassName = info.topActivity.getShortClassName();
-		System.out.println("shortClassName=" + shortClassName);
 		return shortClassName;
 	}
 

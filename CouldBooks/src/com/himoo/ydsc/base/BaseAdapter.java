@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 /**
  * 为了减轻代码的负担，创建BaseAdapter的子类时推荐继承该类
- * @author gwm
  * @param <D> 适配器所承载的数据类型
  */
 public abstract class BaseAdapter<D> extends android.widget.BaseAdapter {

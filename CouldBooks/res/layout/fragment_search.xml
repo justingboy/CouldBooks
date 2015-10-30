@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.himoo.ydsc"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include layout="@layout/titlebar_layout" />
+
+    <com.ios.switchbutton.SwitchButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:offColor="#C4C3C0" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <com.ios.edittext.SearchEditText
+            android:id="@+id/more_book_search"
+            style="@style/editTextStyle"
+            android:layout_width="280dp"
+            android:layout_height="36dp"
+            android:hint="@string/search_book_hint_text"
+            android:textColor="@color/status_bar_bg" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/icon_mircophone" />
+    </LinearLayout>
+
+    <com.himoo.ydsc.ui.view.KeywordsFlow
+        android:id="@+id/search_keywordFlow"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="1" >
+    </com.himoo.ydsc.ui.view.KeywordsFlow>
+
+</LinearLayout>

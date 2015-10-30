@@ -4,7 +4,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import com.himoo.ydsc.config.SPContants;
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.manager.SizeOf;
 import com.himoo.ydsc.mvc.BaseModel;
@@ -44,7 +44,7 @@ public abstract class BasePager extends SizeOf implements OnItemSelectedListener
 			throw new NullPointerException("当前Page并不能找到它的依附Fragment");
 		}
 		this.frag = frag;
-		SharedPreferences sp = frag.getActivity().getSharedPreferences(SPContants.CONFIG, Context.MODE_PRIVATE);
+		SharedPreferences sp = frag.getActivity().getSharedPreferences(SpConstant.CONFIG, Context.MODE_PRIVATE);
 		Log = MyLogger.kLog();
 		view = initView(sp);
 		findViews();

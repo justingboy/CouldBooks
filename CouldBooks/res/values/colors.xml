@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-     <color name="status_bar_bg">#3BBD73</color>
-     <color name="main_bottom_textcolor">#B4B3BD</color>
-     <color name="main_bottom_textcolor_press">#50C34F</color>
-     
-     
+
+    <color name="status_bar_bg">#FF00B64F</color>
+    <color name="main_bottom_textcolor_press">#00B64F</color>
+    <color name="main_bottom_textcolor_default">#7E7D7B</color>
+    <color name="bg_indicator_vpi">#00B64F</color>
+
+    <!-- 标记关于创建图形的颜色值 -->
+    <color name="shap_more_text_color">#E7E6E5</color>
+
+    <!-- 搜索界面文字hint 颜色值 -->
+    <color name="search_book_hint_textcolor">#BAB9B6</color>
+
 </resources>

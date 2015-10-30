@@ -3,11 +3,27 @@
 
     <string name="app_name">云端书城</string>
     <string name="hello_world">Hello world!</string>
-    
+
+    <!-- 主界面底部导航栏文字配置 -->
     <string name="main_selected">精选</string>
     <string name="main_classify">分类</string>
     <string name="main_search">搜索</string>
     <string name="main_bookshelf">书架</string>
     <string name="main_more">更多</string>
+
+    <!-- 更多界面文字配置 -->
+
+    <string name="more_topic">主题设置</string>
+    <string name="more_book_updatetype">图书更新类型</string>
+    <string name="more_service_update">后台自动更新</string>
+    <string name="more_unlock">解锁功能</string>
+    <string name="more_read_statistics">阅读统计</string>
+    <string name="more_password_protect">密码保护</string>
+    <string name="more_user_feedback">用户反馈</string>
+    <string name="more_bottom_thinks">感谢您使用 云端书城\n版本号：1.0 201510281234 </string>
+
+    <!-- 搜索界面文字配置 -->
+    <string name="search_book_hint_text">请输入书名关键字或作者</string>
+    <string name="search_book_button_change">换一换</string>
 
 </resources>

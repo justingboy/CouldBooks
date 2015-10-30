@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include layout="@layout/titlebar_layout" />
+
+    <com.himoo.ydsc.ui.view.ReboundScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="35dp" >
+
+            <TextView
+                android:id="@+id/more_topic"
+                style="@style/Text_more_style"
+                android:background="@drawable/more_textview_bg_selector"
+                android:drawableLeft="@drawable/more_topic"
+                android:text="@string/more_topic" />
+
+            <TextView
+                style="@style/Text_more_style"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/more_text_bg"
+                android:drawableLeft="@drawable/more_update"
+                android:text="@string/more_book_updatetype" />
+
+            <TextView
+                android:id="@+id/more_timeUpdate"
+                style="@style/Text_more_style"
+                android:background="@drawable/more_textview_line_selector"
+                android:drawableLeft="@drawable/more_time"
+                android:text="@string/more_service_update" />
+
+            <TextView
+                android:id="@+id/more_unlock"
+                style="@style/Text_more_style"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/more_textview_bg_selector"
+                android:drawableLeft="@drawable/more_unlock"
+                android:text="@string/more_unlock" />
+
+            <TextView
+                android:background="@drawable/more_textview_noline_selector"
+                android:id="@+id/more_statistics"
+                style="@style/Text_more_style"
+                android:drawableLeft="@drawable/more_statistics"
+                android:text="@string/more_read_statistics" />
+            <TextView
+                android:background="@drawable/more_textview_bg_selector"
+                android:id="@+id/more_passwordProtect"
+                style="@style/Text_more_style"
+                android:drawableLeft="@drawable/more_password"
+                android:text="@string/more_password_protect" />
+
+            <TextView
+                android:id="@+id/more_feedback"
+                style="@style/Text_more_style"
+               android:background="@drawable/more_textview_line_selector"
+                android:drawableLeft="@drawable/more_feedback"
+                android:text="@string/more_user_feedback" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:gravity="center"
+                android:text="@string/more_bottom_thinks"
+                android:textColor="@color/main_bottom_textcolor_default" />
+        </LinearLayout>
+    </com.himoo.ydsc.ui.view.ReboundScrollView>
+
+</LinearLayout>

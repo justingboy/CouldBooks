@@ -1,14 +1,14 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
+            backward-compatibility can go here.
         -->
     </style>
 
@@ -16,7 +16,7 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
-     <!-- 底部导航栏RadioButton样式 -->
+    <!-- 底部导航栏RadioButton样式 -->
     <style name="main_tab_bottom">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -24,11 +24,64 @@
         <item name="android:gravity">center_horizontal|bottom</item>
         <item name="android:background">@android:color/transparent</item>
         <item name="android:button">@null</item>
-        <item name="android:textColor">@drawable/main_bottom_textcolor_selector</item>
         <item name="android:paddingTop">@dimen/bottom_tab_padding_up</item>
         <item name="android:singleLine">true</item>
         <item name="android:drawablePadding">@dimen/bottom_tab_padding_drawable</item>
-        <item name="android:textSize">@dimen/bottom_tab_font_size</item>  
+        <item name="android:textSize">@dimen/bottom_tab_font_size</item>
+    </style>
+
+    <!-- ViewpagerIndicator的样式 -->
+    <style name="StyledIndicators" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="vpiTabPageIndicatorStyle">@style/CustomTabPageIndicator</item>
+    </style>
+
+    <style name="CustomTabPageIndicator" parent="Widget.TabPageIndicator">
+        <item name="android:background">@drawable/vpi_tab_indicator</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAppearance">@style/CustomTabPageIndicator.Text</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:divider">@android:color/white</item>
+        <item name="android:showDividers">middle</item>
+        <item name="android:dividerPadding">0dp</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingLeft">2dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:fadingEdge">horizontal</item>
+        <item name="android:fadingEdgeLength">8dp</item>
+    </style>
+
+    <style name="CustomTabPageIndicator.Text" parent="android:TextAppearance.Medium">
+        <item name="android:typeface">monospace</item>
+        <item name="android:textColor">@drawable/vpi_selector_tabtext</item>
+    </style>
+
+    <!-- 更多界面的TextView设置 -->
+
+    <style name="Text_more_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:drawablePadding">15dp</item>
+        <item name="android:drawableRight">@drawable/more_arrow</item>
+        <item name="android:gravity">center_vertical|left</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:textColor">@color/main_bottom_textcolor_default</item>
+    </style>
+    <!-- ios 搜索框属性定义 -->
+    <style name="editTextStyle">
+        <item name="android:textColorHint">@color/search_book_hint_textcolor</item>
+        <item name="android:drawablePadding">5dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:background">@drawable/shap_edittext_search</item>
+        <item name="android:drawableStart">@drawable/search_icon</item>
     </style>
 
 </resources>

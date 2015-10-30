@@ -5,16 +5,16 @@
     android:orientation="vertical" >
 
     <FrameLayout
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.0"
-        />
+        android:layout_weight="1.0" />
 
     <View
         android:id="@+id/main_bottom_line"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/main_bottom_textcolor" />
+        android:layout_height="0.80dp"
+        android:background="#B8B7B4" />
 
     <RadioGroup
         android:id="@+id/main_bottom_group"
@@ -26,31 +26,26 @@
             android:id="@+id/main_bottom_choice"
             style="@style/main_tab_bottom"
             android:checked="true"
-            android:drawableTop="@drawable/main_bottom_choice_selector"
             android:text="@string/main_selected" />
 
         <RadioButton
             android:id="@+id/main_bottom_classify"
             style="@style/main_tab_bottom"
-            android:drawableTop="@drawable/main_bottom_classify_selector"
             android:text="@string/main_classify" />
 
         <RadioButton
             android:id="@+id/main_bottom_search"
             style="@style/main_tab_bottom"
-            android:drawableTop="@drawable/main_bottom_search_selector"
             android:text="@string/main_search" />
 
         <RadioButton
             android:id="@+id/main_bottom_bookshelf"
             style="@style/main_tab_bottom"
-            android:drawableTop="@drawable/main_bottom_bookself_selector"
             android:text="@string/main_bookshelf" />
 
         <RadioButton
             android:id="@+id/main_bottom_more"
             style="@style/main_tab_bottom"
-            android:drawableTop="@drawable/main_bottom_more_selector"
             android:text="@string/main_more" />
     </RadioGroup>
 

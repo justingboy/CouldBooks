@@ -1,6 +1,14 @@
 package com.himoo.ydsc.ui.utils;
 
+import java.io.IOException;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import com.himoo.ydsc.R;
+
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 
@@ -12,40 +20,50 @@ public class ViewSelector {
 
 	/**
 	 * 
-	 * @param context 上下文
-	 * @param noFocusedResId 没有获取焦点时的图片
-	 * @param focusedResId   获取焦点时的图片
-	 * @param pressResId	   点击时的图片
+	 * @param context
+	 *            上下文
+	 * @param checkResId
+	 *            选中时的图片
+	 * @param noCheckResId
+	 *            默认的图片
 	 */
-	public static void setWidgetSelector(Context context, int noFocusedResId,
-			int focusedResId, int pressResId) {
+	public static StateListDrawable creatWidgetSelector(Context context,
+			int checkResId, int noCheckResId) {
 		StateListDrawable drawable = new StateListDrawable();
-		// Non focused states
-		drawable.addState(
-				new int[] { -android.R.attr.state_focused,
-						-android.R.attr.state_selected,
-						-android.R.attr.state_pressed },
-				getDrawable(context, noFocusedResId));
-		drawable.addState(new int[] { -android.R.attr.state_focused,
-				android.R.attr.state_selected, -android.R.attr.state_pressed },
-				getDrawable(context, noFocusedResId));
-		
-		// Focused states
-		drawable.addState(
-				new int[] { android.R.attr.state_focused,
-						-android.R.attr.state_selected,
-						-android.R.attr.state_pressed },
-				getDrawable(context, focusedResId));
-		drawable.addState(new int[] { android.R.attr.state_focused,
-				android.R.attr.state_selected, -android.R.attr.state_pressed },
-				getDrawable(context, focusedResId));
-		
-		// Pressed
-		drawable.addState(new int[] { android.R.attr.state_selected,
-				android.R.attr.state_pressed },
-				getDrawable(context, pressResId));
-		drawable.addState(new int[] { android.R.attr.state_pressed },
-				getDrawable(context, pressResId));
+
+		// check
+		drawable.addState(new int[] { android.R.attr.state_enabled,
+				android.R.attr.state_checked },
+				getDrawable(context, checkResId));
+		// default
+		drawable.addState(new int[] {}, getDrawable(context, noCheckResId));
+		return drawable;
+	}
+
+	/**
+	 * 
+	 * @param context
+	 *            上下文
+	 * @param checkResId
+	 *            选中时的图片
+	 * @param noCheckResId
+	 *            默认的图片
+	 * @return StateListDrawable
+	 */
+	public static ColorStateList creatTextColorSelector(Context context) {
+		XmlResourceParser xrp = context.getResources().getXml(
+				R.color.main_rb_textcolor_selector);
+		ColorStateList colors = null;
+		try {
+			colors = ColorStateList.createFromXml(context.getResources(), xrp);
+		} catch (XmlPullParserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return colors;
 	}
 
 	/**
@@ -53,10 +71,10 @@ public class ViewSelector {
 	 * 
 	 * @param context
 	 * @param resId
-	 * @return
+	 * @return Drawable
 	 */
 	private static Drawable getDrawable(Context context, int resId) {
-		return context.getDrawable(resId);
+		return context.getResources().getDrawable(resId);
 	}
 
 }
