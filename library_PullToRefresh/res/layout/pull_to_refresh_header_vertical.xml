@@ -11,10 +11,10 @@
         android:paddingTop="@dimen/header_footer_top_bottom_padding" >
 
         <FrameLayout
-            android:layout_marginLeft="60dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left|center_vertical" >
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginLeft="45dp" >
 
             <ImageView
                 android:id="@+id/pull_to_refresh_image"
@@ -24,7 +24,7 @@
 
             <ProgressBar
                 android:id="@+id/pull_to_refresh_progress"
-                style="?android:attr/progressBarStyleSmall"
+                style="?android:attr/progressBarStyleSmallTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -45,7 +45,8 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearance"
-                android:textStyle="bold" />
+                android:textColor="@color/vpi_head_textcolor_default"
+                />
 
             <TextView
                 android:id="@+id/pull_to_refresh_sub_text"
@@ -53,6 +54,7 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/vpi_head_textcolor_default"
                 android:visibility="gone" />
         </LinearLayout>
     </FrameLayout>
