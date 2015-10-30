@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceGroup;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import com.lidroid.xutils.util.LogUtils;
 import com.lidroid.xutils.view.EventListenerManager;
@@ -48,6 +49,9 @@ public class ViewUtils {
     public static void inject(Activity activity) {
         injectObject(activity, new ViewFinder(activity));
     }
+    public static void inject(Fragment fragment) {  
+        injectObject(fragment, new ViewFinder(fragment));  
+    }  
 
     public static void inject(PreferenceActivity preferenceActivity) {
         injectObject(preferenceActivity, new ViewFinder(preferenceActivity));
