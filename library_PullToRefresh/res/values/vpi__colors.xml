@@ -15,6 +15,7 @@
 -->
 
 <resources>
+    <color name="vpi_head_textcolor_default">#7E7D7B</color>
     <color name="vpi__background_holo_dark">#ff000000</color>
     <color name="vpi__background_holo_light">#fff3f3f3</color>
     <color name="vpi__bright_foreground_holo_dark">@color/vpi__background_holo_light</color>
