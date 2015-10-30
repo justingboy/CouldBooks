@@ -1,0 +1,15 @@
+
+   1.  onDrawable ：绘制背景为ON状态
+   2.  offDrawable ：绘制的背景状态OFF
+   3.  thumbDrawable ：绘制拇指
+   4.  thumb_margin ：拇指和边缘之间设置内边距
+   5.  thumb_marginLeft /上/下/右：设置为特定的装订边
+   6.  thumb_width ：设置大拇指的宽度，可能用于绘制渐变
+   7.  thumb_height ：设置滑块的高度
+   8.  OnColor ：设置状态为ON，美元的平板版本的颜色，当务之急是onDrawable以下
+   9.  offColor ：喜欢的OnColor
+   10. thumbColor ：喜欢的OnColor
+   11. thumbPressedColor ：像thumbColor ，但对于压状态
+   12. animationVelocity ：距离每帧动画
+   13. radius：用于彩色版，背景和经验圆角半径。
+   14. measureFactor ：系数限制的最小宽度几乎相等（拇指 * measureFactor的高度）
