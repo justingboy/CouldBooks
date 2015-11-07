@@ -43,18 +43,22 @@ public class PullToRefreshListView extends PullToRefreshAdapterViewBase<ListView
 
 	public PullToRefreshListView(Context context) {
 		super(context);
+		initRefreshTextView();
 	}
 
 	public PullToRefreshListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		initRefreshTextView();
 	}
 
 	public PullToRefreshListView(Context context, Mode mode) {
 		super(context, mode);
+		initRefreshTextView();
 	}
 
 	public PullToRefreshListView(Context context, Mode mode, AnimationStyle style) {
 		super(context, mode, style);
+		initRefreshTextView();
 	}
 
 	@Override
@@ -334,4 +338,20 @@ public class PullToRefreshListView extends PullToRefreshAdapterViewBase<ListView
 
 	}
 
+	/**
+	 * 设置刷新文本
+	 */
+	protected void initRefreshTextView() {
+		ILoadingLayout startLabels = this
+				.getLoadingLayoutProxy(true, false);
+		startLabels.setPullLabel("下拉可以刷新");// 刚下拉时，显示的提示
+		startLabels.setRefreshingLabel("正在刷新...");// 刷新时
+		startLabels.setReleaseLabel("松开立即刷新");// 下来达到一定距离时，显示的提示
+
+		ILoadingLayout endLabels = this.getLoadingLayoutProxy(
+				false, true);
+		endLabels.setPullLabel("上拉加载更多数据");// 刚下拉时，显示的提示
+		endLabels.setRefreshingLabel("正在加载数据...");// 刷新时
+		endLabels.setReleaseLabel("松开加载更多数据");// 下来达到一定距离时，显示的提示
+	}
 }
