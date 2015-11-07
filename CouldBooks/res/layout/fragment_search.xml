@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res/com.himoo.ydsc"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
     <include layout="@layout/titlebar_layout" />
-
-    <com.ios.switchbutton.SwitchButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:offColor="#C4C3C0" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -29,6 +22,7 @@
             android:textColor="@color/status_bar_bg" />
 
         <ImageView
+            android:id="@+id/search_speech"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/app_name"

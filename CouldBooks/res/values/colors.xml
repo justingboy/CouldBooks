@@ -11,5 +11,26 @@
 
     <!-- 搜索界面文字hint 颜色值 -->
     <color name="search_book_hint_textcolor">#BAB9B6</color>
+    
+    <!-- 书详情Dialog中TextView 颜色值 -->
+    <color name="dialog_book_textcolor">#80807D</color>
+    <color name="dialog_book_summary_textcolor">#ABA9A7</color>
+    
+    <!-- ListView的divider分割线 颜色值 -->
+    <color name="listview_divider">#BBB182</color>
+    
+    <!-- 主题界面的字体颜色 -->
+    <color name="theme_textcolor">#535353</color>
+     <!-- 主题界面皮肤的种颜色 -->
+    <color name="theme_skin_red">#F30911</color>
+    <color name="theme_skin_blue">#00B6DF</color>
+    <color name="theme_skin_green">#00B758</color>
+    <color name="theme_skin_yellow">#F5BB18</color>
+    <color name="theme_skin_darkgray">#2C2000</color>
+   
+    
+    
+    
+    
 
 </resources>

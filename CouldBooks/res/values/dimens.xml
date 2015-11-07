@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="bottom_tab_padding_up">2dp</dimen>
     <dimen name="bottom_tab_padding_drawable">2dp</dimen>
     <dimen name="bottom_tab_font_size">12sp</dimen>
-    <dimen name="titlebar_height">56dp</dimen>
-    
+    <dimen name="titlebar_height">55dp</dimen>
+    <dimen name="pulltorefresh_heard_textSize">16sp</dimen>
+    <dimen name="margn_top_height">40sp</dimen>
+
 </resources>

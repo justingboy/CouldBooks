@@ -16,6 +16,8 @@ import android.util.SparseArray;
 import com.himoo.ydsc.common.AppException;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.MyLogger;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -64,6 +66,11 @@ public class BaseApplication extends Application {
 		}
 		super.onCreate();
 		instance = this;
+		//初始化科大讯飞语音功能5638453a	5638453a 
+		SpeechUtility.createUtility(this, SpeechConstant.APPID +"=5638453a");  
+		// 以下语句用于设置日志开关（默认开启），设置成false时关闭语音云SDK日志打印
+		// Setting.setShowLog(false);
+		
 		// 配置ImageLoader
 		initImageLoader(this);
 		// 注册App异常崩溃处理器

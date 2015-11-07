@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.http.HttpOperator;
 
 /**
  * 启动Activity 不需要继承
@@ -17,6 +18,10 @@ public class SplashActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		getWindow().setBackgroundDrawableResource(R.drawable.splash_bg);
+
+		// 验证服务器正常的网址
+		HttpOperator.validateHostUrlWork(this);
+
 		// 停止800ms
 		new Handler().postDelayed(new Runnable() {
 

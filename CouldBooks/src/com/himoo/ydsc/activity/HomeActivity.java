@@ -21,6 +21,7 @@ import com.himoo.ydsc.fragment.ChoiceFragment;
 import com.himoo.ydsc.fragment.ClassifyFragment;
 import com.himoo.ydsc.fragment.MoreFragment;
 import com.himoo.ydsc.fragment.SearchFragment;
+import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
@@ -85,6 +86,9 @@ public class HomeActivity extends BaseActivity {
 		initFragmentList();
 		setCurrentClickPoint(RB_VIEW_CHOICE);
 		addFirstToast(this.getActivityName());
+		
+		Log.d(SharedPreferences.getInstance().getString("host",HttpConstant.HOST_URL_TEST ));
+		
 
 	}
 

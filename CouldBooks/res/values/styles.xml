@@ -1,21 +1,44 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    -->
-    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
+    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.NoActionBar">
         <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
+			Theme customizations available in newer API levels can go in
+			res/values-vXX/styles.xml, while customizations related to
+			backward-compatibility can go here.
         -->
     </style>
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
+
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <item name="vpiIconPageIndicatorStyle">@style/Widget.IconPageIndicator</item>
+        <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator.Custom</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <!--
+        translucent system bars
+		<item name="android:windowTranslucentStatus">true</item>
+		<item name="android:windowTranslucentNavigation">true</item>
+		<item name="android:fitsSystemWindows">true</item>
+        -->
     </style>
+
+    <style name="Widget.TabPageIndicator.Custom" parent="Widget">
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/vpi__tab_indicator</item>
+        <item name="android:paddingLeft">22dip</item>
+        <item name="android:paddingRight">22dip</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.TabPageIndicator.Custom</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="TextAppearance.TabPageIndicator.Custom" parent="Widget">
+        <item name="android:textColor">@color/vpi__background_holo_dark</item>
+    </style>
+
     <!-- 底部导航栏RadioButton样式 -->
     <style name="main_tab_bottom">
         <item name="android:layout_width">0dp</item>
@@ -82,6 +105,54 @@
         <item name="android:paddingBottom">5dp</item>
         <item name="android:background">@drawable/shap_edittext_search</item>
         <item name="android:drawableStart">@drawable/search_icon</item>
+    </style>
+
+    <!-- 书的详情dialog样式 -->
+    <style name="BookDetailsStyle" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@drawable/dialog_bookdetails_bg</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowAnimationStyle">@style/anistyle</item>
+    </style>
+
+    <style name="anistyle" parent="android:Animation">
+        <item name="@android:windowEnterAnimation">@anim/dialog_enter_bottom</item>
+        <item name="@android:windowExitAnimation">@anim/dialog_exit_bottom</item>
+    </style>
+
+    <style name="Dialog_text_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/dialog_book_textcolor</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:gravity">center|left</item>
+    </style>
+
+    <!-- pulltorefreshListview头部字体样式 -->
+    <style name="PulltorefreshListview_textStyle">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!-- 线段样式 -->
+    <style name="line_style">
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:background">@color/listview_divider</item>
+        <item name="android:layout_height">0.5dp</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+    <!-- 主题界面字体样式 -->
+    <style name="theme_text_style">
+        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:textColor">@color/theme_textcolor</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
 </resources>

@@ -1,18 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/titlebar_height"
-    android:layout_marginTop="25dp"
-    android:background="@color/status_bar_bg"
-    android:gravity="center"
-    android:orientation="horizontal" >
+<merge xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <TextView
-        android:id="@+id/titlebar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/main_more"
-        android:textColor="@android:color/white"
-        android:textSize="20sp" />
+    <com.himoo.ydsc.ui.view.BookTitleBar
+        android:id="@+id/book_titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/titlebar_height" >
+    </com.himoo.ydsc.ui.view.BookTitleBar>
 
-</LinearLayout>
+</merge>

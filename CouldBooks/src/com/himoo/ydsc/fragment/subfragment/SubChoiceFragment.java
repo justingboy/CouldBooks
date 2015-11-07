@@ -2,11 +2,12 @@ package com.himoo.ydsc.fragment.subfragment;
 
 import java.util.ArrayList;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
 import com.google.gson.Gson;
@@ -19,12 +20,14 @@ import com.himoo.ydsc.adapter.BookAdapter;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.Book;
 import com.himoo.ydsc.config.SpConstant;
+import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.http.HttpOperator;
 import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -48,6 +51,7 @@ public class SubChoiceFragment extends BaseFragment implements
 	private ArrayList<Book> mBookList = new ArrayList<Book>();;
 	/** 当前的页数 */
 	private int currentPage = 1;
+	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,6 +80,16 @@ public class SubChoiceFragment extends BaseFragment implements
 		// 得到下拉刷新的GridView
 		mPullRefreshGridView = (PullToRefreshGridView) findViewById(R.id.pull_refresh_grid);
 		mGridView = mPullRefreshGridView.getRefreshableView();
+		mGridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Book book = (Book) parent.getItemAtPosition(position);
+				BookDetailsTask.getInstance().excute(getActivity(),
+						book.getBook_ID());
+			}
+		});
 		initLastRefreshTime(SpConstant.LAST_REF_TIME_SUBCHOICE,
 				mPullRefreshGridView);
 		// 设置监听器，这个监听器是可以监听双向滑动的，这样可以触发不同的事件
@@ -119,7 +133,10 @@ public class SubChoiceFragment extends BaseFragment implements
 				mBookList);
 		String heardParams = HttpOperator.getRequestHeard("", 1, "ydsc8.8",
 				"Book_Popularity", 1, 40);
-		String url = HttpConstant.HOST_URL + heardParams;
+
+		String url = SharedPreferences.getInstance().getString("host",
+				HttpConstant.HOST_URL_TEST)
+				+ "getBooksList.asp" + heardParams;
 		HttpUtils http = new HttpUtils();
 		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
 

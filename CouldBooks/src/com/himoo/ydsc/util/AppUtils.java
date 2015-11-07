@@ -34,7 +34,7 @@ public class AppUtils {
 	 * 
 	 * @return
 	 */
-	public String getVersionName() {
+	public static String getVersionName(Context context) {
 		try {
 			PackageManager packageManager = context.getPackageManager();
 			PackageInfo packInfo = packageManager.getPackageInfo(

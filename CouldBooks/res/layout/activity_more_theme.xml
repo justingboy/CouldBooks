@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.himoo.ydsc"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical" >
+
+    <include layout="@layout/titlebar_layout" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="30dp" >
+
+            <View style="@style/line_style" />
+
+            <TextView
+                style="@style/theme_text_style"
+                android:layout_marginTop="10dp"
+                android:text="@string/theme_color_choice" />
+
+            <com.himoo.ydsc.ui.view.ExpandGridView
+                android:id="@+id/theme_color_gridview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:horizontalSpacing="12dp"
+                android:numColumns="5"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="10dp"
+                android:verticalSpacing="12dp" >
+            </com.himoo.ydsc.ui.view.ExpandGridView>
+
+            <View
+                style="@style/line_style"
+                android:layout_marginLeft="10dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp" >
+
+                <TextView
+                    android:id="@+id/theme_text_topic"
+                    style="@style/theme_text_style"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/theme_auto_night" />
+
+                <com.ios.switchbutton.SwitchButton
+                    android:id="@+id/theme_switch_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="40dp"
+                    app:offColor="#C4C3C0"
+                    app:onColor="@color/status_bar_bg" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/theme_text_topic"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/theme_touch_time"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+
+            <View
+                style="@style/line_style"
+                android:layout_marginLeft="10dp" />
+
+            <TextView
+                style="@style/theme_text_style"
+                android:layout_marginTop="10dp"
+                android:text="@string/theme_default_cover" />
+
+            <com.himoo.ydsc.ui.view.ExpandGridView
+                android:id="@+id/theme_cover_gridview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:horizontalSpacing="15dp"
+                android:verticalSpacing="15dp"
+                android:numColumns="3"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="10dp" >
+            </com.himoo.ydsc.ui.view.ExpandGridView>
+
+            <View style="@style/line_style" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -4,11 +4,13 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
 import com.google.gson.Gson;
@@ -17,6 +19,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
 import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.activity.BaiduDetailsActivity;
 import com.himoo.ydsc.adapter.BaiduBookAdapter;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.BaiduBook;
@@ -27,6 +30,8 @@ import com.himoo.ydsc.http.HttpOperator;
 import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.ui.utils.UIHelper;
+import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -80,6 +85,16 @@ public class SubRankingFragment extends BaseFragment implements
 		mGridView = mPullRefreshGridView.getRefreshableView();
 		initLastRefreshTime(SpConstant.LAST_REF_TIME_SUBRANKING,
 				mPullRefreshGridView);
+		mGridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				BaiduBook book = (BaiduBook) parent.getItemAtPosition(position);
+				UIHelper.startToActivity(getActivity(),book, BaiduDetailsActivity.class);
+			}
+		});
+
 		// 设置监听器，这个监听器是可以监听双向滑动的，这样可以触发不同的事件
 		mPullRefreshGridView
 				.setOnRefreshListener(new OnRefreshListener2<GridView>() {

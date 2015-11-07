@@ -3,7 +3,6 @@ package com.himoo.ydsc.fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,11 +14,12 @@ import android.view.ViewGroup;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseFragment;
-import com.himoo.ydsc.fragment.subfragment.SubHotSearchFragment;
 import com.himoo.ydsc.fragment.subfragment.SubChoiceFragment;
+import com.himoo.ydsc.fragment.subfragment.SubHotSearchFragment;
 import com.himoo.ydsc.fragment.subfragment.SubRankingFragment;
 import com.himoo.ydsc.manager.PageManager;
-import com.himoo.ydsc.ui.view.NoScrollViewPager;
+import com.himoo.ydsc.util.SharedPreferences;
+import com.lidroid.xutils.view.annotation.ViewInject;
 import com.viewpagerindicator.TabPageIndicator;
 
 /**
@@ -37,23 +37,20 @@ public class ChoiceFragment extends BaseFragment {
 	private List<Fragment> fragmentList;
 
 	/** TabPageIndicator */
-	// @ViewInject(R.id.pager_indicator)
+	@ViewInject(R.id.pager_indicator)
 	private TabPageIndicator tabPageIndicator;
 
 	/** NoScrollViewPager */
-	// @ViewInject(R.id.viewpager_choice)
+	@ViewInject(R.id.viewpager_choice)
 	private ViewPager viewPager;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, SharedPreferences sp,
-			Bundle savedInstanceState, PageManager pageManager) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			SharedPreferences sp, Bundle savedInstanceState,
+			PageManager pageManager) {
 		// TODO Auto-generated method stub
-		View view = inflater.inflate(R.layout.fragment_choice, container,false);
-
-		tabPageIndicator = (TabPageIndicator) view
-				.findViewById(R.id.pager_indicator);
-		viewPager = (ViewPager) view
-				.findViewById(R.id.viewpager_choice);
+		View view = inflater
+				.inflate(R.layout.fragment_choice, container, false);
 
 		return view;
 	}
@@ -116,6 +113,6 @@ public class ChoiceFragment extends BaseFragment {
 		public int getCount() {
 			return TITLE.length;
 		}
-		
+
 	}
 }

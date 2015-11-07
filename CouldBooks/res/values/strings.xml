@@ -20,10 +20,28 @@
     <string name="more_read_statistics">阅读统计</string>
     <string name="more_password_protect">密码保护</string>
     <string name="more_user_feedback">用户反馈</string>
-    <string name="more_bottom_thinks">感谢您使用 云端书城\n版本号：1.0 201510281234 </string>
+    <string name="more_bottom_thinks">感谢您使用 云端书城\n版本号: </string>
 
     <!-- 搜索界面文字配置 -->
     <string name="search_book_hint_text">请输入书名关键字或作者</string>
     <string name="search_book_button_change">换一换</string>
+
+    <!-- 书的详请Diaolog文字配置 -->
+    <string name="dialog_book_summary">内容简介:</string>
+
+    <!-- 搜索历史记录popupwindow文字配置 -->
+    <string name="popup_search_book_clear">清除历史记录</string>
+    <string name="popup_search_book_cancel">关闭</string>
+    <string name="titlebar_search">搜索</string>
+
+    <!-- 主题界面文字配置 -->
+    <string name="theme_color_choice">主题颜色选择</string>
+    <string name="theme_auto_night">自动夜晚模式</string>
+    <string name="theme_default_cover">默认封面</string>
+    <string name="theme_touch_time">触发时间段19:00 - 7:00</string>
+    
+      <!-- 主题界面文字配置 -->
+    <string name="baidu_book_download">下载</string>
+    <string name="baidu_book_evaluation">豆瓣评书</string>
 
 </resources>

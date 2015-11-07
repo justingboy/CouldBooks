@@ -4,13 +4,10 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -23,14 +20,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.CompoundButton;
-import android.widget.Spinner;
 
 import com.handmark.pulltorefresh.library.PullToRefreshGridView;
-import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.mvc.BaseModel;
 import com.himoo.ydsc.mvc.ServiceListener;
 import com.himoo.ydsc.util.MyLogger;
+import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
 import com.lidroid.xutils.ViewUtils;
 
@@ -54,8 +50,6 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 		super.onCreate(savedInstanceState);
 		Log = MyLogger.kLog();
 		manager = getFragmentManager();
-		sp = getActivity().getSharedPreferences(SpConstant.CONFIG,
-				Context.MODE_PRIVATE);
 	}
 
 	@Override

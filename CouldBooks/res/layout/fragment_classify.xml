@@ -1,9 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.himoo.ydsc"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <include layout="@layout/titlebar_layout" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/status_bar_bg"
+        android:padding="10dp" >
+
+        <com.viewpagerindicator.TabPageIndicator
+            android:id="@+id/pager_indicator"
+            android:layout_width="220dp"
+            android:layout_height="36dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/vpi_tab_drawable"
+            app:dividerWith="2dp" >
+        </com.viewpagerindicator.TabPageIndicator>
+
+        <ImageView
+            android:id="@+id/book_refresh"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/gengxin" />
+    </RelativeLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager_classify"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 </LinearLayout>

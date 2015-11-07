@@ -21,6 +21,8 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import com.himoo.ydsc.util.MyLogger;
+
 /**
  * Abstraction class of a BaseAdapter in which you only need
  * to provide the convert() implementation.<br/>
@@ -30,6 +32,7 @@ import java.util.List;
  */
 public abstract class QuickAdapter<T> extends BaseQuickAdapter<T, BaseAdapterHelper> {
 
+	public MyLogger Log;
     /**
      * Create a QuickAdapter.
      *
@@ -38,6 +41,7 @@ public abstract class QuickAdapter<T> extends BaseQuickAdapter<T, BaseAdapterHel
      */
     public QuickAdapter(Context context, int layoutResId) {
         super(context, layoutResId);
+        Log = MyLogger.kLog();
     }
 
     /**
@@ -50,10 +54,12 @@ public abstract class QuickAdapter<T> extends BaseQuickAdapter<T, BaseAdapterHel
      */
     public QuickAdapter(Context context, int layoutResId, List<T> data) {
         super(context, layoutResId, data);
+        Log = MyLogger.kLog();
     }
 
     protected BaseAdapterHelper getAdapterHelper(int position, View convertView, ViewGroup parent) {
-        return BaseAdapterHelper.get(context, convertView, parent, layoutResId, position);
+    	Log = MyLogger.kLog();
+    	return BaseAdapterHelper.get(context, convertView, parent, layoutResId, position);
     }
 
 }

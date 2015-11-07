@@ -4,12 +4,13 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -17,6 +18,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
 import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.activity.BaiduDetailsActivity;
 import com.himoo.ydsc.adapter.BaiduBookAdapter;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.BaiduBook;
@@ -27,6 +29,8 @@ import com.himoo.ydsc.http.HttpOperator;
 import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.ui.utils.UIHelper;
+import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -53,8 +57,9 @@ public class SubHotSearchFragment extends BaseFragment implements
 	private int currentPage = 0;
 
 	@Override
-	public View onCreateView(LayoutInflater inflater,  ViewGroup container,SharedPreferences sp,
-			Bundle savedInstanceState, PageManager pageManager) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			SharedPreferences sp, Bundle savedInstanceState,
+			PageManager pageManager) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.fragment_sub_book_display, null);
 		Log.d("onCreateView");
@@ -79,6 +84,17 @@ public class SubHotSearchFragment extends BaseFragment implements
 		mGridView = mPullRefreshGridView.getRefreshableView();
 		initLastRefreshTime(SpConstant.LAST_REF_TIME_SUBHOTSEARCH,
 				mPullRefreshGridView);
+		mGridView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				BaiduBook book = (BaiduBook) parent.getItemAtPosition(position);
+				UIHelper.startToActivity(getActivity(), book,
+						BaiduDetailsActivity.class);
+			}
+		});
+
 		// 设置监听器，这个监听器是可以监听双向滑动的，这样可以触发不同的事件
 		mPullRefreshGridView
 				.setOnRefreshListener(new OnRefreshListener2<GridView>() {
@@ -144,13 +160,13 @@ public class SubHotSearchFragment extends BaseFragment implements
 						mAdapter.notifyDataSetChanged();
 						currentPage += 2;
 					} else {
-						if(getActivity()!=null)
-						Toast.showLong(getActivity(), "数据库中暂无数据");
+						if (getActivity() != null)
+							Toast.showLong(getActivity(), "数据库中暂无数据");
 					}
 
 				} catch (Exception e) {
-					if(getActivity()!=null)
-					Toast.showLong(getActivity(), "加载数据失败");
+					if (getActivity() != null)
+						Toast.showLong(getActivity(), "加载数据失败");
 
 				}
 
@@ -159,8 +175,8 @@ public class SubHotSearchFragment extends BaseFragment implements
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
-				if(getActivity()!=null)
-				Toast.showLong(getActivity(), "返回失败 ：" + msg);
+				if (getActivity() != null)
+					Toast.showLong(getActivity(), "返回失败 ：" + msg);
 
 			}
 		});

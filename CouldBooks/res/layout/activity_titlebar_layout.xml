@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/titlebar_height"
+    android:background="@color/status_bar_bg"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp" >
+
+    <TextView
+        android:id="@+id/titlebar_left_title"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
+        android:drawableLeft="@drawable/titlebar_back"
+        android:drawablePadding="5dp"
+        android:gravity="center"
+        android:text="@string/titlebar_search"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/titlebar_title"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="@string/titlebar_search"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
+
+    <ImageView
+        android:id="@+id/titlebar_refresh"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="right"
+        android:layout_marginRight="8dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/refresh_book" />
+
+</RelativeLayout>

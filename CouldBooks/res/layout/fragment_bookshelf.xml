@@ -7,13 +7,13 @@
     <include layout="@layout/titlebar_layout" />
 
     <ImageView
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:padding="20dp"
-        android:scaleType="centerCrop"
         android:layout_width="320dp"
         android:layout_height="320dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
         android:contentDescription="@string/app_name"
+        android:padding="20dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/home_nobook" />
 
 </LinearLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <ImageView
+        android:id="@+id/theme_skin_image"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:background="@drawable/theme_shape_red"
+        android:contentDescription="@string/app_name" />
+
+    <ImageView
+        android:id="@+id/theme_skinChoice_image"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignBottom="@id/theme_skin_image"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="2dp"
+        android:layout_marginRight="2dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/shelf_left_feedback_help_check"
+        android:visibility="invisible" />
+
+</RelativeLayout>

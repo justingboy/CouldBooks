@@ -6,7 +6,6 @@ import android.util.Log;
 
 /**
  * 日志打印工具类
- * @author asus1 
  * MyLogger log = MyLogger.kLog(); 
  * log.d(str);
  */
@@ -18,10 +17,8 @@ public class MyLogger {
 
 	private static Hashtable<String, MyLogger> sLoggerTable = new Hashtable<String, MyLogger>();
 	private String mClassName;
-//	private static MyLogger jlog;
 	private static MyLogger klog;
-//	private static final String JAMES = "@james@ ";
-	private static final String KESEN = "@kesen@ ";
+	private static final String KESEN = "@Ken@ ";
 
 	private MyLogger(String name) {
 		mClassName = name;

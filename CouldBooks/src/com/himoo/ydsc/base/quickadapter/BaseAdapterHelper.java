@@ -39,11 +39,13 @@ import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.himoo.ydsc.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
+import com.squareup.picasso.Picasso;
 
 /**
  * Allows an abstraction of the ViewHolder pattern.<br>
@@ -257,8 +259,15 @@ public class BaseAdapterHelper {
 	 */
 	public BaseAdapterHelper setImageUrl(int viewId, String imageUrl) {
 		ImageView view = retrieveView(viewId);
-		ImageLoader.getInstance().displayImage(imageUrl, view);
-
+//		ImageLoader.getInstance().displayImage(imageUrl, view);
+		
+		 Picasso.with(context).load(imageUrl)
+         .placeholder(R.drawable.book_face_default)
+         .error(R.drawable.book_face_default)
+         .tag(context)
+         .into(view);
+		
+		
 		return this;
 	}
 
@@ -303,7 +312,7 @@ public class BaseAdapterHelper {
 	}
 
 	public static String getURLWithSize(String url) {
-		if (url == null || url.length() == 0) {
+		if (url == null || url.length() == 0||!url.endsWith(".jpg")||!url.endsWith(".png")||!url.endsWith(".gpeg")||!url.endsWith(".gif")) {
 			return url;
 		}
 		if (!url.startsWith("http://")) {

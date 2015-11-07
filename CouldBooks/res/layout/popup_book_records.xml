@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dialog_bookdetails_bg"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <ListView
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:id="@+id/pop_listview"
+        android:layout_width="match_parent"
+        android:layout_height="140dp"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="@color/listview_divider"
+        android:dividerHeight="0.6dp"
+        android:drawSelectorOnTop="false"
+        android:fadingEdge="none"
+        android:listSelector="@drawable/fragment_listview_selector"
+        android:scrollbarStyle="outsideOverlay" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/popup_btn_clear"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight="3"
+            android:background="@drawable/popup_button_selector"
+            android:text="@string/popup_search_book_clear"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/popup_btn_cancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight="2"
+            android:background="@drawable/popup_button_selector"
+            android:text="@string/popup_search_book_cancel"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</LinearLayout>
