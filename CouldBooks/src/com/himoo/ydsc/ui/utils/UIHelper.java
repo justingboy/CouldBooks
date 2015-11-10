@@ -9,6 +9,8 @@ import com.himoo.ydsc.bean.BaiduBook;
 
 public class UIHelper {
 
+	private static final int REQUEST_CODE = 0;
+
 	/**
 	 * 跳转到详情界面去
 	 * 
@@ -22,6 +24,50 @@ public class UIHelper {
 		bundle.putParcelable("book", book);
 		intent.putExtras(bundle);
 		context.startActivity(intent);
+		context.overridePendingTransition(R.anim.activity_zoom_in, 0);
+
+	}
+
+	/**
+	 * 跳转到详情界面去
+	 * 
+	 * @param book
+	 * @param className
+	 */
+	public static void startToActivity(Activity context, Class<?> className) {
+
+		Intent intent = new Intent(context, className);
+		context.startActivity(intent);
+//		context.overridePendingTransition(R.anim.activity_zoom_in, 0);
+
+	}
+	
+	/**
+	 * 跳转到详情界面去
+	 * 
+	 * @param book
+	 * @param className
+	 */
+	public static void startToActivity(Activity context, Class<?> className,String value) {
+
+		Intent intent = new Intent(context, className);
+		intent.putExtra("key", value);
+		context.startActivity(intent);
+		context.overridePendingTransition(R.anim.activity_zoom_in, 0);
+
+	}
+	
+
+	/**
+	 * 跳转到详情界面去
+	 * 
+	 * @param book
+	 * @param className
+	 */
+	public static void startForReseltToActivity(Activity context,
+			Class<?> className) {
+		Intent intent = new Intent(context, className);
+		context.startActivityForResult(intent, REQUEST_CODE);
 		context.overridePendingTransition(R.anim.activity_zoom_in, 0);
 
 	}

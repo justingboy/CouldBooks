@@ -21,9 +21,11 @@ public class BookTitleBar extends LinearLayout {
 	/** 中间的Title */
 	private TextView title;
 	/** 右边的刷新view */
-	private ImageView titlebar_refresh;
+	public ImageView titlebar_refresh;
 	/** TitleBar父布局 */
 	private View view;
+	/** Title父布局 */
+	private LinearLayout titlebar_content;
 
 	public BookTitleBar(Context context) {
 		super(context);
@@ -55,6 +57,8 @@ public class BookTitleBar extends LinearLayout {
 		LayoutInflater mInflater = LayoutInflater.from(context);
 		view = mInflater.inflate(R.layout.activity_titlebar_layout, null);
 		leftTitle = (TextView) view.findViewById(R.id.titlebar_left_title);
+		titlebar_content = (LinearLayout) view
+				.findViewById(R.id.titlebar_content);
 		title = (TextView) view.findViewById(R.id.titlebar_title);
 		titlebar_refresh = (ImageView) view.findViewById(R.id.titlebar_refresh);
 		leftTitle.setOnClickListener(new OnClickListener() {
@@ -133,12 +137,34 @@ public class BookTitleBar extends LinearLayout {
 
 	/**
 	 * 设置左边的图片
+	 * 
 	 * @param resId
 	 */
 	public void setLeftDrawable(int resId) {
 		leftTitle.setText(" ");
-		leftTitle.setCompoundDrawablesWithIntrinsicBounds(null
-				, null, getResources().getDrawable(resId), null);
+		leftTitle.setCompoundDrawablesWithIntrinsicBounds(null, null,
+				getResources().getDrawable(resId), null);
+	}
+
+	/**
+	 * 设置Title 是否可见
+	 * 
+	 * @param resId
+	 */
+	public void setTitleVisible(boolean isVisible) {
+		title.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+
+	}
+
+	/**
+	 * 设置Title的自定义布局
+	 * 
+	 * @param resId
+	 */
+	public void setTitleView(View view) {
+		setTitleVisible(false);
+		titlebar_content.addView(view);
+
 	}
 
 }

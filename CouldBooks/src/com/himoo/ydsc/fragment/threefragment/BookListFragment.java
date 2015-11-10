@@ -49,6 +49,7 @@ public class BookListFragment extends ListFragment {
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
+		
 		getBookClassList();
 	}
 

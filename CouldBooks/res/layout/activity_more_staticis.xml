@@ -7,6 +7,35 @@
     android:orientation="vertical" >
 
     <include layout="@layout/titlebar_layout" />
-    
+
+    <TextView
+        android:id="@+id/read_time"
+        style="@style/read_staticis_text_style"
+        android:layout_marginTop="40dp" />
+
+    <TextView
+        android:id="@+id/read_book_count"
+        style="@style/read_staticis_text_style"
+        android:layout_marginTop="30dp" />
+
+    <TextView
+        android:id="@+id/read_download_count"
+        style="@style/read_staticis_text_style"
+        android:layout_marginTop="30dp" />
+
+    <TextView
+        android:id="@+id/read_flow"
+        style="@style/read_staticis_text_style"
+        android:layout_marginTop="30dp" />
+
+    <Button
+        android:id="@+id/read_clear_btn"
+        android:layout_width="240dp"
+        android:layout_height="45dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:text="@string/read_staticis_text"
+        android:textColor="@android:color/white"
+        android:textSize="18sp" />
 
 </LinearLayout>

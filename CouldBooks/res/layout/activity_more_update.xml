@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res/com.himoo.ydsc"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="true"
@@ -7,6 +9,247 @@
     android:orientation="vertical" >
 
     <include layout="@layout/titlebar_layout" />
-    
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="10dp"
+            android:paddingTop="40dp" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_double_line"
+                android:padding="20dp" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:layout_centerVertical="true"
+                    android:text="后台自动更新书籍"
+                    android:textSize="16sp" />
+
+                <com.ios.switchbutton.SwitchButton
+                    android:id="@+id/book_update_switch_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="18dp"
+                    app:offColor="#C4C3C0"
+                    app:onColor="@color/status_bar_bg" />
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:text="后台自动更新功能将只更新最新章节，使用最小流量。"
+                android:textColor="#C0BFBC"
+                android:textSize="13.5sp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_double_line"
+                android:padding="20dp" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:layout_centerVertical="true"
+                    android:text="更新图书声音提醒"
+                    android:textSize="16sp" />
+
+                <com.ios.switchbutton.SwitchButton
+                    android:id="@+id/book_voice_switch_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="18dp"
+                    app:offColor="#C4C3C0"
+                    app:onColor="@color/status_bar_bg" />
+            </RelativeLayout>
+
+            <LinearLayout
+                style="@style/book_update_space_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/shape_double_line"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:text="后台更新时间间隔"
+                    android:textSize="16sp" />
+
+                <com.ios.radiogroup.SegmentedGroup
+                    android:id="@+id/segment_update_space"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:orientation="horizontal"
+                    segmentedgroup:sc_border_width="1dp"
+                    segmentedgroup:sc_corner_radius="5dp"
+                    segmentedgroup:sc_tint_color="@color/status_bar_bg" >
+
+                    <RadioButton
+                        android:id="@+id/book_update_space_1"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="1小时"
+                        android:textSize="16sp" />
+
+                    <RadioButton
+                        android:id="@+id/book_update_space_3"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="3小时"
+                        android:textSize="16sp" />
+
+                    <RadioButton
+                        android:id="@+id/book_update_space_6"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="6小时"
+                        android:textSize="16sp" />
+
+                    <RadioButton
+                        android:id="@+id/book_update_space_12"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="12小时"
+                        android:textSize="16sp" />
+                </com.ios.radiogroup.SegmentedGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/book_update_space_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/shape_double_line"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:text="后台更新时网络类型"
+                    android:textSize="16sp" />
+
+                <com.ios.radiogroup.SegmentedGroup
+                    android:id="@+id/segment_update_network"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:orientation="horizontal"
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
+                    segmentedgroup:sc_border_width="1dp"
+                    segmentedgroup:sc_corner_radius="5dp"
+                    segmentedgroup:sc_tint_color="@color/status_bar_bg" >
+
+                    <RadioButton
+                        android:id="@+id/book_update_network_wifi"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="仅WIFI"
+                        android:textSize="16sp" />
+
+                    <RadioButton
+                        android:id="@+id/book_update_network_all"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="所有网络"
+                        android:textSize="16sp" />
+                </com.ios.radiogroup.SegmentedGroup>
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/book_update_space_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="35dp"
+                android:background="@drawable/shape_double_line"
+                android:orientation="vertical" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:text="在通知中心显示通知详情"
+                    android:textSize="16sp" />
+
+                <com.ios.radiogroup.SegmentedGroup
+                    android:id="@+id/segment_book_notice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:orientation="horizontal"
+                    segmentedgroup:sc_border_width="1dp"
+                    segmentedgroup:sc_corner_radius="5dp"
+                    segmentedgroup:sc_tint_color="@color/status_bar_bg" >
+
+                    <RadioButton
+                        android:id="@+id/book_notice_together"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="聚合详细通知"
+                        android:textSize="15sp" />
+
+                    <RadioButton
+                        android:id="@+id/book_notice_details"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="详细详情通知"
+                        android:textSize="15sp" />
+
+                    <RadioButton
+                        android:id="@+id/book_notice_none"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="不通知"
+                        android:textSize="15sp" />
+                </com.ios.radiogroup.SegmentedGroup>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="10dp"
+                android:text="使用”详细通知“将在每本书更新后,都提示一条本地通知。”聚合通知“将只提示一条本地通知。"
+                android:textColor="#C0BFBC"
+                android:textSize="13.5sp" />
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

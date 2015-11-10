@@ -39,9 +39,39 @@
     <string name="theme_auto_night">自动夜晚模式</string>
     <string name="theme_default_cover">默认封面</string>
     <string name="theme_touch_time">触发时间段19:00 - 7:00</string>
-    
-      <!-- 主题界面文字配置 -->
+
+    <!-- 主题界面文字配置 -->
     <string name="baidu_book_download">下载</string>
     <string name="baidu_book_evaluation">豆瓣评书</string>
+
+    <!-- 反馈界面文字配置 -->
+    <string name="feedback_theme_text">主题</string>
+    <string name="feedback_theme_text_questtion_type">问题</string>
+    <string name="feedback_attach_info">附加信息</string>
+    <string name="feedback_attach_text">选择反馈附件（图片）</string>
+    <string name="feedback_device_info">设备信息</string>
+    <string name="feedback_device">设备</string>
+    <string name="feedback_device_ios">Android</string>
+    <string name="feedback_app_info">应用信息</string>
+    <string name="feedback_app_name">名字</string>
+    <string name="feedback_app_versioncode">版本</string>
+    <string name="feedback_app_build">Build</string>
+
+    <!-- 反馈主题界面文字配置 -->
+    <string name="feedback_theme_question">问题</string>
+    <string name="feedback_theme_require">需求</string>
+    <string name="feedback_theme_bug">程序错误报告</string>
+    <string name="feedback_theme_other">其他</string>
+
+    <!-- 阅读统计界面文字配置 -->
+    <string name="read_staticis_text">清除阅读统计记录</string>
+
+    <!-- 密码保护计界面文字配置 -->
+    <string name="password_open_text">开启密码</string>
+    <string name="password_close_text">修改密码</string>
+    <string name="password_protected_instruction">设置密码,充分保护隐私,但是如何您忘记密码,
+               只通过系统设置里清除缓存来实现解锁，届时您的所有下载的书籍及阅读书签、设置将被删除。</string>
+               
+    <string name="password_input_text">输入你的密码</string>
 
 </resources>

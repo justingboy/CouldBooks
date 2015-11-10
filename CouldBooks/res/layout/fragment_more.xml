@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -24,12 +25,50 @@
                 android:drawableLeft="@drawable/more_topic"
                 android:text="@string/more_topic" />
 
-            <TextView
-                style="@style/Text_more_style"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/more_text_bg"
-                android:drawableLeft="@drawable/more_update"
-                android:text="@string/more_book_updatetype" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp" >
+
+                <TextView
+                    style="@style/Text_more_style"
+                    android:background="@drawable/more_text_bg"
+                    android:drawableLeft="@drawable/more_update"
+                    android:drawableRight="@null"
+                    android:text="@string/more_book_updatetype" />
+
+                <com.ios.radiogroup.SegmentedGroup
+                    android:layout_marginRight="15dp"
+                    android:layout_centerInParent="true"
+                    android:layout_alignParentRight="true"
+                    android:id="@+id/segmented_book_update"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    segmentedgroup:sc_border_width="1dp"
+                    segmentedgroup:sc_corner_radius="5dp"
+                    segmentedgroup:sc_tint_color="@color/status_bar_bg" >
+
+                    <RadioButton
+                        android:id="@+id/rb_all_book"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="整本图书"
+                        android:textSize="16sp" />
+
+                    <RadioButton
+                        android:id="@+id/rb_last_chapter"
+                        style="@style/RadioButton"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="最新章节"
+                        android:textSize="16sp" />
+                </com.ios.radiogroup.SegmentedGroup>
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/more_timeUpdate"
@@ -47,22 +86,23 @@
                 android:text="@string/more_unlock" />
 
             <TextView
-                android:background="@drawable/more_textview_noline_selector"
                 android:id="@+id/more_statistics"
                 style="@style/Text_more_style"
+                android:background="@drawable/more_textview_noline_selector"
                 android:drawableLeft="@drawable/more_statistics"
                 android:text="@string/more_read_statistics" />
+
             <TextView
-                android:background="@drawable/more_textview_bg_selector"
                 android:id="@+id/more_passwordProtect"
                 style="@style/Text_more_style"
+                android:background="@drawable/more_textview_bg_selector"
                 android:drawableLeft="@drawable/more_password"
                 android:text="@string/more_password_protect" />
 
             <TextView
                 android:id="@+id/more_feedback"
                 style="@style/Text_more_style"
-               android:background="@drawable/more_textview_line_selector"
+                android:background="@drawable/more_textview_line_selector"
                 android:drawableLeft="@drawable/more_feedback"
                 android:text="@string/more_user_feedback" />
 

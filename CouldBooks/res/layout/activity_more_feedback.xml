@@ -7,12 +7,216 @@
     android:orientation="vertical" >
 
     <include layout="@layout/titlebar_layout" />
-    <ImageView 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/test_image"
-        
-        />
-    
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb" >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="40dp"
+            android:paddingTop="40dp" >
+
+            <View style="@style/feedback_line_style" />
+
+            <RelativeLayout
+                android:id="@+id/feedback_question"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/feedback_bg_selector"
+                android:paddingBottom="15dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="15dp" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:text="@string/feedback_theme_text" />
+
+                <TextView
+                    android:id="@+id/feedback_question_type"
+                    style="@style/Feedback_large_text_style"
+                    android:layout_alignParentRight="true"
+                    android:drawablePadding="15dp"
+                    android:drawableRight="@drawable/more_arrow"
+                    android:text="@string/feedback_theme_text_questtion_type"
+                    android:textColor="@color/feedback_text_color" />
+            </RelativeLayout>
+
+            <View
+                style="@style/feedback_line_style"
+                android:layout_marginLeft="20dp" />
+
+            <EditText
+                android:id="@+id/feedback_content"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@null"
+                android:gravity="left|top"
+                android:paddingBottom="5dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="5dp" />
+
+            <View style="@style/feedback_line_style" />
+
+            <TextView
+                style="@style/Feedback_small_text_style"
+                android:text="@string/feedback_attach_info"
+                android:textColor="@color/feedback_text_color" />
+
+            <View style="@style/feedback_line_style" />
+
+            <TextView
+                android:paddingLeft="20dp"
+                android:id="@+id/feedback_select_picture"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_gravity="right|center_vertical"
+                android:background="@drawable/feedback_bg_selector"
+                android:drawablePadding="15dp"
+                android:drawableRight="@drawable/more_arrow"
+                android:gravity="center|right"
+                android:paddingRight="20dp"
+                android:text="@string/feedback_attach_text"
+                android:textColor="@color/feedback_text_color"
+                android:textSize="18sp" />
+
+            <View style="@style/feedback_line_style" />
+
+            <TextView
+                style="@style/Feedback_small_text_style"
+                android:text="@string/feedback_device_info"
+                android:textColor="@color/feedback_text_color" />
+
+            <View style="@style/feedback_line_style" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="15dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="15dp" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:text="@string/feedback_device" />
+
+                <TextView
+                    android:id="@+id/feedback_device"
+                    style="@style/Feedback_large_text_style"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/feedback_theme_text_questtion_type"
+                    android:textColor="@color/feedback_text_color" />
+            </RelativeLayout>
+
+            <View
+                style="@style/feedback_line_style"
+                android:layout_marginLeft="20dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="15dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="15dp" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:text="@string/feedback_device_ios" />
+
+                <TextView
+                    android:id="@+id/feedback_device_system"
+                    style="@style/Feedback_large_text_style"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/feedback_theme_text_questtion_type"
+                    android:textColor="@color/feedback_text_color" />
+            </RelativeLayout>
+
+            <View style="@style/feedback_line_style" />
+
+            <TextView
+                style="@style/Feedback_small_text_style"
+                android:text="@string/feedback_app_info"
+                android:textColor="@color/feedback_text_color" />
+
+            <View style="@style/feedback_line_style" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="15dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="15dp" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:text="@string/feedback_app_name" />
+
+                <TextView
+                    android:id="@+id/feedback_app_name"
+                    style="@style/Feedback_large_text_style"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/feedback_theme_text_questtion_type"
+                    android:textColor="@color/feedback_text_color" />
+            </RelativeLayout>
+
+            <View
+                style="@style/feedback_line_style"
+                android:layout_marginLeft="20dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="15dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="15dp" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:text="@string/feedback_app_versioncode" />
+
+                <TextView
+                    android:id="@+id/feedback_app_version"
+                    style="@style/Feedback_large_text_style"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/feedback_theme_text_questtion_type"
+                    android:textColor="@color/feedback_text_color" />
+            </RelativeLayout>
+
+            <View
+                style="@style/feedback_line_style"
+                android:layout_marginLeft="20dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="15dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="15dp" >
+
+                <TextView
+                    style="@style/Feedback_large_text_style"
+                    android:text="@string/feedback_app_build" />
+
+                <TextView
+                    android:id="@+id/feedback_app_build"
+                    style="@style/Feedback_large_text_style"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/feedback_theme_text_questtion_type"
+                    android:textColor="@color/feedback_text_color" />
+            </RelativeLayout>
+
+            <View style="@style/feedback_line_style" />
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

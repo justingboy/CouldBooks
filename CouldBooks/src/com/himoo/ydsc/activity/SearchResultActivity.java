@@ -27,6 +27,7 @@ import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.ui.utils.UIHelper;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
 public class SearchResultActivity extends SwipeBackActivity implements
@@ -42,6 +43,9 @@ public class SearchResultActivity extends SwipeBackActivity implements
 
 	@ViewInject(R.id.pull_refresh_list)
 	private PullToRefreshListView mRefrshListView;
+	
+	/** 标记当前点击Item的位置 */
+	private int mCurrentClickPosition  = -1;
 
 	/** 标题 */
 	private String title;
@@ -60,6 +64,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search_layout);
 		initPullToRefeshListView();
+		showRefreshDialog("正在加载中");
 		exeTask();
 	}
 
@@ -73,11 +78,19 @@ public class SearchResultActivity extends SwipeBackActivity implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				if(mCurrentClickPosition ==position)
+					return ;
+				mCurrentClickPosition = position;
 				if (firstReSuccess == 0) {
 					BookSearch book = (BookSearch) parent
 							.getItemAtPosition(position);
 					new BookDetailsDialog.Builder(SearchResultActivity.this)
 							.setBookDetails(book).create().show();
+				}else if(firstReSuccess == 1)
+				{
+					BaiduBook book = (BaiduBook) parent
+							.getItemAtPosition(position);
+					UIHelper.startToActivity(SearchResultActivity.this,book, BaiduDetailsActivity.class);
 				}
 
 			}
@@ -157,14 +170,17 @@ public class SearchResultActivity extends SwipeBackActivity implements
 					bookList = gosn.fromJson(json,
 							new TypeToken<ArrayList<BookSearch>>() {
 							}.getType());
+					dismissRefreshDialog();
 					mBookAdapter = new SearchBookAdapter(
 							SearchResultActivity.this,
 							R.layout.adapter_search_item, bookList);
 					mRefrshListView.setAdapter(mBookAdapter);
 					mCurrentMePage++;
+					
 				} else {
 					mCurrentBaiduPage +=2;
 					baiduBookList = parseBaiduJson(json);
+					dismissRefreshDialog();
 					mBaiduAdapter = new SearchBaiduBookAdapter(
 							SearchResultActivity.this,
 							R.layout.adapter_search_item, baiduBookList);
@@ -203,6 +219,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	@Override
 	public void onSearcFailure(Exception error, String msg, int whoservice) {
 		// TODO Auto-generated method stub
+		dismissRefreshDialog();
 		Toast.showLong(this, "搜索失败 :" + msg);
 		firstReSuccess = whoservice;
 	}
@@ -290,6 +307,12 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		}
 		mRefrshListView.onRefreshComplete();
 
+	}
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		mCurrentClickPosition = -1;
 	}
 
 }

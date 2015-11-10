@@ -24,6 +24,7 @@ import com.himoo.ydsc.listener.OnParseChapterListener;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.ViewSelector;
+import com.himoo.ydsc.util.RegularUtil;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -58,11 +59,11 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_baidu_book_details);
-		initBookChapter(book.getGid());
 		initListView();
 		option = BaseApplication.getInstance().displayImageOptionsBuider(
 				R.drawable.book_face_default);
 		initListener();
+		initBookChapter(book.getGid());
 	}
 
 	@Override
@@ -108,9 +109,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 
 		ViewSelector.setButtonSelector(this, bookDownload);
 		ViewSelector.setButtonSelector(this, bookEvaluation);
-
-		ImageLoader.getInstance().displayImage(book.getCoverImage(),
-				bookCoverImg, option);
+		String imageUrl = RegularUtil.converUrl(book.getCoverImage());
+		ImageLoader.getInstance().displayImage(imageUrl, bookCoverImg, option);
 		bookAuthor.setText("作者 ：" + book.getAuthor());
 		bookStatue.setText("状态 ：" + book.getStatus());
 		bookCategory.setText("类别 ：" + book.getCategory());
@@ -130,6 +130,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	 * @param gid
 	 */
 	private void initBookChapter(String gid) {
+		showRefreshDialog("正在加载中");
 		BookDetailsTask.getInstance().executeBaidu(this, gid);
 		BookDetailsTask.getInstance().setOnParseChapterListener(this);
 
@@ -149,7 +150,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 			chapters[i] = bookList.get(i).getText().toString().trim();
 		}
 		adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_list_item_1, chapters);
+				R.layout.android_adapter_textview, chapters);
 		listView.setAdapter(adapter);
 	}
 
@@ -175,12 +176,14 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	@Override
 	public void onParseSuccess(ArrayList<BaiduBookChapter> list) {
 		// TODO Auto-generated method stub
+		dismissRefreshDialog();
 		initData(list);
 	}
 
 	@Override
 	public void onParseFailure(Exception ex, String msg) {
 		// TODO Auto-generated method stub
+		dismissRefreshDialog();
 		Toast.showLong(this, "解析章节错误：" + msg);
 	}
 
@@ -197,8 +200,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		}
 		chapter_count.setCompoundDrawablesWithIntrinsicBounds(null, null,
 				drawable, null);
-		floowView.setCompoundDrawablesWithIntrinsicBounds(null, null,
-				drawable, null);
+		floowView.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable,
+				null);
 
 		Collections.reverse(bookList);
 		for (int i = 0; i < bookList.size(); i++) {

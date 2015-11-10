@@ -55,7 +55,9 @@ public class SubHotSearchFragment extends BaseFragment implements
 	private ArrayList<BaiduBook> mBookList = new ArrayList<BaiduBook>();;
 	/** 当前的页数 */
 	private int currentPage = 0;
-
+	/** 标记当前点击Item的位置 */
+	private int mCurrentClickPosition  = -1;
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			SharedPreferences sp, Bundle savedInstanceState,
@@ -89,6 +91,9 @@ public class SubHotSearchFragment extends BaseFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				if(mCurrentClickPosition ==position)
+					return ;
+				mCurrentClickPosition = position;
 				BaiduBook book = (BaiduBook) parent.getItemAtPosition(position);
 				UIHelper.startToActivity(getActivity(), book,
 						BaiduDetailsActivity.class);
@@ -228,6 +233,13 @@ public class SubHotSearchFragment extends BaseFragment implements
 		}
 		mPullRefreshGridView.onRefreshComplete();
 
+	}
+	
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		mCurrentClickPosition = -1;
 	}
 
 }

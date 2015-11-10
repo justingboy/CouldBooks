@@ -14,19 +14,34 @@ import com.himoo.ydsc.util.SharedPreferences;
 public class BookShelfFragment extends BaseFragment {
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,SharedPreferences sp,
-			Bundle savedInstanceState, PageManager pageManager) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			SharedPreferences sp, Bundle savedInstanceState,
+			PageManager pageManager) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.fragment_bookshelf, null);
-		BookTitleBar titleBar = (BookTitleBar) view.findViewById(R.id.book_titleBar);
-		titleBar.setShowSingleTile();
-		titleBar.setTitle(getResources().getString(R.string.main_bookshelf));
+		initTitleBar(view);
 		return view;
 	}
 
 	@Override
 	public void initData() {
 		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * 初始化TitleBar
+	 * 
+	 * @param view
+	 */
+	private void initTitleBar(View view) {
+		BookTitleBar titleBar = (BookTitleBar) view
+				.findViewById(R.id.book_titleBar);
+		titleBar.setLeftDrawable(R.drawable.book_deleted);
+		titleBar.setLeftTitle("  ");
+		View layout = View.inflate(getActivity(),
+				R.layout.titlebar_custom_view, null);
+		titleBar.setTitleView(layout);
 
 	}
 

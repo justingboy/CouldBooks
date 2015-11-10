@@ -53,7 +53,9 @@ public class BaiduBookClassFragment extends BaseFragment implements
 	private int currentPage = 0;
 	/** 书的类别ID */
 	private String cateid = "1";
-
+	/** 标记当前点击Item的位置 */
+	private int mCurrentClickPosition  = -1;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -76,6 +78,7 @@ public class BaiduBookClassFragment extends BaseFragment implements
 	public void initData() {
 		// TODO Auto-generated method stub
 		Log.d("initData");
+		showRefreshDialog("正在加载中");
 		getCouldBookInfoByGet();
 		initPTRGrideView();
 
@@ -94,6 +97,9 @@ public class BaiduBookClassFragment extends BaseFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				if(mCurrentClickPosition ==position)
+					return ;
+				mCurrentClickPosition = position;
 				BaiduBook book = (BaiduBook) parent.getItemAtPosition(position);
 				UIHelper.startToActivity(getActivity(), book,
 						BaiduDetailsActivity.class);
@@ -166,17 +172,20 @@ public class BaiduBookClassFragment extends BaseFragment implements
 						ArrayList<BaiduBook> list = gson.fromJson(json,
 								new TypeToken<ArrayList<BaiduBook>>() {
 								}.getType());
+						dismissRefreshDialog();
 						mAdapter.addAll(list);
 						mGridView.setAdapter(mAdapter);
 						mAdapter.notifyDataSetChanged();
 						currentPage += 2;
 					} else {
+						dismissRefreshDialog();
 						if (getActivity() != null)
 							Toast.showLong(getActivity(), "数据库中暂无数据");
 					}
 
 				} catch (Exception e) {
 					Log.e(e);
+					dismissRefreshDialog();
 					if (getActivity() != null)
 						Toast.showLong(getActivity(), "加载数据失败");
 
@@ -188,6 +197,7 @@ public class BaiduBookClassFragment extends BaseFragment implements
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
 				Log.e(error + "msg=" + msg);
+				dismissRefreshDialog();
 				if (getActivity() != null)
 					Toast.showLong(getActivity(), "返回失败 ：" + msg);
 
@@ -246,4 +256,10 @@ public class BaiduBookClassFragment extends BaseFragment implements
 
 	}
 
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		mCurrentClickPosition = -1;
+	}
 }

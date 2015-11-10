@@ -3,12 +3,15 @@ package com.himoo.ydsc.ui.swipebacklayout;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.dialog.RefreshDialog;
 import com.himoo.ydsc.ui.view.BookTitleBar;
 import com.himoo.ydsc.util.MyLogger;
 import com.lidroid.xutils.ViewUtils;
@@ -19,6 +22,65 @@ public abstract class SwipeBackActivity extends FragmentActivity implements
 	private SwipeBackActivityHelper mHelper;
 	public MyLogger Log;
 	protected BookTitleBar mTitleBar;
+	protected SystemBarTintManager tintManager;
+	
+	/** 展示 刷新Dialog */
+	private static final int REFRESH_DIALOG_SHOW = 0;
+	/** 关闭 刷新Dialog */
+	private static final int REFRESH_DIALOG_DIMISS = 1;
+
+	private RefreshDialog mDialog;
+
+	public Handler refreshHandler = new Handler() {
+
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+			case REFRESH_DIALOG_SHOW:
+				if (mDialog == null) {
+					mDialog = new RefreshDialog(SwipeBackActivity.this);
+					mDialog.setCancelable(false);
+				}
+				mDialog.setMessage(msg.obj.toString());
+				if (!mDialog.isShowing()) {
+					mDialog.dismiss();
+					mDialog.show();
+				}
+				break;
+			case REFRESH_DIALOG_DIMISS:
+				if (mDialog != null)
+					if (mDialog.isShowing()) {
+						mDialog.dismiss();
+					}
+				break;
+
+			default:
+				break;
+			}
+
+		};
+	};
+	
+
+	/**
+	 * 　显示 刷新Dialog
+	 * 
+	 * @param string
+	 */
+	protected void showRefreshDialog(String string) {
+		Message msg = refreshHandler.obtainMessage();
+		msg.what = REFRESH_DIALOG_SHOW;
+		msg.obj = string;
+		refreshHandler.sendMessage(msg);
+	}
+
+	/** 　关闭 刷新Dialog */
+	protected void dismissRefreshDialog() {
+		Message msg = refreshHandler.obtainMessage();
+		msg.what = REFRESH_DIALOG_DIMISS;
+		refreshHandler.sendMessage(msg);
+	}
+
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +93,7 @@ public abstract class SwipeBackActivity extends FragmentActivity implements
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			setTranslucentStatus();
 		}
-		SystemBarTintManager tintManager = new SystemBarTintManager(this);
+		tintManager = new SystemBarTintManager(this);
 		tintManager.setStatusBarTintEnabled(true);
 		tintManager.setStatusBarTintResource(R.color.status_bar_bg);// 通知栏所需颜色
 	}

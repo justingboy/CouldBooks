@@ -125,6 +125,9 @@ public class BookDetailsTask {
 				if (list != null && list.size() > 0) {
 					if (mListener != null)
 						mListener.onParseSuccess(list);
+				} else {
+					if (mListener != null)
+						mListener.onParseFailure(null, "获取数据为空");
 				}
 			}
 

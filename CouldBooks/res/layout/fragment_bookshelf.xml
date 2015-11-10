@@ -6,11 +6,37 @@
 
     <include layout="@layout/titlebar_layout" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <com.ios.edittext.SearchEditText
+            android:id="@+id/book_shelf_search"
+            style="@style/editTextStyle"
+            android:layout_width="240dp"
+            android:layout_height="36dp"
+            android:hint="检索书架  书名/作者"
+            android:textColor="@color/status_bar_bg" />
+
+        <Button
+            android:id="@+id/btn_book_name_sort"
+            android:layout_width="80dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="20dp"
+            android:background="@drawable/shape_shelf_sort_bg"
+            android:text="书名排序"
+            android:textColor="@color/status_bar_bg" />
+    </LinearLayout>
+
     <ImageView
         android:layout_width="320dp"
         android:layout_height="320dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="10dp"
         android:contentDescription="@string/app_name"
         android:padding="20dp"
         android:scaleType="centerCrop"

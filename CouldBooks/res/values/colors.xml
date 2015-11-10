@@ -28,6 +28,13 @@
     <color name="theme_skin_yellow">#F5BB18</color>
     <color name="theme_skin_darkgray">#2C2000</color>
    
+      <!-- 反馈界面的字体颜色 -->
+    <color name="feedback_text_color">#B1B0AD</color>
+    
+       <!-- 反馈界面的字体颜色 -->
+    <color name="password_bg_color">#55C55B</color>
+    
+    
     
     
     

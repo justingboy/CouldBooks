@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
@@ -14,14 +15,17 @@ import com.himoo.ydsc.activity.more.ReadstatisticsActivity;
 import com.himoo.ydsc.activity.more.ThemeActivity;
 import com.himoo.ydsc.activity.more.UpdateSettingActivity;
 import com.himoo.ydsc.base.BaseFragment;
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.view.BookTitleBar;
 import com.himoo.ydsc.util.AppUtils;
 import com.himoo.ydsc.util.SharedPreferences;
+import com.ios.radiogroup.SegmentedGroup;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
-public class MoreFragment extends BaseFragment {
+public class MoreFragment extends BaseFragment implements
+		RadioGroup.OnCheckedChangeListener {
 
 	/** 主题皮肤设置 */
 	@ViewInject(R.id.more_topic)
@@ -51,6 +55,10 @@ public class MoreFragment extends BaseFragment {
 	@ViewInject(R.id.more_version_code)
 	private TextView more_version;
 
+	/** 版本信息 */
+	@ViewInject(R.id.segmented_book_update)
+	private SegmentedGroup segment_book_update;
+
 	/** ids */
 	public int ids[] = { R.id.more_topic, R.id.more_timeUpdate,
 			R.id.more_unlock, R.id.more_statistics, R.id.more_passwordProtect,
@@ -72,6 +80,8 @@ public class MoreFragment extends BaseFragment {
 	@Override
 	public void initData() {
 		// TODO Auto-generated method stub
+		//设置监听器
+		segment_book_update.setOnCheckedChangeListener(this);
 		// 设置版本信息
 		String versionCode = AppUtils.getVersionName(getActivity());
 		more_version.setText(getActivity().getString(
@@ -106,6 +116,26 @@ public class MoreFragment extends BaseFragment {
 			break;
 		}
 
+	}
+
+	@Override
+	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		// TODO Auto-generated method stub
+		switch (checkedId) {
+		case R.id.rb_all_book:
+			SharedPreferences.getInstance().putInt("book_update_type",
+					SpConstant.BOOK_UPDATE_TYPE_ALL);
+			Log.d("rb_all_book");
+			break;
+		case R.id.rb_last_chapter:
+			SharedPreferences.getInstance().putInt("book_update_type",
+					SpConstant.BOOK_UPDATE_TYPE_CHAPTER);
+			Log.d("rb_last_chapter");
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	/**

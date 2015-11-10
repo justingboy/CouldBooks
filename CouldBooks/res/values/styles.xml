@@ -4,7 +4,7 @@
         <!--
 			Theme customizations available in newer API levels can go in
 			res/values-vXX/styles.xml, while customizations related to
-			backward-compatibility can go here.
+			backward-compatibility can go here.
         -->
     </style>
 
@@ -19,7 +19,7 @@
         translucent system bars
 		<item name="android:windowTranslucentStatus">true</item>
 		<item name="android:windowTranslucentNavigation">true</item>
-		<item name="android:fitsSystemWindows">true</item>
+		<item name="android:fitsSystemWindows">true</item>
         -->
     </style>
 
@@ -153,6 +153,62 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- 主题界面字体样式 -->
+    <style name="Feedback_large_text_style">
+        <item name="android:textColor">@color/theme_textcolor</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+    <!-- 反馈界面小号字体样式 -->
+    <style name="Feedback_small_text_style">
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:background">@color/shap_more_text_color</item>
+        <item name="android:paddingTop">40dp</item>
+        <item name="android:textColor">@color/theme_textcolor</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingBottom">5dp</item>
+    </style>
+
+    <!-- 反馈界面线段样式 -->
+    <style name="feedback_line_style">
+        <item name="android:background">@color/listview_divider</item>
+        <item name="android:layout_height">0.5dp</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <!-- 阅读统计界面字体样式 -->
+    <style name="read_staticis_text_style">
+        <item name="android:textColor">@color/theme_textcolor</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_height">55dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:background">@android:color/white</item>
+    </style>
+    <!-- 刷新dialog样式 -->
+    <style name="Refresh_Dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+    </style>
+
+    <!-- 后台自动更新界面间隔样式 -->
+    <style name="book_update_space_style">
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingLeft">20dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:paddingTop">10dp</item>
     </style>
 
 </resources>

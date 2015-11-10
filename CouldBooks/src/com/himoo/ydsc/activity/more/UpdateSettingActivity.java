@@ -1,11 +1,13 @@
 package com.himoo.ydsc.activity.more;
 
 import android.os.Bundle;
+import android.widget.RadioGroup;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 
-public class UpdateSettingActivity extends SwipeBackActivity {
+public class UpdateSettingActivity extends SwipeBackActivity implements
+		RadioGroup.OnCheckedChangeListener {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -22,5 +24,15 @@ public class UpdateSettingActivity extends SwipeBackActivity {
 		mTitleBar.setTitle(getResources().getString(
 				R.string.more_service_update));
 		mTitleBar.setRightLogoGone();
+	}
+
+	@Override
+	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		// TODO Auto-generated method stub
+		switch (checkedId) {
+
+		default:
+			break;
+		}
 	}
 }

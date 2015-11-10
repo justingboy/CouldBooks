@@ -2,6 +2,7 @@
 <lint>
     <issue id="ClickableViewAccessibility" severity="ignore" />
     <issue id="CommitTransaction" severity="ignore" />
+    <issue id="HandlerLeak" severity="ignore" />
     <issue id="InflateParams" severity="ignore" />
     <issue id="NewApi" severity="ignore" />
     <issue id="Recycle" severity="ignore" />

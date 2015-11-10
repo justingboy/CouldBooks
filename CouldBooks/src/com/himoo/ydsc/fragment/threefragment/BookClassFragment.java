@@ -73,6 +73,7 @@ public class BookClassFragment extends BaseFragment implements
 	public void initData() {
 		// TODO Auto-generated method stub
 		Log.d("initData");
+		showRefreshDialog("正在加载中");
 		getCouldBookInfoByGet();
 		initPTRGrideView();
 
@@ -117,7 +118,8 @@ public class BookClassFragment extends BaseFragment implements
 						BookRefreshTask<Book> task = new BookRefreshTask<Book>(
 								mPullRefreshGridView);
 						task.setOnRefreshListener(BookClassFragment.this);
-						task.execute(classId,1, HttpConstant.BOOK_REQUEST_TYPE_ME);
+						task.execute(classId, 1,
+								HttpConstant.BOOK_REQUEST_TYPE_ME);
 					}
 
 					@Override
@@ -126,7 +128,7 @@ public class BookClassFragment extends BaseFragment implements
 						BookRefreshTask<Book> task = new BookRefreshTask<Book>(
 								mPullRefreshGridView);
 						task.setOnRefreshListener(BookClassFragment.this);
-						task.execute(classId,currentPage,
+						task.execute(classId, currentPage,
 								HttpConstant.BOOK_REQUEST_TYPE_ME);
 					}
 
@@ -139,7 +141,7 @@ public class BookClassFragment extends BaseFragment implements
 	 */
 	private void getCouldBookInfoByGet() {
 		if (getArguments() != null) {
-			 classId = getArguments().getString("class");
+			classId = getArguments().getString("class");
 
 		}
 		mAdapter = new BookAdapter(getActivity(), R.layout.gridview_book_item,
@@ -160,6 +162,7 @@ public class BookClassFragment extends BaseFragment implements
 				ArrayList<Book> list = gson.fromJson(responseInfo.result,
 						new TypeToken<ArrayList<Book>>() {
 						}.getType());
+				dismissRefreshDialog();
 				mAdapter.addAll(list);
 				mGridView.setAdapter(mAdapter);
 				mAdapter.notifyDataSetChanged();
@@ -170,6 +173,7 @@ public class BookClassFragment extends BaseFragment implements
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
+				dismissRefreshDialog();
 				if (getActivity() != null)
 					Toast.showLong(getActivity(), "返回失败 ：" + msg);
 

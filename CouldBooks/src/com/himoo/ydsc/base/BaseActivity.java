@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.SparseArray;
@@ -20,6 +22,7 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.dialog.RefreshDialog;
 import com.himoo.ydsc.mvc.BaseModel;
 import com.himoo.ydsc.mvc.ServiceListener;
 import com.himoo.ydsc.ui.utils.Toast;
@@ -38,9 +41,10 @@ import com.readystatesoftware.systembartint.SystemBarTintManager;
  * 通用的HashMap实现的内存使用率非常的低，因为他需要为每一个mapping创建一个分离的entry
  * object。另外，SparseArray类避免了系统对有些key的自动装箱，因而带来了更高的效率。
  */
-public abstract class BaseActivity extends FragmentActivity implements ServiceListener {
+public abstract class BaseActivity extends FragmentActivity implements
+		ServiceListener {
 	/** 相当于HashMap ,但是效率高于HashMap */
-	private HashMap<Integer, String >activitys;
+	private HashMap<Integer, String> activitys;
 	/** 保存键值对 */
 	private SharedPreferences sp;
 	private AppUtils app_util;
@@ -52,6 +56,60 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceLi
 	private TitleBar title;
 
 	private boolean slidemenuModel = true;
+	/** 展示 刷新Dialog */
+	private static final int REFRESH_DIALOG_SHOW = 0;
+	/** 关闭 刷新Dialog */
+	private static final int REFRESH_DIALOG_DIMISS = 1;
+
+	private RefreshDialog mDialog;
+
+	public Handler refreshHandler = new Handler() {
+
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+			case REFRESH_DIALOG_SHOW:
+				if (mDialog == null) {
+					mDialog = new RefreshDialog(BaseActivity.this);
+					mDialog.setCancelable(false);
+				}
+				mDialog.setMessage(msg.obj.toString());
+				if (!mDialog.isShowing()) {
+					mDialog.dismiss();
+					mDialog.show();
+				}
+				break;
+			case REFRESH_DIALOG_DIMISS:
+				if (mDialog != null)
+					if (mDialog.isShowing()) {
+						mDialog.dismiss();
+					}
+				break;
+
+			default:
+				break;
+			}
+
+		};
+	};
+
+	/**
+	 * 　显示 刷新Dialog
+	 * 
+	 * @param string
+	 */
+	protected void showRefreshDialog(String string) {
+		Message msg = refreshHandler.obtainMessage();
+		msg.what = REFRESH_DIALOG_SHOW;
+		msg.obj = string;
+		refreshHandler.sendMessage(msg);
+	}
+
+	/** 　关闭 刷新Dialog */
+	protected void dismissRefreshDialog() {
+		Message msg = refreshHandler.obtainMessage();
+		msg.what = REFRESH_DIALOG_DIMISS;
+		refreshHandler.sendMessage(msg);
+	}
 
 	/**
 	 * 设置是否兼容SlideMenu组件
@@ -60,7 +118,7 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceLi
 	 */
 	public void setSlidemenuModel(boolean slidemenuModel) {
 		this.slidemenuModel = slidemenuModel;
-		
+
 	}
 
 	/**
@@ -137,7 +195,7 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceLi
 		} else {
 			super.setContentView(layoutResID);
 		}
-		
+
 	}
 
 	@Override
@@ -155,14 +213,11 @@ public abstract class BaseActivity extends FragmentActivity implements ServiceLi
 		} else {
 			super.setContentView(view);
 		}
-		
+
 	}
 
-	
 	protected abstract void initEvent();
-	
-	
-	
+
 	public void setCurrentFragment(BaseFragment frag) {
 		current_Fragment = frag;
 	}
