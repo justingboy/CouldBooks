@@ -56,14 +56,14 @@ public class BaseApplication extends Application {
 
 	@Override
 	public void onCreate() {
-		if (DEVELOPER_MODE) {
-			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-					.detectDiskReads().detectDiskWrites().detectNetwork()
-					.penaltyLog().build());
-			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-					.detectLeakedSqlLiteObjects().penaltyLog().penaltyDeath()
-					.build());
-		}
+//		if (DEVELOPER_MODE) {
+//			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+//					.detectDiskReads().detectDiskWrites().detectNetwork()
+//					.penaltyLog().build());
+//			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//					.detectLeakedSqlLiteObjects().penaltyLog().penaltyDeath()
+//					.build());
+//		}
 		super.onCreate();
 		instance = this;
 		//初始化科大讯飞语音功能5638453a	5638453a 

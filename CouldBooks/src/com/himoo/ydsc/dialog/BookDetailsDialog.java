@@ -1,5 +1,6 @@
 package com.himoo.ydsc.dialog;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -7,6 +8,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.bean.BookDetails;
+import com.himoo.ydsc.share.UmengShare;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -36,9 +39,10 @@ public class BookDetailsDialog extends Dialog {
 				R.drawable.book_face_default);
 	}
 
-	public static class Builder {
+	public static class Builder implements View.OnClickListener {
 		private Context context; // 上下文对象
 		private BookDetails bookDetails;
+		private BookDetailsDialog dialog;
 
 		public Builder(Context context) {
 			this.context = context;
@@ -57,12 +61,10 @@ public class BookDetailsDialog extends Dialog {
 		public BookDetailsDialog create() {
 			LayoutInflater inflater = (LayoutInflater) context
 					.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			final BookDetailsDialog dialog = new BookDetailsDialog(context,
-					R.style.BookDetailsStyle);
+			dialog = new BookDetailsDialog(context, R.style.BookDetailsStyle);
 			View layout = inflater.inflate(R.layout.dialog_bookdetails, null);
 			dialog.addContentView(layout, new LayoutParams(
 					LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-
 			ScrollView dialog_summary_layout = (ScrollView) layout
 					.findViewById(R.id.dialog_summary_layout);
 			TextView book_name = (TextView) layout.findViewById(R.id.book_name);
@@ -82,15 +84,20 @@ public class BookDetailsDialog extends Dialog {
 					.findViewById(R.id.book_image);
 			ImageView dialog_close = (ImageView) layout
 					.findViewById(R.id.dialog_close);
-			dialog_close.setOnClickListener(new View.OnClickListener() {
+			Button dialog_btn_share = (Button) layout
+					.findViewById(R.id.dialog_btn_share);
 
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					dialog.dismiss();
-				}
-			});
-			
+			Button dialog_btn_rate = (Button) layout
+					.findViewById(R.id.dialog_btn_rate);
+
+			Button dialog_btn_download = (Button) layout
+					.findViewById(R.id.dialog_btn_download);
+
+			dialog_close.setOnClickListener(this);
+			dialog_btn_share.setOnClickListener(this);
+			dialog_btn_rate.setOnClickListener(this);
+			dialog_btn_download.setOnClickListener(this);
+
 			setSummaryHeight(dialog_summary_layout,
 					bookDetails.getBook_Summary());
 			// 设置值
@@ -196,6 +203,35 @@ public class BookDetailsDialog extends Dialog {
 
 			textView.setCompoundDrawablesWithIntrinsicBounds(null, null,
 					drawable, null);
+		}
+
+		@Override
+		public void onClick(View v) {
+			// TODO Auto-generated method stub
+			switch (v.getId()) {
+			case R.id.dialog_close:
+				dialog.dismiss();
+				break;
+			case R.id.dialog_btn_share:
+				dialog.dismiss();
+				UmengShare.getInstance().setShareContent((Activity) context,
+						bookDetails.getBook_Name(),
+						bookDetails.getBook_Image(),
+						bookDetails.getBook_Summary());
+				// 注册友盟分享
+				UmengShare.getInstance().addCustomPlatforms((Activity) context);
+
+				break;
+			case R.id.dialog_btn_rate:
+				dialog.dismiss();
+				break;
+			case R.id.dialog_btn_download:
+				dialog.dismiss();
+				break;
+
+			default:
+				break;
+			}
 		}
 
 	}

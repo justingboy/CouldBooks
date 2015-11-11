@@ -3,6 +3,7 @@ package com.himoo.ydsc.activity;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
@@ -21,13 +22,17 @@ import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.listener.OnParseChapterListener;
+import com.himoo.ydsc.share.UmengShare;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.ui.utils.UIHelper;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.RegularUtil;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.umeng.socialize.bean.SocializeConfig;
+import com.umeng.socialize.sso.UMSsoHandler;
 
 public class BaiduDetailsActivity extends SwipeBackActivity implements
 		OnScrollListener, OnParseChapterListener, OnClickListener {
@@ -54,6 +59,10 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 
 	private ArrayAdapter<String> adapter;
 
+	private Button bookDownload;
+
+	private Button bookEvaluation;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -72,6 +81,19 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		mTitleBar.setLeftDrawable(R.drawable.book_details_close);
 		mTitleBar.setTitle(book.getTitle());
 		mTitleBar.setRightLogoDrawable(R.drawable.book_share);
+		mTitleBar.getRightLogo().setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				UmengShare.getInstance().setShareContent(
+						BaiduDetailsActivity.this, book.getTitle(),
+						book.getCoverImage(), book.getSummary());
+				// 注册友盟分享
+				UmengShare.getInstance().addCustomPlatforms(
+						BaiduDetailsActivity.this);
+			}
+		});
 	}
 
 	/**
@@ -79,6 +101,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	 */
 	private void initListener() {
 		chapter_count.setOnClickListener(this);
+		bookDownload.setOnClickListener(this);
+		bookEvaluation.setOnClickListener(this);
 		floowView.setOnClickListener(this);
 		listView.setOnScrollListener(this);
 	}
@@ -102,14 +126,15 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				.findViewById(R.id.baidu_book_category);
 		TextView bookSummary = (TextView) headerView
 				.findViewById(R.id.baidu_book_summary);
-		Button bookDownload = (Button) headerView
+		bookDownload = (Button) headerView
 				.findViewById(R.id.baidu_book_download);
-		Button bookEvaluation = (Button) headerView
+		bookEvaluation = (Button) headerView
 				.findViewById(R.id.baidu_book_evaluation);
 
 		ViewSelector.setButtonSelector(this, bookDownload);
 		ViewSelector.setButtonSelector(this, bookEvaluation);
 		String imageUrl = RegularUtil.converUrl(book.getCoverImage());
+		Log.i("CoverImage = "+imageUrl);
 		ImageLoader.getInstance().displayImage(imageUrl, bookCoverImg, option);
 		bookAuthor.setText("作者 ：" + book.getAuthor());
 		bookStatue.setText("状态 ：" + book.getStatus());
@@ -190,26 +215,48 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
-		Drawable drawable = null;
-		isReverse = !isReverse;
-		if (!isReverse) {
-			drawable = getResources().getDrawable(R.drawable.menu_book_down);
 
-		} else {
-			drawable = getResources().getDrawable(R.drawable.menu_book_up);
+		if (v == chapter_count || v == floowView) {
+
+			Drawable drawable = null;
+			isReverse = !isReverse;
+			if (!isReverse) {
+				drawable = getResources()
+						.getDrawable(R.drawable.menu_book_down);
+
+			} else {
+				drawable = getResources().getDrawable(R.drawable.menu_book_up);
+			}
+			chapter_count.setCompoundDrawablesWithIntrinsicBounds(null, null,
+					drawable, null);
+			floowView.setCompoundDrawablesWithIntrinsicBounds(null, null,
+					drawable, null);
+
+			Collections.reverse(bookList);
+			for (int i = 0; i < bookList.size(); i++) {
+				chapters[i] = bookList.get(i).getText().toString().trim();
+			}
+
+			adapter.notifyDataSetChanged();
+			// 下载书籍
+		} else if (v == bookDownload) {
+			// 豆瓣评书
+		} else if (v == bookEvaluation) {
+			UIHelper.startToActivity(this, DoubanBookActivity.class,
+					book.getTitle());
+
 		}
-		chapter_count.setCompoundDrawablesWithIntrinsicBounds(null, null,
-				drawable, null);
-		floowView.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable,
-				null);
 
-		Collections.reverse(bookList);
-		for (int i = 0; i < bookList.size(); i++) {
-			chapters[i] = bookList.get(i).getText().toString().trim();
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		UMSsoHandler ssoHandler = SocializeConfig.getSocializeConfig()
+				.getSsoHandler(requestCode);
+		if (ssoHandler != null) {
+			ssoHandler.authorizeCallBack(requestCode, resultCode, data);
 		}
-
-		adapter.notifyDataSetChanged();
-
 	}
 
 }

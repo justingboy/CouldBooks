@@ -1,10 +1,13 @@
 package com.himoo.ydsc.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * 书的详细信息
  * 
  */
-public class BookDetails {
+public class BookDetails implements Parcelable {
 	/** 书名 */
 	private String Book_Name;
 	/** 书的ID */
@@ -125,5 +128,53 @@ public class BookDetails {
 	public int getBook_RateNum() {
 		return this.Book_RateNum;
 	}
+
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		// TODO Auto-generated method stub
+		// 然后按写入的顺序读取出来
+		dest.writeString(Book_Name);
+		dest.writeInt(Book_ID);
+		dest.writeString(Book_AddTime);
+		dest.writeInt(Book_Rate);
+		dest.writeInt(Book_Popularity);
+		dest.writeInt(Book_Class_ID);
+		dest.writeString(Book_Summary);
+		dest.writeString(Book_Image);
+		dest.writeString(Book_Download);
+		dest.writeString(Book_Author);
+		dest.writeString(Book_Source);
+		dest.writeInt(Book_RateNum);
+
+	}
+
+	public static final Parcelable.Creator<BookDetails> CREATOR = new Parcelable.Creator<BookDetails>() {
+		public BookDetails createFromParcel(Parcel in) {
+			BookDetails book = new BookDetails();
+			book.setBook_Name(in.readString());
+			book.setBook_ID(in.readInt());
+			book.setBook_AddTime(in.readString());
+			book.setBook_Rate(in.readInt());
+			book.setBook_Popularity(in.readInt());
+			book.setBook_Class_ID(in.readInt());
+			book.setBook_Summary(in.readString());
+			book.setBook_Image(in.readString());
+			book.setBook_Download(in.readString());
+			book.setBook_Author(in.readString());
+			book.setBook_Source(in.readString());
+			book.setBook_RateNum(in.readInt());
+			return book;
+		}
+
+		public BookDetails[] newArray(int size) {
+			return new BookDetails[size];
+		}
+	};
 
 }

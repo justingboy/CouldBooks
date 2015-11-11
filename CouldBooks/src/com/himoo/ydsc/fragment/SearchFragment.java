@@ -111,6 +111,9 @@ public class SearchFragment extends BaseFragment implements
 	/** 是否可以搜索了 */
 	private boolean isKeyEnterDown = false;
 
+	/** 是否有保存key的操作 */
+	private boolean isSaveKey = false;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			SharedPreferences sp, Bundle savedInstanceState,
@@ -172,7 +175,7 @@ public class SearchFragment extends BaseFragment implements
 			if (!TextUtils.isEmpty(bookSearch.getText())) {
 				save(bookSearch.getText().toString());
 				startToActivity(bookSearch.getText().toString());
-				Toast.showShort(getActivity(), "去搜索小说了！");
+				// Toast.showShort(getActivity(), "去搜索小说了！");
 			}
 			isKeyEnterDown = false;
 		}
@@ -272,10 +275,17 @@ public class SearchFragment extends BaseFragment implements
 		isKeyEnterDown = true;
 		if (bookDb.isEmpty())
 			return;
-		if (bookDb.querryCount() != mDbBookCount) {
+		int bookCount = bookDb.querryCount();
+		if (bookCount != mDbBookCount || popupWindow == null) {
 			popupWindow = new BookPopupWindow(SearchFragment.this, popupView);
-			mDbBookCount = bookDb.querryCount();
-		} else {
+			mDbBookCount = bookCount;
+			Log.i("执行" + bookCount);
+		} else if (bookCount == 15 && isSaveKey) {
+			popupWindow = new BookPopupWindow(SearchFragment.this, popupView);
+			isSaveKey = false;
+		}
+
+		else {
 			if (popupWindow != null && popupWindow.isShowing()) {
 				return;
 			}
@@ -290,8 +300,12 @@ public class SearchFragment extends BaseFragment implements
 	 * @param keyword
 	 */
 	private void save(String keyword) {
+		isSaveKey = true;
 		BookSearchRecords record = new BookSearchRecords();
 		record.setRecord(keyword);
+		bookSearch.setText(keyword);
+		bookSearch.setSelection(keyword.length());
+		bookSearch.postInvalidate();
 		bookDb.saveBookSearch(record);
 	}
 
@@ -337,8 +351,9 @@ public class SearchFragment extends BaseFragment implements
 	 */
 	private RecognizerDialogListener mRecognizerDialogListener = new RecognizerDialogListener() {
 		public void onResult(RecognizerResult results, boolean isLast) {
-			if (!isLast) {
-				
+			Log.d(parseResult(results));
+			if (isLast) {
+
 				String result = parseResult(results);
 				bookSearch.setText(result);
 				bookSearch.setSelection(result.length());
@@ -381,7 +396,7 @@ public class SearchFragment extends BaseFragment implements
 		mIat.setParameter(SpeechConstant.VAD_BOS, "5000");
 
 		// 设置语音后端点:后端点静音检测时间，即用户停止说话多长时间内即认为不再输入， 自动停止录音
-		mIat.setParameter(SpeechConstant.VAD_EOS, "2000");
+		mIat.setParameter(SpeechConstant.VAD_EOS, "1500");
 		// 设置标点符号,设置为"0"返回结果无标点,设置为"1"返回结果有标点
 		mIat.setParameter(SpeechConstant.ASR_PTT, "0");
 

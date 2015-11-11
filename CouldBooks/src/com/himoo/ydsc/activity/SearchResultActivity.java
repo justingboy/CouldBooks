@@ -19,7 +19,6 @@ import com.himoo.ydsc.adapter.SearchBaiduBookAdapter;
 import com.himoo.ydsc.adapter.SearchBookAdapter;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BookSearch;
-import com.himoo.ydsc.dialog.BookDetailsDialog;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.BookSearchTask;
 import com.himoo.ydsc.http.BookSearchTask.OnSearchListener;
@@ -84,8 +83,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 				if (firstReSuccess == 0) {
 					BookSearch book = (BookSearch) parent
 							.getItemAtPosition(position);
-					new BookDetailsDialog.Builder(SearchResultActivity.this)
-							.setBookDetails(book).create().show();
+					UIHelper.startToActivity(SearchResultActivity.this, book, BookDialogActivity.class);
 				}else if(firstReSuccess == 1)
 				{
 					BaiduBook book = (BaiduBook) parent

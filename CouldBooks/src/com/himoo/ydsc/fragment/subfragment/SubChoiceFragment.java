@@ -2,6 +2,10 @@ package com.himoo.ydsc.fragment.subfragment;
 
 import java.util.ArrayList;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,21 +20,24 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
 import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.activity.BookDialogActivity;
 import com.himoo.ydsc.adapter.BookAdapter;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.Book;
+import com.himoo.ydsc.bean.BookDetails;
 import com.himoo.ydsc.config.SpConstant;
-import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.http.HttpOperator;
 import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.ui.utils.UIHelper;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
@@ -51,6 +58,8 @@ public class SubChoiceFragment extends BaseFragment implements
 	private ArrayList<Book> mBookList = new ArrayList<Book>();;
 	/** 当前的页数 */
 	private int currentPage = 1;
+	/** 当前点击的Item位置 */
+	private int mCurrentClickPosition = -1;
 	
 
 	@Override
@@ -86,9 +95,15 @@ public class SubChoiceFragment extends BaseFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				
+				if(mCurrentClickPosition ==position)
+					return ;
+				mCurrentClickPosition = position;
 				Book book = (Book) parent.getItemAtPosition(position);
-				BookDetailsTask.getInstance().excute(getActivity(),
-						book.getBook_ID());
+			/*	BookDetailsTask.getInstance().excute(getActivity(),
+						book.getBook_ID());*/
+				showRefreshDialog("正在加载中");
+				getBookDetailsInfo(getActivity(),  book.getBook_ID());
 			}
 		});
 		initLastRefreshTime(SpConstant.LAST_REF_TIME_SUBCHOICE,
@@ -167,6 +182,50 @@ public class SubChoiceFragment extends BaseFragment implements
 		});
 
 	}
+	
+	
+	/**
+	 * 请求自己服务器的书的详情界面信息
+	 * 
+	 * @param context
+	 * @param bookId
+	 */
+	private void getBookDetailsInfo(final Context context, int bookId) {
+		HttpUtils http = new HttpUtils();
+		RequestParams params = new RequestParams();
+		NameValuePair nameValuePair = new BasicNameValuePair("bookID",
+				String.valueOf(bookId));
+		params.addBodyParameter(nameValuePair);
+		String url = SharedPreferences.getInstance().getString("host",
+				HttpConstant.HOST_URL_TEST)
+				+ "getBooksDetail.asp";
+		http.send(HttpMethod.POST, url, params, new RequestCallBack<String>() {
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo) {
+				// TODO Auto-generated method stub
+				Gson gson = new Gson();
+				BookDetails bookDetalis = gson.fromJson(
+						responseInfo.result.substring(1,
+								responseInfo.result.length() - 1),
+						BookDetails.class);
+				dismissRefreshDialog();
+				mCurrentClickPosition = -1;
+				UIHelper.startToActivity(getActivity(), bookDetalis, BookDialogActivity.class);
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg) {
+				// TODO Auto-generated method stub
+				Toast.showLong(context, "获取详情失败：" + msg);
+				dismissRefreshDialog();
+				mCurrentClickPosition = -1;
+			}
+
+		});
+	}
+	
+	
 
 	/**
 	 * 通知数据改变，并且数据刷新完毕

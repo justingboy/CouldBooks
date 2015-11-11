@@ -6,5 +6,6 @@
     android:textSize="14sp"
     android:textColor="@color/status_bar_bg"
     android:padding="5dp"
-    
+    android:singleLine="true"
+	android:ellipsize="end"
     />

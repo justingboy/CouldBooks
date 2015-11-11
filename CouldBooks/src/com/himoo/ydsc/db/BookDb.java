@@ -44,11 +44,19 @@ public class BookDb {
 	public void saveBookSearch(BookSearchRecords book) {
 
 		try {
+			// 先判断数据库的个数是否超过15条,防止数据过大，查询速度慢
+			List<BookSearchRecords> bookAlllist = querryAll();
+			{
+				if (bookAlllist != null && bookAlllist.size() > 14) {
+					db.delete(bookAlllist.get(0));
+				}
+			}
+
 			// 先判断数据库中是否已经存在
 			List<BookSearchRecords> list = db.findAll(Selector.from(
 					BookSearchRecords.class).where("record", "=",
 					book.getRecord()));
-			if (list ==null||list.isEmpty())
+			if (list == null || list.isEmpty())
 				db.save(book);
 		} catch (DbException e) {
 			// TODO Auto-generated catch block

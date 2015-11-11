@@ -1,6 +1,7 @@
 package com.himoo.ydsc.dialog;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
@@ -83,6 +84,7 @@ public class BookPopupWindow extends BasePopWindow implements OnClickListener,
 		bookDb = BookDb.getInstance(getActivity(), "Book");
 		ArrayList<BookSearchRecords> records = bookDb.querryAll();
 		if (records != null) {
+			Collections.reverse(records);
 			String bookArray[] = new String[records.size()];
 			for (int i = 0; i < records.size(); i++) {
 				bookArray[i] = records.get(i).getRecord();

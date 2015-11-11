@@ -1,10 +1,12 @@
 package com.himoo.ydsc.bean;
+
+
 /**
- *自己服务器搜索返回书籍 
- *
+ * 自己服务器搜索返回书籍
+ * 
  */
 public class BookSearch extends BookDetails {
-	
+
 	/** 书的更新状态 */
 	private int Book_Yellow;
 

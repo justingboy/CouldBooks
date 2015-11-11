@@ -33,7 +33,7 @@ public class BaiduBookAdapter extends QuickAdapter<BaiduBook>{
 	protected void convert(BaseAdapterHelper helper, BaiduBook item) {
 		// TODO Auto-generated method stub
 
-		helper.setImageUrl(R.id.book_image, item.getCoverImage(), option);
+		helper.setImageUrl(R.id.book_image, item.getCoverImage());
 		helper.setText(R.id.book_name, item.getTitle());
 		helper.setTextColorRes(R.id.book_name,R.color.main_bottom_textcolor_press );
 		

@@ -42,7 +42,7 @@ public class SearchBookAdapter extends QuickAdapter<BookSearch> {
 		helper.setImageUrl(R.id.search_book_image, item.getBook_Image(),option);
 		helper.setText(R.id.search_book_name, item.getBook_Name());
 		helper.setText(R.id.search_book_author, item.getBook_Author());
-		helper.setText(R.id.search_book_summary, item.getBook_Summary().replaceAll("　　", ""));
+		helper.setText(R.id.search_book_summary, item.getBook_Summary()==null?"暂无简介":item.getBook_Summary().replaceAll("　　", ""));
 		if (item.getBook_Yellow()==0) {
 			helper.setImageResource(R.id.book_statue,
 					R.drawable.story_state_finished); 

@@ -46,6 +46,7 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 import com.squareup.picasso.Picasso;
+import com.umeng.socialize.utils.Log;
 
 /**
  * Allows an abstraction of the ViewHolder pattern.<br>
@@ -259,15 +260,18 @@ public class BaseAdapterHelper {
 	 */
 	public BaseAdapterHelper setImageUrl(int viewId, String imageUrl) {
 		ImageView view = retrieveView(viewId);
-//		ImageLoader.getInstance().displayImage(imageUrl, view);
-		
-		 Picasso.with(context).load(imageUrl)
-         .placeholder(R.drawable.book_face_default)
-         .error(R.drawable.book_face_default)
-         .tag(context)
-         .into(view);
-		
-		
+		// ImageLoader.getInstance().displayImage(imageUrl, view);
+		if (imageUrl != null && imageUrl.trim().length() != 0) {
+
+			Picasso.with(context).load(imageUrl)
+					.placeholder(R.drawable.book_face_default)
+					.error(R.drawable.book_face_default).tag(context)
+					.into(view);
+		} else {
+			view.setImageResource(R.drawable.book_face_default);
+			System.out.println("AAA-------------------");
+		}
+
 		return this;
 	}
 
@@ -312,7 +316,9 @@ public class BaseAdapterHelper {
 	}
 
 	public static String getURLWithSize(String url) {
-		if (url == null || url.length() == 0||!url.endsWith(".jpg")||!url.endsWith(".png")||!url.endsWith(".gpeg")||!url.endsWith(".gif")) {
+		if (url == null || url.length() == 0 || !url.endsWith(".jpg")
+				|| !url.endsWith(".png") || !url.endsWith(".gpeg")
+				|| !url.endsWith(".gif")) {
 			return url;
 		}
 		if (!url.startsWith("http://")) {
