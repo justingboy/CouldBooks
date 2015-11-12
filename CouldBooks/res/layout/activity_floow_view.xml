@@ -9,6 +9,6 @@
     android:gravity="center_vertical"
     android:paddingBottom="10dp"
     android:paddingLeft="15dp"
-    android:paddingRight="20dp"
+    android:paddingRight="30dp"
     android:paddingTop="10dp"
     android:textColor="@android:color/white" />

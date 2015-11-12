@@ -81,6 +81,10 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name="com.himoo.ydsc.activity.more.WallActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.himoo.ydsc.activity.BaiduDetailsActivity"
             android:screenOrientation="portrait" >
         </activity>
@@ -102,6 +106,15 @@
             android:name="com.himoo.ydsc.activity.DoubanBookActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.himoo.ydsc.activity.DoubanCommentActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.himoo.ydsc.activity.DoubanWebActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+     
         
 
         <!-- 友盟分享相关注册 -->

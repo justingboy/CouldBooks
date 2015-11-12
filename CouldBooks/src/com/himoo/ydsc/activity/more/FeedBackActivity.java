@@ -152,6 +152,7 @@ public class FeedBackActivity extends SwipeBackActivity implements
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub

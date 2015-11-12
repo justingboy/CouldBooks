@@ -15,4 +15,7 @@ public interface SpConstant {
 	public static final int BOOK_UPDATE_TYPE_ALL = 1;
 	/** 小说更新类型-- 最新章节 */
 	public static final int BOOK_UPDATE_TYPE_CHAPTER = 2;
+
+	/** 标记是否开启小说更新设置 */
+	public static final String BOOK_UPATE_SETTING = "book_update_setting";
 }

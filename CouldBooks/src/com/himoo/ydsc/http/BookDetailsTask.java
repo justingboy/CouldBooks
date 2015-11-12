@@ -237,6 +237,35 @@ public class BookDetailsTask {
 	}
 
 	/**
+	 * 通过HttpUrlConnection发送POST请求
+	 * 
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	public InputStream executeByGet(String urlString) {
+
+		try {
+			URL url = new URL(urlString);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setConnectTimeout(5000);
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
+			int code = conn.getResponseCode();
+			if (code == 200) {
+				InputStream is = conn.getInputStream();
+				return is;
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/**
 	 * 将流转换成String
 	 * 
 	 * @param is

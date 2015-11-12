@@ -62,5 +62,9 @@ public interface HttpConstant {
 	public static final String BAIDU_BOOK_DETAILS_URL = "http://m.baidu.com/tc?";
 	
 	
+	/** 豆瓣评书请求地址 */
+	public static final String DOUBAN_STORYTELLING_URL = "http://api.douban.com/book/subjects?";
+	
+	
 	
 }

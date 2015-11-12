@@ -6,6 +6,7 @@ import java.util.Collections;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AbsListView;
@@ -133,9 +134,16 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 
 		ViewSelector.setButtonSelector(this, bookDownload);
 		ViewSelector.setButtonSelector(this, bookEvaluation);
+		Log.i("CoverImage1 = " + book.getCoverImage());
 		String imageUrl = RegularUtil.converUrl(book.getCoverImage());
-		Log.i("CoverImage = "+imageUrl);
-		ImageLoader.getInstance().displayImage(imageUrl, bookCoverImg, option);
+		if (TextUtils.isEmpty(imageUrl)) {
+			bookCoverImg.setImageResource(R.drawable.book_face_default);
+		} else {
+
+			ImageLoader.getInstance().displayImage(imageUrl, bookCoverImg,
+					option);
+		}
+		Log.i("CoverImage2 = " + imageUrl);
 		bookAuthor.setText("作者 ：" + book.getAuthor());
 		bookStatue.setText("状态 ：" + book.getStatus());
 		bookCategory.setText("类别 ：" + book.getCategory());
@@ -244,6 +252,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		} else if (v == bookEvaluation) {
 			UIHelper.startToActivity(this, DoubanBookActivity.class,
 					book.getTitle());
+			bookEvaluation.setClickable(false);
 
 		}
 
@@ -257,6 +266,13 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		if (ssoHandler != null) {
 			ssoHandler.authorizeCallBack(requestCode, resultCode, data);
 		}
+	}
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		bookEvaluation.setClickable(true);
 	}
 
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -197,6 +198,7 @@ public class BookDialogActivity extends FragmentActivity implements OnClickListe
 		case R.id.dialog_btn_rate:
 			break;
 		case R.id.dialog_btn_download:
+			Log.d("msg", bookDetails.getBook_Download());
 			break;
 
 		default:

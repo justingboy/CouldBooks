@@ -15,6 +15,7 @@
         <item name="vpiIconPageIndicatorStyle">@style/Widget.IconPageIndicator</item>
         <item name="vpiTabPageIndicatorStyle">@style/Widget.TabPageIndicator.Custom</item>
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:fastScrollThumbDrawable">@drawable/fast_bar_normal</item>
         <!--
         translucent system bars
 		<item name="android:windowTranslucentStatus">true</item>
@@ -200,7 +201,7 @@
         <item name="android:background">@android:color/transparent</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:backgroundDimAmount">0.6</item>
+        <item name="android:backgroundDimAmount">0.4</item>
     </style>
 
     <!-- 后台自动更新界面间隔样式 -->

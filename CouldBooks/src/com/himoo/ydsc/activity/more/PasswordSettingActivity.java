@@ -175,7 +175,7 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 										HomeActivity.class);
 								finish();
 							}
-						}, 200);
+						}, 100);
 					}else
 					{
 						inputCount--;

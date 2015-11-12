@@ -13,6 +13,7 @@
         android:layout_height="wrap_content" >
 
         <ListView
+            android:scrollbarStyle="outsideOverlay"
             android:fastScrollEnabled="true"
             android:id="@+id/book_chapter_listview"
             android:layout_width="match_parent"
@@ -20,6 +21,7 @@
             android:fadingEdge="none" />
 
         <TextView
+            android:focusable="true"
             android:id="@+id/book_chapter_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,7 +30,7 @@
             android:gravity="center_vertical"
             android:paddingBottom="10dp"
             android:paddingLeft="15dp"
-            android:paddingRight="20dp"
+            android:paddingRight="30dp"
             android:paddingTop="10dp"
             android:textColor="@android:color/white"
             android:visibility="gone" />

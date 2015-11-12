@@ -39,14 +39,11 @@ import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.himoo.ydsc.R;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.squareup.picasso.Picasso;
-import com.umeng.socialize.utils.Log;
 
 /**
  * Allows an abstraction of the ViewHolder pattern.<br>
@@ -260,17 +257,7 @@ public class BaseAdapterHelper {
 	 */
 	public BaseAdapterHelper setImageUrl(int viewId, String imageUrl) {
 		ImageView view = retrieveView(viewId);
-		// ImageLoader.getInstance().displayImage(imageUrl, view);
-		if (imageUrl != null && imageUrl.trim().length() != 0) {
-
-			Picasso.with(context).load(imageUrl)
-					.placeholder(R.drawable.book_face_default)
-					.error(R.drawable.book_face_default).tag(context)
-					.into(view);
-		} else {
-			view.setImageResource(R.drawable.book_face_default);
-			System.out.println("AAA-------------------");
-		}
+		ImageLoader.getInstance().displayImage(imageUrl, view);
 
 		return this;
 	}
@@ -288,7 +275,7 @@ public class BaseAdapterHelper {
 	 */
 	public BaseAdapterHelper setImageUrl(int viewId, String imageUrl,
 			DisplayImageOptions option) {
-		ImageView view = retrieveView(viewId);
+		final ImageView view = retrieveView(viewId);
 		ImageLoader.getInstance().displayImage(imageUrl, view, option);
 
 		return this;

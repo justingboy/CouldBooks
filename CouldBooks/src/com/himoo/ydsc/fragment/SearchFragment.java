@@ -279,18 +279,15 @@ public class SearchFragment extends BaseFragment implements
 		if (bookCount != mDbBookCount || popupWindow == null) {
 			popupWindow = new BookPopupWindow(SearchFragment.this, popupView);
 			mDbBookCount = bookCount;
-			Log.i("执行" + bookCount);
-		} else if (bookCount == 15 && isSaveKey) {
-			popupWindow = new BookPopupWindow(SearchFragment.this, popupView);
-			isSaveKey = false;
-		}
 
-		else {
+		} else if (bookCount == 10 && isSaveKey) {
+			popupWindow.initData();
+			isSaveKey = false;
+		} else {
 			if (popupWindow != null && popupWindow.isShowing()) {
 				return;
 			}
 		}
-
 		popupWindow.showAsDropDown(bookSearch);
 	}
 

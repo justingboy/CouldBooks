@@ -167,4 +167,15 @@ public class BookTitleBar extends LinearLayout {
 
 	}
 
+	/**
+	 * 得到左边的TextView
+	 * 
+	 * @param resId
+	 */
+	public TextView getLeftTextView() {
+
+		return leftTitle;
+
+	}
+
 }

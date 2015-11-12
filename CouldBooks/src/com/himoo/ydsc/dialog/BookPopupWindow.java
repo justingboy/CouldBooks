@@ -20,7 +20,6 @@ import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.base.BasePopWindow;
 import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.db.bean.BookSearchRecords;
-import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.DeviceUtil;
 
 /**
@@ -39,6 +38,8 @@ public class BookPopupWindow extends BasePopWindow implements OnClickListener,
 	private BookDb bookDb;
 
 	private BaseFragment fragment;
+	public ArrayAdapter<String> adapter;
+	private String[] bookArrays;
 
 	public BookPopupWindow(BaseFragment frag, View view) {
 		this(frag, view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
@@ -81,19 +82,10 @@ public class BookPopupWindow extends BasePopWindow implements OnClickListener,
 
 	@Override
 	public void initData() {
-		bookDb = BookDb.getInstance(getActivity(), "Book");
-		ArrayList<BookSearchRecords> records = bookDb.querryAll();
-		if (records != null) {
-			Collections.reverse(records);
-			String bookArray[] = new String[records.size()];
-			for (int i = 0; i < records.size(); i++) {
-				bookArray[i] = records.get(i).getRecord();
-			}
-
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-					getActivity(), R.layout.popup_listview_item, bookArray);
-			pop_listview.setAdapter(adapter);
-		}
+		notifiyDataChange();
+		adapter = new ArrayAdapter<String>(getActivity(),
+				R.layout.popup_listview_item, bookArrays);
+		pop_listview.setAdapter(adapter);
 	}
 
 	@Override
@@ -134,4 +126,18 @@ public class BookPopupWindow extends BasePopWindow implements OnClickListener,
 
 	}
 
+	/**
+	 * 通知数据改变
+	 */
+	public void notifiyDataChange() {
+		bookDb = BookDb.getInstance(getActivity(), "Book");
+		ArrayList<BookSearchRecords> records = bookDb.querryAll();
+		if (records != null) {
+			Collections.reverse(records);
+			bookArrays = new String[records.size()];
+			for (int i = 0; i < records.size(); i++) {
+				bookArrays[i] = records.get(i).getRecord();
+			}
+		}
+	}
 }

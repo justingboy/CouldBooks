@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,11 +14,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.himoo.ydsc.R;
-import com.himoo.ydsc.adapter.DouBanBookAdapter;
-import com.himoo.ydsc.bean.DoubanBook;
-import com.himoo.ydsc.http.HttpConstant;
+import com.himoo.ydsc.adapter.DouBanCommentAdapter;
+import com.himoo.ydsc.bean.DouBanBookComment;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.ui.utils.UIHelper;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
@@ -27,7 +26,7 @@ import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
-public class DoubanBookActivity extends SwipeBackActivity {
+public class DoubanCommentActivity extends SwipeBackActivity {
 
 	@ViewInject(R.id.douban_book_list)
 	private PullToRefreshListView mRefrshListView;
@@ -41,20 +40,19 @@ public class DoubanBookActivity extends SwipeBackActivity {
 		setContentView(R.layout.activity_douban_layout);
 		initPullToRefrehListView();
 		showRefreshDialog("正在加载中");
-		getDouBanBookInfo(getIntent().getStringExtra("key"));
+		getDouBanBookInfo(getIntent().getStringExtra("key2"));
 	}
 
 	@Override
 	protected void initTitleBar() {
 		// TODO Auto-generated method stub
-		String bookName = getIntent().getStringExtra("key");
-		if (bookName == null) {
-			bookName = "返回";
+		String bookName = getIntent().getStringExtra("key1");
+		mTitleBar.setTitle(bookName);
+		if (bookName.length() > 6) {
+			mTitleBar.setLeftTitle("返回");
 		} else {
-			bookName = (bookName.length() > 4) ? "返回" : bookName;
+			mTitleBar.setLeftTitle("图书列表");
 		}
-		mTitleBar.setTitle("图书列表");
-		mTitleBar.setLeftTitle(bookName);
 		mTitleBar.setRightLogoGone();
 
 	}
@@ -72,22 +70,13 @@ public class DoubanBookActivity extends SwipeBackActivity {
 				if (mCurrentClickPosition == position)
 					return;
 				mCurrentClickPosition = position;
-				DoubanBook book = (DoubanBook) parent
+				DouBanBookComment comment = (DouBanBookComment) parent
 						.getItemAtPosition(position);
-				startToActivity(book.getBookName(), book.getBookDetailsUrl());
+				UIHelper.startToActivity(DoubanCommentActivity.this,
+						DoubanWebActivity.class, comment.getCommentContent());
 
 			}
 		});
-	}
-
-	private void startToActivity(String bookName, String subjectUrl) {
-
-		Intent intent = new Intent(this, DoubanCommentActivity.class);
-		intent.putExtra("key1", bookName);
-		intent.putExtra("key2", subjectUrl);
-		startActivity(intent);
-		overridePendingTransition(R.anim.activity_zoom_in, 0);
-
 	}
 
 	/**
@@ -95,26 +84,24 @@ public class DoubanBookActivity extends SwipeBackActivity {
 	 * 
 	 * @param bookName
 	 */
-	private void getDouBanBookInfo(String bookName) {
+	private void getDouBanBookInfo(String subUrl) {
 		HttpUtils http = new HttpUtils();
-		String url = HttpConstant.DOUBAN_STORYTELLING_URL + "q=" + bookName
-				+ "&alt=json";
+		String url = subUrl + "/reviews?alt=json";
 		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
-
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
 				try {
-					ArrayList<DoubanBook> bookList = parseDoubanJson(responseInfo.result);
-					DouBanBookAdapter mAdapter = new DouBanBookAdapter(
-							DoubanBookActivity.this,
-							R.layout.adapter_douban_item, bookList);
+					ArrayList<DouBanBookComment> bookList = parseDoubanJson(responseInfo.result);
+					DouBanCommentAdapter mAdapter = new DouBanCommentAdapter(
+							DoubanCommentActivity.this,
+							R.layout.adapter_douban_comment_item, bookList);
 					dismissRefreshDialog();
 					mRefrshListView.setAdapter(mAdapter);
 
 				} catch (JSONException e) {
 					dismissRefreshDialog();
-					Toast.showLong(DoubanBookActivity.this,
+					Toast.showLong(DoubanCommentActivity.this,
 							"解析评书信息失败：" + e.getMessage());
 				}
 			}
@@ -122,7 +109,7 @@ public class DoubanBookActivity extends SwipeBackActivity {
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				dismissRefreshDialog();
-				Toast.showLong(DoubanBookActivity.this, "获取评书信息失败：" + msg);
+				Toast.showLong(DoubanCommentActivity.this, "获取评书信息失败：" + msg);
 			}
 		});
 	}
@@ -133,62 +120,55 @@ public class DoubanBookActivity extends SwipeBackActivity {
 	 * @param result
 	 * @throws JSONException
 	 */
-	private ArrayList<DoubanBook> parseDoubanJson(String result)
+	private ArrayList<DouBanBookComment> parseDoubanJson(String result)
 			throws JSONException {
 
-		ArrayList<DoubanBook> bookList = new ArrayList<DoubanBook>();
+		ArrayList<DouBanBookComment> commentList = new ArrayList<DouBanBookComment>();
 		JSONObject jsonObject = new JSONObject(result);
 		JSONArray jsonArray = jsonObject.getJSONArray("entry");
 		if (jsonArray.length() > 0) {
 			for (int i = 0; i < jsonArray.length(); i++) {
-				DoubanBook book = new DoubanBook();
+				DouBanBookComment commment = new DouBanBookComment();
 				JSONObject json = jsonArray.getJSONObject(i);
-				String bookAuthor = "";
+				String commentDate = json.getJSONObject("updated").getString(
+						"$t");
+				String commentTitle = json.getJSONObject("title").getString(
+						"$t");
+				String commentSummary = "";
+				if (!json.isNull("summary"))
+					commentSummary = json.getJSONObject("summary").getString(
+							"$t");
+				String commentContent = json.getJSONObject("id")
+						.getString("$t");
+				JSONArray commentImageArray = json.getJSONObject("author")
+						.getJSONArray("link");
+				String commentImage = "http://img3.douban.com/icon/u27352958-2.jpg";
+				for (int j = 0; j < commentImageArray.length(); j++) {
+					if (commentImageArray.getJSONObject(j).getString("@rel")
+							.equals("icon")) {
+						commentImage = commentImageArray.getJSONObject(j)
+								.getString("@href");
+					}
+
+				}
+				String commentName = "";
 				if (!json.isNull("author")) {
-					bookAuthor = json.getJSONArray("author").getJSONObject(0)
+					commentName = json.getJSONObject("author")
 							.getJSONObject("name").getString("$t");
 				}
+				commment.setCommentName(commentName);
+				commment.setCommentImage(commentImage);
+				commment.setCommentDate(commentDate);
+				commment.setCommentTitle(commentTitle);
+				commment.setCommentSummary(commentSummary);
+				commment.setCommentContent(commentContent);
 
-				String bookName = json.getJSONObject("title").getString("$t");
-				String bookDetailsUrl = json.getJSONArray("link")
-						.getJSONObject(0).getString("@href");
-				String bookCoverUrl = json.getJSONArray("link")
-						.getJSONObject(2).getString("@href");
-				JSONArray dbArray = json.getJSONArray("db:attribute");
-				String bookPublisher = "";
-				String bookPubdate = "";
-				for (int j = 0; j < dbArray.length(); j++) {
-					if (dbArray.getJSONObject(j).getString("@name")
-							.equals("pubdate")) {
-						bookPubdate = dbArray.getJSONObject(j).getString("$t");
-					}
-					if (dbArray.getJSONObject(j).getString("@name")
-							.equals("publisher")) {
-						bookPublisher = dbArray.getJSONObject(j)
-								.getString("$t");
-					}
-				}
-
-				String bookNumRaters = json.getJSONObject("gd:rating")
-						.getString("@numRaters") + "";
-				String bookAverage = json.getJSONObject("gd:rating").getString(
-						"@average")
-						+ "";
-
-				book.setBookName(bookName);
-				book.setBookAuthor(bookAuthor);
-				book.setBookDetailsUrl(bookDetailsUrl);
-				book.setCoverImageUrl(bookCoverUrl);
-				book.setBookAverage(bookAverage);
-				book.setBookNumRaters(bookNumRaters);
-				book.setBookPubdate(bookPubdate);
-				book.setBookPublisher(bookPublisher);
-				bookList.add(book);
+				commentList.add(commment);
 			}
 
 		}
 
-		return bookList;
+		return commentList;
 	}
 
 	@Override

@@ -47,7 +47,7 @@ public class BookDb {
 			// 先判断数据库的个数是否超过15条,防止数据过大，查询速度慢
 			List<BookSearchRecords> bookAlllist = querryAll();
 			{
-				if (bookAlllist != null && bookAlllist.size() > 14) {
+				if (bookAlllist != null && bookAlllist.size() > 9) {
 					db.delete(bookAlllist.get(0));
 				}
 			}

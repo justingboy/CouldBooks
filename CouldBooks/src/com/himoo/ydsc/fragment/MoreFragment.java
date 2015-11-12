@@ -14,10 +14,10 @@ import com.himoo.ydsc.activity.more.PasswordLockActivity;
 import com.himoo.ydsc.activity.more.ReadstatisticsActivity;
 import com.himoo.ydsc.activity.more.ThemeActivity;
 import com.himoo.ydsc.activity.more.UpdateSettingActivity;
+import com.himoo.ydsc.activity.more.WallActivity;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.manager.PageManager;
-import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.view.BookTitleBar;
 import com.himoo.ydsc.util.AppUtils;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -59,6 +59,10 @@ public class MoreFragment extends BaseFragment implements
 	@ViewInject(R.id.segmented_book_update)
 	private SegmentedGroup segment_book_update;
 
+	/** 标识是否开启自动更新设置 */
+	@ViewInject(R.id.more_book_update_identifiy)
+	private TextView bookUpdateIdentify;
+
 	/** ids */
 	public int ids[] = { R.id.more_topic, R.id.more_timeUpdate,
 			R.id.more_unlock, R.id.more_statistics, R.id.more_passwordProtect,
@@ -80,7 +84,8 @@ public class MoreFragment extends BaseFragment implements
 	@Override
 	public void initData() {
 		// TODO Auto-generated method stub
-		//设置监听器
+
+		// 设置监听器
 		segment_book_update.setOnCheckedChangeListener(this);
 		// 设置版本信息
 		String versionCode = AppUtils.getVersionName(getActivity());
@@ -101,7 +106,7 @@ public class MoreFragment extends BaseFragment implements
 			startToActivity(UpdateSettingActivity.class);
 			break;
 		case R.id.more_unlock:
-			Toast.showLong(getActivity(), "解锁功能");
+			startToActivity(WallActivity.class);
 			break;
 		case R.id.more_statistics:
 			startToActivity(ReadstatisticsActivity.class);
@@ -136,6 +141,15 @@ public class MoreFragment extends BaseFragment implements
 		default:
 			break;
 		}
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		boolean isOpenUpdate = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_UPATE_SETTING, false);
+		bookUpdateIdentify.setText(isOpenUpdate ? "已开启" : "未开启");
 	}
 
 	/**

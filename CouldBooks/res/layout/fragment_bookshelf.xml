@@ -27,7 +27,7 @@
             android:layout_width="80dp"
             android:layout_height="30dp"
             android:layout_marginLeft="20dp"
-            android:background="@drawable/shape_shelf_sort_bg"
+            android:background="@drawable/btn_booksort_selector"
             android:text="书名排序"
             android:textColor="@color/status_bar_bg" />
     </LinearLayout>

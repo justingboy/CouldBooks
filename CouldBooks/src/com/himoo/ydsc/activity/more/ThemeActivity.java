@@ -41,6 +41,12 @@ public class ThemeActivity extends SwipeBackActivity implements
 			R.drawable.book_face_default };
 	private String[] title = { "封面一", "封面二", "封面三", "封面四" };
 
+	/** 当前选择皮肤的颜色 */
+	private int mCurrentSkinColor = R.drawable.theme_shape_green;
+
+	/** 当前选择皮的小说默认封面 */
+	private String mCurrentTitle = title[0];
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -67,16 +73,18 @@ public class ThemeActivity extends SwipeBackActivity implements
 			skin.setDrawableId(skinDrawable[i]);
 			themeList.add(skin);
 		}
-		QuickAdapter<ThemeSkin> skinAdapter = new QuickAdapter<ThemeSkin>(this,
-				R.layout.adapter_them_item, themeList) {
+		final QuickAdapter<ThemeSkin> skinAdapter = new QuickAdapter<ThemeSkin>(
+				this, R.layout.adapter_them_item, themeList) {
 
 			@Override
 			protected void convert(BaseAdapterHelper helper, ThemeSkin item) {
 				// TODO Auto-generated method stub
 				helper.setBackgroundRes(R.id.theme_skin_image,
 						item.getDrawableId());
-				if (item.getDrawableId() == R.drawable.theme_shape_green)
+				if (item.getDrawableId() == mCurrentSkinColor)
 					helper.setVisible(R.id.theme_skinChoice_image, true);
+				else
+					helper.setVisible(R.id.theme_skinChoice_image, false);
 			}
 		};
 
@@ -87,6 +95,8 @@ public class ThemeActivity extends SwipeBackActivity implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO Auto-generated method stub
+				mCurrentSkinColor = skinDrawable[position];
+				skinAdapter.notifyDataSetChanged();
 
 			}
 		});
@@ -100,7 +110,7 @@ public class ThemeActivity extends SwipeBackActivity implements
 			skin.setDrawableId(coverDrawable[i]);
 			themeList.add(skin);
 		}
-		QuickAdapter<ThemeSkin> coverAdapter = new QuickAdapter<ThemeSkin>(
+		final QuickAdapter<ThemeSkin> coverAdapter = new QuickAdapter<ThemeSkin>(
 				this, R.layout.adapter_them_coveritem, themeList) {
 
 			@Override
@@ -109,8 +119,10 @@ public class ThemeActivity extends SwipeBackActivity implements
 				helper.setBackgroundRes(R.id.theme_cover_image,
 						item.getDrawableId());
 				helper.setText(R.id.theme_cover_text, item.getTitle());
-				if (item.getTitle().equals("封面一"))
+				if (item.getTitle().equals(mCurrentTitle))
 					helper.setVisible(R.id.theme_coverChoice_image, true);
+				else
+					helper.setVisible(R.id.theme_coverChoice_image, false);
 
 			}
 		};
@@ -121,7 +133,9 @@ public class ThemeActivity extends SwipeBackActivity implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// TODO Auto-generated method stub
+
+				mCurrentTitle = title[position];
+				coverAdapter.notifyDataSetChanged();
 
 			}
 		});
