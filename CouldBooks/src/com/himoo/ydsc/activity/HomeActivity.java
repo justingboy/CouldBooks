@@ -74,21 +74,21 @@ public class HomeActivity extends BaseActivity {
 	public static final int RB_VIEW_MORE = 4;
 
 	@Override
-	public void onCreate(SharedPreferences sp, FragmentManager manager,
-			Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 		ViewUtils.inject(this);
 		initEvent();
 		setRadioButtonDrawableSelector();
 		setRadioButtonTextColorSelector();
-		this.fragmentManager = manager;
+		this.fragmentManager = getSupportFragmentManager();
 		initFragmentList();
 		setCurrentClickPoint(RB_VIEW_CHOICE);
 		addFirstToast(this.getActivityName());
-		
-		Log.d(SharedPreferences.getInstance().getString("host",HttpConstant.HOST_URL_TEST ));
-		
+
+		Log.d(SharedPreferences.getInstance().getString("host",
+				HttpConstant.HOST_URL_TEST));
 
 	}
 
@@ -201,7 +201,7 @@ public class HomeActivity extends BaseActivity {
 			}
 		}
 	}
-
+	
 	/**
 	 * 设置RadioButton选择器
 	 */
@@ -246,5 +246,10 @@ public class HomeActivity extends BaseActivity {
 		rBBookshelf.setTextColor(colorstate);
 		rBMore.setTextColor(colorstate);
 	}
+
+	
+	
+	
+	
 
 }

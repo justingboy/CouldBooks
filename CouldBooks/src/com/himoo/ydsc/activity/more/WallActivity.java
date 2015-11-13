@@ -1,36 +1,43 @@
 package com.himoo.ydsc.activity.more;
 
 import java.io.InputStream;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.animation.openbook.BookView;
 import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
+import com.himoo.ydsc.ui.view.ArrowDownloadButton;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
 public class WallActivity extends SwipeBackActivity {
 	@ViewInject(R.id.iv)
-	private ImageView iv ;
-	public Handler mHandler = new Handler()
-	{
+	private ImageView iv;
+
+	int count = 0;
+	int progress = 0;
+	ArrowDownloadButton button;
+
+	public Handler mHandler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
-			Bitmap bm = BitmapFactory.decodeStream((InputStream)msg.obj);
-			if(bm ==null)
-			{
+			Bitmap bm = BitmapFactory.decodeStream((InputStream) msg.obj);
+			if (bm == null) {
 				Log.d("bm ==null");
-				iv.setImageResource(R.drawable.book_face_default);	
-			}else
-			{
+				iv.setImageResource(R.drawable.book_face_default);
+			} else {
 				Log.d("正常");
-				iv.setImageBitmap(bm);	
+				iv.setImageBitmap(bm);
 			}
-				
+
 		}
 	};
 
@@ -39,13 +46,40 @@ public class WallActivity extends SwipeBackActivity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_more_wall);
-//		String url = "http://bj.bs.baidu.com/wise-novel-authority-logo/4d6be3fc2772e80faf13b69dc8557fa3.jpg";
-//		String url2 = "http://bj.bs.baidu.com/wise-novel-authority-logo/88022e5b48ce48b636ed1b24aba09653.jpg";
+		BookView bookView = (BookView) findViewById(R.id.book);
+		bookView.setImageResource(R.drawable.book_face_default);
+		// String url =
+		// "http://bj.bs.baidu.com/wise-novel-authority-logo/4d6be3fc2772e80faf13b69dc8557fa3.jpg";
+		// String url2 =
+		// "http://bj.bs.baidu.com/wise-novel-authority-logo/88022e5b48ce48b636ed1b24aba09653.jpg";
 		String url3 = "http://bj.bs.baidu.com/wise-novel-authority-logo/adf66ea1f9f6c7a3f73b924161d5c793.jpg";
 		getBitamp(url3);
-		
-		
-		
+
+		button = (ArrowDownloadButton) findViewById(R.id.arrow_download_button);
+		button.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if ((count % 2) == 0) {
+					button.startAnimating();
+					Timer timer = new Timer();
+					timer.schedule(new TimerTask() {
+						@Override
+						public void run() {
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									progress = progress + 1;
+									button.setProgress(progress);
+								}
+							});
+						}
+					}, 800, 500);
+				} else {
+					button.reset();
+				}
+				count++;
+			}
+		});
 
 	}
 
@@ -56,15 +90,15 @@ public class WallActivity extends SwipeBackActivity {
 		mTitleBar.setTitle("积分墙");
 		mTitleBar.setRightLogoGone();
 	}
-	
-	private void getBitamp(final String urlString)
-	{
+
+	private void getBitamp(final String urlString) {
 		new Thread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				InputStream in = BookDetailsTask.getInstance().executeByGet(urlString);
+				InputStream in = BookDetailsTask.getInstance().executeByGet(
+						urlString);
 				Message msg = mHandler.obtainMessage();
 				msg.obj = in;
 				mHandler.sendMessage(msg);
@@ -72,5 +106,4 @@ public class WallActivity extends SwipeBackActivity {
 		}).start();
 	}
 
-	
 }

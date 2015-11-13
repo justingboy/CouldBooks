@@ -62,6 +62,10 @@ public class MoreFragment extends BaseFragment implements
 	/** 标识是否开启自动更新设置 */
 	@ViewInject(R.id.more_book_update_identifiy)
 	private TextView bookUpdateIdentify;
+	
+	/** 用于防止多次点击 */
+	private boolean isClickable = false;
+	
 
 	/** ids */
 	public int ids[] = { R.id.more_topic, R.id.more_timeUpdate,
@@ -84,7 +88,7 @@ public class MoreFragment extends BaseFragment implements
 	@Override
 	public void initData() {
 		// TODO Auto-generated method stub
-
+		
 		// 设置监听器
 		segment_book_update.setOnCheckedChangeListener(this);
 		// 设置版本信息
@@ -98,6 +102,9 @@ public class MoreFragment extends BaseFragment implements
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		super.onClick(v);
+		if(isClickable)
+			return ;
+		isClickable = true;
 		switch (v.getId()) {
 		case R.id.more_topic:
 			startToActivity(ThemeActivity.class);
@@ -149,7 +156,8 @@ public class MoreFragment extends BaseFragment implements
 		super.onResume();
 		boolean isOpenUpdate = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_UPATE_SETTING, false);
-		bookUpdateIdentify.setText(isOpenUpdate ? "已开启" : "未开启");
+		bookUpdateIdentify.setText(isOpenUpdate ? "已开启" : "已关闭");
+		isClickable = false;
 	}
 
 	/**

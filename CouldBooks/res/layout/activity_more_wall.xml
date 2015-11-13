@@ -12,5 +12,19 @@
         android:id="@+id/iv"
         android:layout_width="70dp"
         android:layout_height="132dp" />
+     <com.himoo.ydsc.ui.view.ArrowDownloadButton
+         android:layout_marginTop="15dp"
+        android:id="@+id/arrow_download_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp" />
+     
+     <com.himoo.ydsc.animation.openbook.BookView
+        android:id="@+id/book"
+        android:layout_width="72dp"
+        android:layout_height="128dp"
+        android:layout_margin="20dp"
+        android:scaleType="centerCrop" 
+        android:layout_gravity="center"/>
+     
 
 </LinearLayout>

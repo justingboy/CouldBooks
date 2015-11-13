@@ -16,20 +16,16 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.SparseArray;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.dialog.RefreshDialog;
 import com.himoo.ydsc.mvc.BaseModel;
 import com.himoo.ydsc.mvc.ServiceListener;
 import com.himoo.ydsc.ui.utils.Toast;
-import com.himoo.ydsc.ui.view.TitleBar;
 import com.himoo.ydsc.util.AppUtils;
 import com.himoo.ydsc.util.MyLogger;
-import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
@@ -46,16 +42,13 @@ public abstract class BaseActivity extends FragmentActivity implements
 	/** 相当于HashMap ,但是效率高于HashMap */
 	private HashMap<Integer, String> activitys;
 	/** 保存键值对 */
-	private SharedPreferences sp;
 	private AppUtils app_util;
 	private FragmentManager manager;
 	protected BaseFragment current_Fragment;
 	public MyLogger Log;
 	public static int flag = 1; // 无实际意义，只是为了使用SparseArray类
 	private long exitTime = 0;
-	private TitleBar title;
 
-	private boolean slidemenuModel = true;
 	/** 展示 刷新Dialog */
 	private static final int REFRESH_DIALOG_SHOW = 0;
 	/** 关闭 刷新Dialog */
@@ -111,29 +104,8 @@ public abstract class BaseActivity extends FragmentActivity implements
 		refreshHandler.sendMessage(msg);
 	}
 
-	/**
-	 * 设置是否兼容SlideMenu组件
-	 * 
-	 * @param slidemenuModel
-	 */
-	public void setSlidemenuModel(boolean slidemenuModel) {
-		this.slidemenuModel = slidemenuModel;
-
-	}
-
-	/**
-	 * 设置不兼容SlideMenu组件，并刷新该activity的视图
-	 * 
-	 * @param view
-	 *            该activity的视图
-	 */
-	public void setSlidemenuModel(View view) {
-		this.slidemenuModel = false;
-		setContentView(view);
-	}
-
 	@Override
-	protected final void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		ViewUtils.inject(this);
@@ -146,13 +118,12 @@ public abstract class BaseActivity extends FragmentActivity implements
 		setStatusBarTintResource(R.color.status_bar_bg);
 
 		Log = MyLogger.kLog();
-		sp = SharedPreferences.getInstance();
 		manager = getSupportFragmentManager();
 		app_util = new AppUtils(getApplicationContext());
 		// 将activity添加到自定义界面集合
 		BaseApplication.getInstance().addActivity(this);
 		activitys = BaseApplication.getInstance().getUIS();
-		onCreate(sp, manager, savedInstanceState);
+		// onCreate(sp, manager, savedInstanceState);
 	}
 
 	@TargetApi(19)
@@ -175,61 +146,8 @@ public abstract class BaseActivity extends FragmentActivity implements
 		tintManager.setStatusBarTintResource(color);// 通知栏所需颜色
 	}
 
-	/**
-	 * 重写setContentView()方法，添加自定义标题栏
-	 */
-	@Override
-	public void setContentView(int layoutResID) {
-		if (!slidemenuModel) {
-			title = new TitleBar(this);
-			LinearLayout linear = new LinearLayout(this);
-			linear.setOrientation(LinearLayout.VERTICAL);
-			View view = View
-					.inflate(getApplicationContext(), layoutResID, null);
-			linear.setLayoutParams(new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.MATCH_PARENT,
-					LinearLayout.LayoutParams.MATCH_PARENT));
-			linear.addView(title, 0);
-			linear.addView(view, 1);
-			super.setContentView(linear);
-		} else {
-			super.setContentView(layoutResID);
-		}
-
-	}
-
-	@Override
-	public void setContentView(View view) {
-		if (!slidemenuModel) {
-			title = new TitleBar(this);
-			LinearLayout linear = new LinearLayout(this);
-			linear.setOrientation(LinearLayout.VERTICAL);
-			linear.setLayoutParams(new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.MATCH_PARENT,
-					LinearLayout.LayoutParams.MATCH_PARENT));
-			linear.addView(title, 0);
-			linear.addView(view, 1);
-			super.setContentView(linear);
-		} else {
-			super.setContentView(view);
-		}
-
-	}
-
 	protected abstract void initEvent();
 
-	public void setCurrentFragment(BaseFragment frag) {
-		current_Fragment = frag;
-	}
-
-	/**
-	 * 获取标题栏
-	 * 
-	 * @return
-	 */
-	public TitleBar getTitleBar() {
-		return title;
-	}
 
 	/**
 	 * 将Activity添加到退出通知
@@ -396,18 +314,6 @@ public abstract class BaseActivity extends FragmentActivity implements
 		overridePendingTransition(enterAnim, exitAnim);
 	}
 
-	/**
-	 * Activity的生命周期onCreate()方法
-	 * 
-	 * @param sp
-	 *            SharedPreferences文件对象
-	 * @param manager
-	 *            管理Fragment的对象，如果使用Fragment可以跟本框架做到无缝的结合
-	 * @param savedInstanceState
-	 *            Activity的状态保存
-	 */
-	public abstract void onCreate(SharedPreferences sp,
-			FragmentManager manager, Bundle savedInstanceState);
 
 	/**
 	 * Fragment之间的切换方法，加载Fragment方法.<br />

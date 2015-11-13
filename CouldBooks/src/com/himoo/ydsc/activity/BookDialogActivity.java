@@ -1,6 +1,8 @@
 package com.himoo.ydsc.activity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -9,23 +11,30 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.aescrypt.AESCrypt;
+import com.himoo.ydsc.animation.mesh.BitmapMesh;
 import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.bean.BookDetails;
 import com.himoo.ydsc.share.UmengShare;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 /**
  * 展示自己服务器的书籍详情
  * 
  */
-public class BookDialogActivity extends FragmentActivity implements OnClickListener {
+public class BookDialogActivity extends FragmentActivity implements
+		OnClickListener {
 
 	private ScrollView dialog_summary_layout;
 	private TextView book_name;
@@ -42,6 +51,8 @@ public class BookDialogActivity extends FragmentActivity implements OnClickListe
 	private Button dialog_btn_download;
 	private BookDetails bookDetails;
 	private DisplayImageOptions option;
+	private FrameLayout ani_mesh_layout;
+	private BitmapMesh.SampleView mSampleView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +77,7 @@ public class BookDialogActivity extends FragmentActivity implements OnClickListe
 		book_Popularity = (TextView) this.findViewById(R.id.book_Popularity);
 		book_score = (TextView) this.findViewById(R.id.book_score);
 		book_summary = (TextView) this.findViewById(R.id.book_summary);
+		ani_mesh_layout = (FrameLayout) this.findViewById(R.id.ani_mesh_layout);
 		book_image = (ImageView) this.findViewById(R.id.book_image);
 		dialog_close = (ImageView) this.findViewById(R.id.dialog_close);
 		dialog_btn_share = (Button) this.findViewById(R.id.dialog_btn_share);
@@ -83,10 +95,31 @@ public class BookDialogActivity extends FragmentActivity implements OnClickListe
 	}
 
 	private void initData() {
+
 		bookDetails = (BookDetails) getIntent().getExtras().getParcelable(
 				"book");
 		setSummaryHeight(dialog_summary_layout, bookDetails.getBook_Summary());
 		// 设置值
+		ImageLoader.getInstance().displayImage(bookDetails.getBook_Image(),
+				book_image, option, new SimpleImageLoadingListener() {
+					@Override
+					public void onLoadingComplete(String imageUri, View view,
+							Bitmap loadedImage) {
+						// TODO Auto-generated method stub
+						super.onLoadingComplete(imageUri, view, loadedImage);
+						addAnimView(loadedImage);
+					}
+
+					@Override
+					public void onLoadingFailed(String imageUri, View view,
+							FailReason failReason) {
+						// TODO Auto-generated method stub
+						super.onLoadingFailed(imageUri, view, failReason);
+						addAnimView(null);
+					}
+
+				});
+
 		book_name.setText(bookDetails.getBook_Name());
 		setTextBookNameSize(book_name, bookDetails.getBook_Name());
 		book_author.setText("作者:" + bookDetails.getBook_Author());
@@ -105,8 +138,6 @@ public class BookDialogActivity extends FragmentActivity implements OnClickListe
 			book_summary.setText(bookDetails.getBook_Summary().trim());
 		} else
 			book_summary.setText("　　" + bookDetails.getBook_Summary().trim());
-		ImageLoader.getInstance().displayImage(bookDetails.getBook_Image(),
-				book_image, option);
 	}
 
 	/**
@@ -198,12 +229,34 @@ public class BookDialogActivity extends FragmentActivity implements OnClickListe
 		case R.id.dialog_btn_rate:
 			break;
 		case R.id.dialog_btn_download:
+
+			String content = AESCrypt.decryptBook();
+			if (mSampleView != null) {
+				mSampleView.setVisibility(View.VISIBLE);
+				mSampleView.startAnimation(false);
+			}
+			Log.d("msg", content);
 			Log.d("msg", bookDetails.getBook_Download());
 			break;
 
 		default:
 			break;
 		}
+	}
+
+	private void addAnimView(Bitmap bitmap) {
+		if (bitmap == null)
+			bitmap = BitmapFactory.decodeResource(getResources(),
+					R.drawable.book_face_default);
+
+		mSampleView = new BitmapMesh.SampleView(this, bitmap,
+				DeviceUtil.dip2px(this, 104), DeviceUtil.dip2px(this, 136));
+		mSampleView.setLayoutParams(new RelativeLayout.LayoutParams(-1, -1));
+		int padding = DeviceUtil.dip2px(this, 2);
+		mSampleView.setPadding(padding, padding, padding, padding);
+		ani_mesh_layout.addView(mSampleView);
+		mSampleView.setVisibility(View.GONE);
+
 	}
 
 }

@@ -44,6 +44,7 @@ public class UpdateSettingActivity extends SwipeBackActivity implements
 		boolean isOpen = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_UPATE_SETTING, false);
 		sbBookUdate.setChecked(isOpen ? true : false);
+		setComponentAlpha(!isOpen);
 
 	}
 
