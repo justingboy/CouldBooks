@@ -1,30 +1,31 @@
 package com.himoo.ydsc.activity.more;
 
 import android.os.Bundle;
-import android.view.MotionEvent;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-import android.widget.TextView;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.adapter.TestFragmentAdapter;
 import com.himoo.ydsc.animation.AnimationUtils;
+import com.himoo.ydsc.fragment.reader.BookSettingFragment1.OnFragment1Listener;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.viewpagerindicator.CirclePageIndicator;
 
-public class WallActivity extends SwipeBackActivity {
+public class WallActivity extends SwipeBackActivity implements OnFragment1Listener{
 
 	@ViewInject(R.id.tv_bottombar)
-	private TextView tv_bottom;
-	
+	private LinearLayout tv_bottom;
+
 	@ViewInject(R.id.tv_titlebar)
-	private TextView tv_titlebar;
+	private LinearLayout tv_titlebar;
 
 	@ViewInject(R.id.layout_more_rel)
 	private RelativeLayout layout_more_rel;
@@ -65,14 +66,23 @@ public class WallActivity extends SwipeBackActivity {
 		Button dialog_btn_rate = (Button) this
 				.findViewById(R.id.dialog_btn_rate);
 		LayoutParams parmas = (LayoutParams) tv_bottom.getLayoutParams();
-		parmas.height = 280;
+		parmas.height = 520;
 		LayoutParams parmas2 = (LayoutParams) tv_titlebar.getLayoutParams();
-		parmas2.height = 120;
+		parmas2.height = 100;
 		tv_bottom.setLayoutParams(parmas);
 		tv_titlebar.setLayoutParams(parmas2);
-		AnimationUtils.setViewTranslateDownY(tv_bottom,0f,280);
-		AnimationUtils.setViewTranslateDownY(tv_titlebar,0,-120f);
-		
+		AnimationUtils.setViewTranslateDownY(tv_bottom, 0f, 520);
+		AnimationUtils.setViewTranslateDownY(tv_titlebar, 0, -100f);
+
+		TestFragmentAdapter mAdapter = new TestFragmentAdapter(
+				getSupportFragmentManager(),this);
+
+		ViewPager mPager = (ViewPager) findViewById(R.id.pager);
+		mPager.setAdapter(mAdapter);
+
+		CirclePageIndicator mIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
+		mIndicator.setViewPager(mPager);
+
 		tv_bottom.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -81,80 +91,87 @@ public class WallActivity extends SwipeBackActivity {
 				Toast.showShort(WallActivity.this, "可以被点");
 			}
 		});
-		dialog_btn_rate.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// int index = (int) (Math.random()*10);
-				// FileUtils fileUtils = new FileUtils(WallActivity.this);
-				// String filePath =
-				// fileUtils.getStorageDirectory()+"1"+index+".txt";
-				// String bookContent = AESCrypt.readBookFile(filePath);
-				// Toast.showLong(WallActivity.this, bookContent);
-				AnimationUtils.setViewTranslateUpY(tv_titlebar,0,120f);
-				if (!isUp) {
-
-					AnimationUtils.setViewTranslateUpY(tv_bottom,280,0f);
-				} else {
-					AnimationUtils.setViewTranslateDownY(tv_bottom,0f,280);
-					
-					AnimationUtils.setViewTranslateDownY(tv_titlebar,0,-120f);
-				}
-
-				isUp = !isUp;
-			}
-
-		});
+		// dialog_btn_rate.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View v) {
+		// // int index = (int) (Math.random()*10);
+		// // FileUtils fileUtils = new FileUtils(WallActivity.this);
+		// // String filePath =
+		// // fileUtils.getStorageDirectory()+"1"+index+".txt";
+		// // String bookContent = AESCrypt.readBookFile(filePath);
+		// // Toast.showLong(WallActivity.this, bookContent);
+		// AnimationUtils.setViewTranslateUpY(tv_titlebar, 0, 120f);
+		// if (!isUp) {
+		//
+		// AnimationUtils.setViewTranslateUpY(tv_bottom, 280, 0f);
+		// } else {
+		// AnimationUtils.setViewTranslateDownY(tv_bottom, 0f, 280);
+		//
+		// AnimationUtils.setViewTranslateDownY(tv_titlebar, 0, -120f);
+		// }
+		//
+		// isUp = !isUp;
+		// }
+		//
+		// });
 		layout_more_rel.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				
-//				Toast.showShort(WallActivity.this, "Relative --->可以点击");
+
+				// Toast.showShort(WallActivity.this, "Relative --->可以点击");
 				if (!isUp) {
-					AnimationUtils.setViewTranslateUpY(tv_titlebar,-120f,0f);
-					AnimationUtils.setViewTranslateUpY(tv_bottom,280,0f);
+					AnimationUtils.setViewTranslateUpY(tv_titlebar, -100f, 0f);
+					AnimationUtils.setViewTranslateUpY(tv_bottom, 520, 0f);
 				} else {
-					AnimationUtils.setViewTranslateDownY(tv_bottom,0f,280);
-					AnimationUtils.setViewTranslateDownY(tv_titlebar,0f,-120);
+					AnimationUtils.setViewTranslateDownY(tv_bottom, 0f, 520);
+					AnimationUtils.setViewTranslateDownY(tv_titlebar, 0f, -100);
 				}
 
 				isUp = !isUp;
 			}
 		});
-		
-		
-		layout_more_rel.setOnTouchListener(new OnTouchListener() {
-			
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				// TODO Auto-generated method stub
-				int action = event.getAction();  
-				switch (action) {
-				case MotionEvent.ACTION_DOWN:
-					Toast.showShort(WallActivity.this, "ACTION_DOWN");
-					
-					break;
-				case MotionEvent.ACTION_MOVE:
-//					Toast.showShort(WallActivity.this, "移动--------------？？？？");
-					isMove = true;
-					break;
-				case MotionEvent.ACTION_UP:
-					if(isMove)
-						Toast.showShort(WallActivity.this, "滑动---》");
-					else
-						Toast.showShort(WallActivity.this, "点击-----》");
-					isMove = false;
-					break;
 
-				default:
-					break;
-				}
-				
-				return true;
-			}
-		});
+		// layout_more_rel.setOnTouchListener(new OnTouchListener() {
+		//
+		// private float startX;
+		// private float startY;
+		//
+		// @Override
+		// public boolean onTouch(View v, MotionEvent event) {
+		// // TODO Auto-generated method stub
+		// int action = event.getAction();
+		// switch (action) {
+		// case MotionEvent.ACTION_DOWN:
+		// Toast.showShort(WallActivity.this, "ACTION_DOWN");
+		// startX = event.getX();
+		// startY = event.getY();
+		// break;
+		// case MotionEvent.ACTION_MOVE:
+		// // Toast.showShort(WallActivity.this,
+		// // "移动--------------？？？？");
+		// isMove = true;
+		// break;
+		// case MotionEvent.ACTION_UP:
+		//
+		// if (Math.abs(event.getX() - startX) < 15
+		// || Math.abs(event.getY() - startY)< 15) {
+		// Toast.showShort(WallActivity.this, "点击-----》");
+		// } else {
+		// Toast.showShort(WallActivity.this, "滑动---》");
+		// }
+		//
+		// break;
+		//
+		// default:
+		// break;
+		// }
+		//
+		// return true;
+		// }
+		// });
 
 		// BookView bookView = (BookView) findViewById(R.id.book);
 		// bookView.setImageResource(R.drawable.book_face_default);
@@ -218,6 +235,14 @@ public class WallActivity extends SwipeBackActivity {
 		mTitleBar.setLeftTitle("更多");
 		mTitleBar.setTitle("积分墙");
 		mTitleBar.setRightLogoGone();
+	}
+
+	@Override
+	public void onTextSizChange(float textSize) {
+		// TODO Auto-generated method stub
+		Toast.showLong(this, "字体大小发生了改变！"+textSize);
+		
+		
 	}
 
 	// private void getBitamp(final String urlString) {

@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="55dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <TextView
+            android:id="@+id/tv_pre_chapter"
+            style="@style/book_setting_text_style"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="上一章"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/tv_pre_chapter"
+            android:background="#DCD8D5" />
+
+        <TextView
+            android:id="@+id/tv_next_chapter"
+            style="@style/book_setting_text_style"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="下一章"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/tv_next_chapter"
+            android:background="#DCD8D5" />
+
+        <SeekBar
+            android:id="@+id/seekBar_light"
+            style="@style/Widget.SeekBar.Normal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/tv_next_chapter"
+            android:layout_toRightOf="@id/tv_pre_chapter"
+            android:max="200" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DCD8D5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            style="@style/book_setting_text_style"
+            android:gravity="center"
+            android:text="繁體" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#DCD8D5" />
+
+        <TextView
+            style="@style/book_setting_text_style"
+            android:gravity="center"
+            android:text="简体"
+            android:textColor="@color/book_setting_text_color" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DCD8D5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            style="@style/book_setting_text_style"
+            android:gravity="center"
+            android:paddingBottom="15sp"
+            android:paddingTop="15dp"
+            android:text="黑体"
+            android:textColor="@color/book_setting_text_color"
+            android:textSize="20sp" />
+
+        <TextView
+            style="@style/book_setting_text_style"
+            android:gravity="center"
+            android:paddingBottom="15sp"
+            android:paddingTop="15dp"
+            android:text="宋体"
+            android:textColor="@color/book_setting_text_color"
+            android:textSize="20sp" />
+
+        <TextView
+            style="@style/book_setting_text_style"
+            android:gravity="center"
+            android:paddingBottom="15sp"
+            android:paddingTop="15dp"
+            android:text="楷体"
+            android:textSize="20sp" />
+
+        <TextView
+            style="@style/book_setting_text_style"
+            android:gravity="center"
+            android:paddingBottom="15sp"
+            android:paddingTop="15dp"
+            android:text="幼圆"
+            android:textColor="@color/book_setting_text_color"
+            android:textSize="20sp" />
+
+        <TextView
+            style="@style/book_setting_text_style"
+            android:gravity="center"
+            android:paddingBottom="15sp"
+            android:paddingTop="15dp"
+            android:text="兰亭"
+            android:textColor="@color/book_setting_text_color"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DCD8D5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/iphone_b_menu" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/iphone_b_switch" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/iphone_reading" />
+
+        <ImageView
+            android:id="@+id/booksetting_share"
+            style="@style/book_setting_image_style"
+            android:src="@drawable/iphone_share" />
+    </LinearLayout>
+
+</LinearLayout>

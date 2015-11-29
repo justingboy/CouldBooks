@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp" >
+
+        <ImageView
+            android:id="@+id/brightness_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@drawable/read_brightness_down" />
+
+        <ImageView
+            android:id="@+id/brightness_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/read_brightness_up" />
+
+        <SeekBar
+            android:id="@+id/seekBar_light"
+            style="@style/Widget.SeekBar.Normal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/brightness_up"
+            android:layout_toRightOf="@id/brightness_down"
+            android:max="200" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="#DCD8D5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/read_typeface_decrease" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#DCD8D5" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/read_typeface_increase" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#DCD8D5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/reading_bg_eye" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/reading_bg_kraft" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/reading_bg_default" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/reading_bg_5" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/rukou_xuanzhong" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#DCD8D5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/liner_space_0_2" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/liner_space_default_checked" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/liner_space_1" />
+
+        <ImageView
+            style="@style/book_setting_image_style"
+            android:src="@drawable/liner_space_1_5" />
+    </LinearLayout>
+
+</LinearLayout>

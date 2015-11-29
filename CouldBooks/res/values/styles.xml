@@ -4,7 +4,7 @@
         <!--
 			Theme customizations available in newer API levels can go in
 			res/values-vXX/styles.xml, while customizations related to
-			backward-compatibility can go here.
+			backward-compatibility can go here.
         -->
     </style>
 
@@ -20,7 +20,7 @@
         translucent system bars
 		<item name="android:windowTranslucentStatus">true</item>
 		<item name="android:windowTranslucentNavigation">true</item>
-		<item name="android:fitsSystemWindows">true</item>
+		<item name="android:fitsSystemWindows">true</item>
         -->
     </style>
 
@@ -229,5 +229,34 @@
         <!-- 指向star_rating_bar_full.xml文件 -->
         <item name="android:progressDrawable">@drawable/rating_yellow</item>
     </style>
+
+    <!-- SeekBar自定义样式 -->
+    <style name="Widget.SeekBar.Normal" parent="@android:style/Widget.SeekBar">
+        <item name="android:maxHeight">3.0dip</item>
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
+        <item name="android:progressDrawable">@drawable/seekbar_horizontal</item>
+        <item name="android:minHeight">2.0dip</item>
+        <item name="android:thumb">@drawable/seekbar_brightness_slide</item>
+        <item name="android:thumbOffset">5.0dip</item>
+    </style>
+
+     <!-- 阅读界面设置 -->
+    <style name="book_setting_image_style">
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+    </style>
+     <!-- 阅读界面字体设置 -->
+    <style name="book_setting_text_style">
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">25sp</item>
+    </style> 
 
 </resources>

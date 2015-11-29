@@ -22,7 +22,7 @@
     <!-- 主题界面的字体颜色 -->
     <color name="theme_textcolor">#535353</color>
      <!-- 主题界面皮肤的种颜色 -->
-    <color name="theme_skin_red">#F30911</color>
+    <color name="theme_skin_red">#FFFF5A5A</color>
     <color name="theme_skin_blue">#00B6DF</color>
     <color name="theme_skin_green">#00B758</color>
     <color name="theme_skin_yellow">#F5BB18</color>
@@ -35,6 +35,8 @@
     <color name="password_bg_color">#55C55B</color>
     
     <color name="alarm_playback_color">#ff151515</color>
+       <!-- 阅读界面设置字体颜色 -->
+    <color name="book_setting_text_color">#C4C2BF</color>
     
     
     

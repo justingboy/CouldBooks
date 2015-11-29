@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="55dp"
+        android:layout_marginTop="5dp"
+        android:text="翻页动画"
+        android:textSize="20sp" />
+
+    <com.himoo.ydsc.ui.view.ExpandGridView
+        android:id="@+id/theme_cover_gridview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:horizontalSpacing="15dp"
+        android:numColumns="5"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="5dp"
+        android:verticalSpacing="15dp" >
+    </com.himoo.ydsc.ui.view.ExpandGridView>
+
+</LinearLayout>
