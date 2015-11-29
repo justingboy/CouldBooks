@@ -100,7 +100,7 @@ public class ViewDragHelper {
      */
     public static final int DIRECTION_ALL = DIRECTION_HORIZONTAL | DIRECTION_VERTICAL;
 
-    public static final int EDGE_SIZE = 20; // dp
+    public static final int EDGE_SIZE = 200; // dp
 
     private static final int BASE_SETTLE_DURATION = 256; // ms
 

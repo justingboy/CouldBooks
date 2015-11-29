@@ -73,5 +73,6 @@
                只通过系统设置里清除缓存来实现解锁，届时您的所有下载的书籍及阅读书签、设置将被删除。</string>
                
     <string name="password_input_text">输入你的密码</string>
+    <string name="network_error_text">网络不佳,请检查网络后,下拉刷新试试</string>
 
 </resources>

@@ -18,4 +18,15 @@ public interface SpConstant {
 
 	/** 标记是否开启小说更新设置 */
 	public static final String BOOK_UPATE_SETTING = "book_update_setting";
+	
+	/** 主题小说封面设置*/
+	public static final String BOOK_COVER_TYPE = "book_cover_type";
+	
+	/** 主题皮肤颜色设置*/
+	public static final String BOOK_SKIN_TYPE = "book_skin_type";
+	
+	/** 主题对应int*/
+	public static final String BOOK_SKIN_INDEX = "book_skin_index";
+	/** 封面对应int*/
+	public static final String BOOK_COVER_INDEX = "book_cover_index";
 }

@@ -17,9 +17,10 @@
         <com.ios.edittext.SearchEditText
             android:id="@+id/book_shelf_search"
             style="@style/editTextStyle"
-            android:layout_width="240dp"
+            android:layout_width="0dp"
             android:layout_height="36dp"
             android:hint="检索书架  书名/作者"
+            android:layout_weight="1"
             android:textColor="@color/status_bar_bg" />
 
         <Button
@@ -33,6 +34,8 @@
     </LinearLayout>
 
     <ImageView
+        android:visibility="gone"
+        android:id="@+id/shelf_empty_image"
         android:layout_width="320dp"
         android:layout_height="320dp"
         android:layout_gravity="center_horizontal"
@@ -41,5 +44,24 @@
         android:padding="20dp"
         android:scaleType="centerCrop"
         android:src="@drawable/home_nobook" />
+
+    <com.handmark.pulltorefresh.library.PullToRefreshGridView
+        android:layout_marginTop="10dp"
+        xmlns:ptr="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/shelf_book_gridview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="fill"
+        android:horizontalSpacing="12dp"
+        android:listSelector="@android:color/transparent"
+        android:numColumns="3"
+        android:padding="5dp"
+        android:scrollbarStyle="outsideOverlay"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="12dp"
+        ptr:ptrAnimationStyle="flip"
+        ptr:ptrDrawable="@drawable/pullto_refresh_listview_arrow"
+        ptr:ptrListViewExtrasEnabled="false"
+        ptr:ptrScrollingWhileRefreshingEnabled="true" />
 
 </LinearLayout>

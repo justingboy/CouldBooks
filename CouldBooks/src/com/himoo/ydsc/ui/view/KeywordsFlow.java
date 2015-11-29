@@ -79,7 +79,7 @@ public class KeywordsFlow extends FrameLayout implements OnGlobalLayoutListener 
 	/** 动画运行时间。 */
 	private long animDuration;
 	/** 字体颜色 */
-	private String mColor;
+	private int mColor;
 
 	public KeywordsFlow(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
@@ -120,7 +120,7 @@ public class KeywordsFlow extends FrameLayout implements OnGlobalLayoutListener 
 		animDuration = duration;
 	}
 
-	public void setTextColor(String color) {
+	public void setTextColor(int color) {
 		this.mColor = color;
 	}
 
@@ -235,7 +235,7 @@ public class KeywordsFlow extends FrameLayout implements OnGlobalLayoutListener 
 				}
 				txt.setTextSize(TypedValue.COMPLEX_UNIT_SP, txtSize);
 
-				txt.setTextColor(Color.parseColor(mColor));
+				txt.setTextColor(mColor);
 
 				// txt.setShadowLayer(1, 1, 1, 0xdd696969);
 				txt.setGravity(Gravity.CENTER);

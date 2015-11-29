@@ -52,6 +52,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" 
             android:name="com.himoo.ydsc.activity.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/StyledIndicators" >
@@ -114,8 +115,24 @@
             android:name="com.himoo.ydsc.activity.DoubanWebActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.himoo.ydsc.activity.BookQueryActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.himoo.ydsc.activity.BookReaderActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.himoo.ydsc.reader.ReaderActivity"
+            android:screenOrientation="portrait" >
+        </activity>
      
-        
+        <service android:name="com.himoo.ydsc.download.BookDownloadService">
+            <intent-filter  >
+                <action android:name="book.download.service.action"/>
+            </intent-filter>
+        </service>
 
         <!-- 友盟分享相关注册 -->
         <meta-data

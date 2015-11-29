@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
@@ -25,6 +26,7 @@ import com.himoo.ydsc.adapter.BookAdapter;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.Book;
 import com.himoo.ydsc.bean.BookDetails;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.HttpConstant;
@@ -59,6 +61,8 @@ public class BookClassFragment extends BaseFragment implements
 	private String classId = "1";
 	/** 记录当前点击的位置 */
 	private int mCurrentClickPosition = -1;
+	/** 惰性控件，提高效率 */
+	private ViewStub stub;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -102,15 +106,15 @@ public class BookClassFragment extends BaseFragment implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO Auto-generated method stub
-				if(mCurrentClickPosition  ==position)
-					return ;
+				if (mCurrentClickPosition != -1)
+					return;
 				mCurrentClickPosition = position;
-				
+
 				Book book = (Book) parent.getItemAtPosition(position);
 				// BookDetailsTask.getInstance().excute(getActivity(),
 				// book.getBook_ID());
 				showRefreshDialog("正在加载中");
-				getBookDetailsInfo(getActivity(),  book.getBook_ID());
+				getBookDetailsInfo(getActivity(), book.getBook_ID());
 			}
 		});
 		initLastRefreshTime(SpConstant.LAST_REF_TIME_SUBCHOICE,
@@ -187,15 +191,14 @@ public class BookClassFragment extends BaseFragment implements
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
 				dismissRefreshDialog();
-				if (getActivity() != null)
-					Toast.showLong(getActivity(), "返回失败 ：" + msg);
+				stub = (ViewStub) findViewById(R.id.viewstub);
+				stub.inflate();
 
 			}
 		});
 
 	}
 
-	
 	/**
 	 * 请求自己服务器的书的详情界面信息
 	 * 
@@ -223,7 +226,8 @@ public class BookClassFragment extends BaseFragment implements
 						BookDetails.class);
 				dismissRefreshDialog();
 				mCurrentClickPosition = -1;
-				UIHelper.startToActivity(getActivity(), bookDetalis, BookDialogActivity.class);
+				UIHelper.startToActivity(getActivity(), bookDetalis,
+						BookDialogActivity.class);
 			}
 
 			@Override
@@ -236,8 +240,7 @@ public class BookClassFragment extends BaseFragment implements
 
 		});
 	}
-	
-	
+
 	/**
 	 * 通知数据改变，并且数据刷新完毕
 	 */
@@ -269,6 +272,8 @@ public class BookClassFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		if (list != null && list.size() > 0) {
 			if (mAdapter != null) {
+				if (stub != null)
+					stub.setVisibility(View.GONE);
 				mAdapter.clear();
 				mAdapter.addAll(list);
 				mGridView.setAdapter(mAdapter);
@@ -286,6 +291,16 @@ public class BookClassFragment extends BaseFragment implements
 			notifyDataAndRefreshComplete();
 		}
 
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		if (BookTheme.isThemeChange)
+			if (mAdapter != null) {
+				mAdapter.notifyDataSetChanged();
+			}
 	}
 
 }

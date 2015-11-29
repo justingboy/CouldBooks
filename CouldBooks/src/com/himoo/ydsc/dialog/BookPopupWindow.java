@@ -20,6 +20,7 @@ import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.base.BasePopWindow;
 import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.db.bean.BookSearchRecords;
+import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.DeviceUtil;
 
 /**
@@ -70,6 +71,9 @@ public class BookPopupWindow extends BasePopWindow implements OnClickListener,
 		pop_listview = (ListView) view.findViewById(R.id.pop_listview);
 		popup_btn_clear = (Button) view.findViewById(R.id.popup_btn_clear);
 		popup_btn_cancel = (Button) view.findViewById(R.id.popup_btn_cancel);
+		ViewSelector.setButtonSelector(getActivity(), popup_btn_clear);
+		ViewSelector.setButtonSelector(getActivity(), popup_btn_cancel);
+		
 	}
 
 	@Override

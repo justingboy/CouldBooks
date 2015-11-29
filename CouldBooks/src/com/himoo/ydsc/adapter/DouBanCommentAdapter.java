@@ -9,6 +9,7 @@ import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.base.quickadapter.BaseAdapterHelper;
 import com.himoo.ydsc.base.quickadapter.QuickAdapter;
 import com.himoo.ydsc.bean.DouBanBookComment;
+import com.himoo.ydsc.config.BookTheme;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
 public class DouBanCommentAdapter extends QuickAdapter<DouBanBookComment> {
@@ -19,7 +20,7 @@ public class DouBanCommentAdapter extends QuickAdapter<DouBanBookComment> {
 	public DouBanCommentAdapter(Context context, int layoutResId) {
 		super(context, layoutResId);
 		option = BaseApplication.getInstance().displayImageOptionsBuider(
-				R.drawable.book_face_default);
+				BookTheme.BOOK_COVER);
 	}
 
 	public DouBanCommentAdapter(Context context, int layoutResId,
@@ -27,7 +28,7 @@ public class DouBanCommentAdapter extends QuickAdapter<DouBanBookComment> {
 		super(context, layoutResId, data);
 		// TODO Auto-generated constructor stub
 		option = BaseApplication.getInstance().displayImageOptionsBuider(
-				R.drawable.book_face_default);
+				BookTheme.BOOK_COVER);
 	}
 
 	@Override
@@ -36,6 +37,7 @@ public class DouBanCommentAdapter extends QuickAdapter<DouBanBookComment> {
 
 		helper.setImageUrl(R.id.douban_comment_image, item.getCommentImage(),option);
 		helper.setText(R.id.douban_comment_name, item.getCommentTitle());
+		helper.setTextColor(R.id.douban_comment_name, BookTheme.THEME_COLOR);
 		helper.setText(R.id.douban_comment_title, item.getCommentName());
 		String date = item.getCommentDate().substring(0, item.getCommentDate().indexOf("+")).replace("T", " ");
 		helper.setText(R.id.douban_comment_date, date);

@@ -25,6 +25,7 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.activity.SearchResultActivity;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.BookKeyWord;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.db.bean.BookSearchRecords;
 import com.himoo.ydsc.dialog.BookPopupWindow;
@@ -113,6 +114,8 @@ public class SearchFragment extends BaseFragment implements
 
 	/** 是否有保存key的操作 */
 	private boolean isSaveKey = false;
+	
+	private BookTitleBar titleBar;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -121,9 +124,10 @@ public class SearchFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		View view = inflater
 				.inflate(R.layout.fragment_search, container, false);
-		BookTitleBar titleBar = (BookTitleBar) view
+		titleBar = (BookTitleBar) view
 				.findViewById(R.id.book_titleBar);
 		titleBar.setShowSingleTile();
+		titleBar.setBackgroundColor(BookTheme.THEME_COLOR);
 		titleBar.setTitle(getResources().getString(R.string.main_search));
 
 		popupView = View.inflate(getActivity(), R.layout.popup_book_records,
@@ -138,6 +142,7 @@ public class SearchFragment extends BaseFragment implements
 		bookDb = BookDb.getInstance(getActivity(), "Book");
 		http = new HttpUtils();
 		initKeyWordFlow();
+		bookSearch.setTextColor(BookTheme.THEME_COLOR);
 		bookSearch.setOnSearchClickListener(this);
 		bookSearch.setOnFocuesChangeListener(this);
 		search_speech.setOnClickListener(this);
@@ -148,7 +153,7 @@ public class SearchFragment extends BaseFragment implements
 	 * 初始化KeywordsFlow
 	 */
 	private void initKeyWordFlow() {
-		keywordsFlow.setTextColor("#FF00B64F");
+		keywordsFlow.setTextColor(BookTheme.THEME_COLOR);
 		keywordsFlow.setDuration(800l);
 		keywordsFlow.setOnItemClickListener(this);
 		feedKeywordsFlow(keywordsFlow, keywords);
@@ -369,6 +374,7 @@ public class SearchFragment extends BaseFragment implements
 
 	};
 
+
 	/**
 	 * 参数设置
 	 * 
@@ -448,5 +454,20 @@ public class SearchFragment extends BaseFragment implements
 		getActivity().startActivity(intent);
 		getActivity().overridePendingTransition(R.anim.activity_zoom_in, 0);
 
+	}
+	
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		if (BookTheme.isThemeChange)
+		{
+			titleBar.setBackgroundColor(BookTheme.THEME_COLOR);
+			bookSearch.setTextColor(BookTheme.THEME_COLOR);
+			initKeyWordFlow();
+		}
+		
+		
+		
 	}
 }

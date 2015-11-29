@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -22,6 +23,7 @@ import com.himoo.ydsc.activity.BaiduDetailsActivity;
 import com.himoo.ydsc.adapter.BaiduBookAdapter;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.BaiduBook;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.HttpConstant;
@@ -56,8 +58,10 @@ public class SubHotSearchFragment extends BaseFragment implements
 	/** 当前的页数 */
 	private int currentPage = 0;
 	/** 标记当前点击Item的位置 */
-	private int mCurrentClickPosition  = -1;
-	
+	private int mCurrentClickPosition = -1;
+
+	private ViewStub stub;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			SharedPreferences sp, Bundle savedInstanceState,
@@ -91,8 +95,8 @@ public class SubHotSearchFragment extends BaseFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if(mCurrentClickPosition ==position)
-					return ;
+				if (mCurrentClickPosition != -1)
+					return;
 				mCurrentClickPosition = position;
 				BaiduBook book = (BaiduBook) parent.getItemAtPosition(position);
 				UIHelper.startToActivity(getActivity(), book,
@@ -180,8 +184,10 @@ public class SubHotSearchFragment extends BaseFragment implements
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
-				if (getActivity() != null)
-					Toast.showLong(getActivity(), "返回失败 ：" + msg);
+				// if (getActivity() != null)
+				// Toast.showLong(getActivity(), "返回失败 ：" + msg);
+				stub = (ViewStub) findViewById(R.id.viewstub);
+				stub.inflate();
 
 			}
 		});
@@ -206,6 +212,8 @@ public class SubHotSearchFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		if (list != null && list.size() > 0) {
 			if (mAdapter != null) {
+				if (stub != null)
+					stub.setVisibility(View.GONE);
 				mAdapter.clear();
 				mAdapter.addAll(list);
 				mGridView.setAdapter(mAdapter);
@@ -218,7 +226,8 @@ public class SubHotSearchFragment extends BaseFragment implements
 	@Override
 	public void onPullToRefreshFailure(Exception error, String msg) {
 		// TODO Auto-generated method stub
-		Toast.showLong(getActivity(), "加载数据错误 ：" + msg);
+		// Toast.showLong(getActivity(), "加载数据错误 ：" + msg);
+
 		notifyDataAndRefreshComplete();
 	}
 
@@ -234,12 +243,14 @@ public class SubHotSearchFragment extends BaseFragment implements
 		mPullRefreshGridView.onRefreshComplete();
 
 	}
-	
+
 	@Override
 	public void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
 		mCurrentClickPosition = -1;
+		if (BookTheme.isThemeChange)
+			if (mAdapter != null)
+				mAdapter.notifyDataSetChanged();
 	}
-
 }

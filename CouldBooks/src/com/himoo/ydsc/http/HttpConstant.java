@@ -14,12 +14,12 @@ public interface HttpConstant {
 
 	/** 百度分类请求类型 */
 	public static final int BOOK_REQUEST_TYPE_BAIDU_CLASSIFY = 4;
-	
+
 	/** 百度数据源搜索类型 */
-	public static final int BOOK_REQUEST_TYPE_BAIDU_SEARCH= 5;
-	
+	public static final int BOOK_REQUEST_TYPE_BAIDU_SEARCH = 5;
+
 	/** 自己服务器库中搜索的类型 */
-	public static final int BOOK_REQUEST_TYPE_ME_SEARCH= 6;
+	public static final int BOOK_REQUEST_TYPE_ME_SEARCH = 6;
 
 	/** 　三个地址轮询测试，看哪个可以用 */
 	public static final String BASE_URL1 = "http://www.51devapp.com/";
@@ -53,18 +53,23 @@ public interface HttpConstant {
 
 	/** 百度小说库单个分类请求地址 */
 	public static final String BAIDU_BOOK_CATE_URL = "http://m.baidu.com/book/data/cate";
-	
+
 	/** 百度关键字搜索地址 */
 	public static final String BAIDU_BOOK_SEARCH_URL = "http://www.51devapp.com/bookinfo/baidubooksearch.asp?";
 
-	
 	/** 百度详情页面请求地址 */
 	public static final String BAIDU_BOOK_DETAILS_URL = "http://m.baidu.com/tc?";
-	
-	
+
 	/** 豆瓣评书请求地址 */
 	public static final String DOUBAN_STORYTELLING_URL = "http://api.douban.com/book/subjects?";
-	
-	
-	
+
+	/** 评分地址 */
+	public static final String BOOK_RATING_URL = "http://www.51devapp.com/bookinfo0/bookrate.asp";
+
+	/** 书籍下载计算 地址 */
+	public static final String BOOK_DOWNLOAD_COUNT_URL = "http://www.51devapp.com/bookinfo0/getdl.asp";
+
+	/** 百度书籍章节 地址 */
+	public static final String BAIDU_CHAPTER_URL = "http://m.baidu.com/ssid=0/from=0/bd_page_type=1/uid=undefined/pu=sz@1320_1001/t=iphone/tc?srd=1&appui=alaxs&ajax=1&alals=1&";
+
 }

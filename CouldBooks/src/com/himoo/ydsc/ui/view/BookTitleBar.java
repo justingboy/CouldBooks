@@ -116,7 +116,7 @@ public class BookTitleBar extends LinearLayout {
 	 * @param color
 	 */
 	public void setTitlebarBackgroundColor(int color) {
-		this.setBackgroundColor(mActivity.getResources().getColor(color));
+		view.setBackgroundColor(color);
 	}
 
 	/**

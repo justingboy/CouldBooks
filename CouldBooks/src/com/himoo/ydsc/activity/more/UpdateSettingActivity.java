@@ -5,11 +5,14 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.ios.radiogroup.SegmentedGroup;
+import com.ios.switchbutton.Configuration;
 import com.ios.switchbutton.SwitchButton;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
@@ -51,10 +54,26 @@ public class UpdateSettingActivity extends SwipeBackActivity implements
 	@Override
 	protected void initTitleBar() {
 		// TODO Auto-generated method stub
+		setSegmentedGroupColor();
 		mTitleBar.setLeftTitle(getResources().getString(R.string.main_more));
 		mTitleBar.setTitle(getResources().getString(
 				R.string.more_service_update));
 		mTitleBar.setRightLogoGone();
+	}
+
+	/** 设置颜色 */
+	private void setSegmentedGroupColor() {
+
+		sbBookUdate.setConfiguration(
+				Configuration.getDefault(DeviceUtil.getDisplayDensity(this)),
+				BookTheme.THEME_COLOR);
+		sbBookUdateRemind.setConfiguration(
+				Configuration.getDefault(DeviceUtil.getDisplayDensity(this)),
+				BookTheme.THEME_COLOR);
+
+		segmentUpdateSpaces.setTintColor(BookTheme.THEME_COLOR);
+		segmentUpdateNet.setTintColor(BookTheme.THEME_COLOR);
+		segmentUpdateNotice.setTintColor(BookTheme.THEME_COLOR);
 	}
 
 	private void initListener() {

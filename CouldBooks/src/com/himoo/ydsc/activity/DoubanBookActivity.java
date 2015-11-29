@@ -69,7 +69,7 @@ public class DoubanBookActivity extends SwipeBackActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if (mCurrentClickPosition == position)
+				if (mCurrentClickPosition != -1)
 					return;
 				mCurrentClickPosition = position;
 				DoubanBook book = (DoubanBook) parent
@@ -122,7 +122,8 @@ public class DoubanBookActivity extends SwipeBackActivity {
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				dismissRefreshDialog();
-				Toast.showLong(DoubanBookActivity.this, "获取评书信息失败：" + msg);
+				showNiftyNotification( "获取评书信息失败：" + msg, R.id.Nifty_Lyout);
+//				Toast.showLong(DoubanBookActivity.this,"获取评书信息失败：" + msg);
 			}
 		});
 	}

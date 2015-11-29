@@ -77,7 +77,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if(mCurrentClickPosition ==position)
+				if (mCurrentClickPosition != -1)
 					return ;
 				mCurrentClickPosition = position;
 				if (firstReSuccess == 0) {

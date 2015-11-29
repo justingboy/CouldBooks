@@ -217,7 +217,7 @@ public class BookDetailsDialog extends Dialog {
 				UmengShare.getInstance().setShareContent((Activity) context,
 						bookDetails.getBook_Name(),
 						bookDetails.getBook_Image(),
-						bookDetails.getBook_Summary());
+						bookDetails.getBook_Name(),bookDetails.getBook_Download());
 				// 注册友盟分享
 				UmengShare.getInstance().addCustomPlatforms((Activity) context);
 

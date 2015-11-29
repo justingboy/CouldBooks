@@ -128,15 +128,16 @@ public class FeedBackActivity extends SwipeBackActivity implements
 					.addSheetItem("拍照", SheetItemColor.Blue,
 							new OnSheetItemClickListener() {
 								@Override
-								public void onClick(int which) {
+								public void onClick(TextView v, int which) {
 
 									takePhoto();
 								}
+
 							})
 					.addSheetItem("从相册中选取", SheetItemColor.Blue,
 							new OnSheetItemClickListener() {
 								@Override
-								public void onClick(int which) {
+								public void onClick(TextView v, int which) {
 									Intent intent = new Intent(
 											Intent.ACTION_PICK,
 											android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -256,7 +257,8 @@ public class FeedBackActivity extends SwipeBackActivity implements
 	private String createErrorMessge() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("设备：" + feedback_device.getText() + "|\n")
-				.append("Android系统 ：" + feedback_device_system.getText() + "|\n")
+				.append("Android系统 ：" + feedback_device_system.getText()
+						+ "|\n")
 				.append("应用名字：" + feedback_app_name.getText() + "|\n")
 				.append("版本号：" + feedback_app_version.getText() + "|\n")
 				.append("Build :" + feedback_app_build.getText() + "|\n")

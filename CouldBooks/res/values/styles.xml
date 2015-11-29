@@ -4,7 +4,7 @@
         <!--
 			Theme customizations available in newer API levels can go in
 			res/values-vXX/styles.xml, while customizations related to
-			backward-compatibility can go here.
+			backward-compatibility can go here.
         -->
     </style>
 
@@ -20,7 +20,7 @@
         translucent system bars
 		<item name="android:windowTranslucentStatus">true</item>
 		<item name="android:windowTranslucentNavigation">true</item>
-		<item name="android:fitsSystemWindows">true</item>
+		<item name="android:fitsSystemWindows">true</item>
         -->
     </style>
 
@@ -210,6 +210,24 @@
         <item name="android:paddingLeft">20dp</item>
         <item name="android:paddingRight">20dp</item>
         <item name="android:paddingTop">10dp</item>
+    </style>
+
+    <!-- 书架删除dialog样式 -->
+    <style name="BookDeletedDialogTheme" parent="android:Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/anistyle</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <!-- 背景有灰度 -->
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="foodRatingBar" parent="@android:style/Widget.RatingBar">
+
+        <!-- 指向star_rating_bar_full.xml文件 -->
+        <item name="android:progressDrawable">@drawable/rating_yellow</item>
     </style>
 
 </resources>

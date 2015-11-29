@@ -3,6 +3,7 @@ package com.himoo.ydsc.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseActivity;
+import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.fragment.BookShelfFragment;
 import com.himoo.ydsc.fragment.ChoiceFragment;
 import com.himoo.ydsc.fragment.ClassifyFragment;
@@ -59,7 +62,7 @@ public class HomeActivity extends BaseActivity {
 	private Fragment choiceFragment = new ChoiceFragment();
 	private Fragment classifyFragment = new ClassifyFragment();
 	private Fragment searchFragment = new SearchFragment();
-	private Fragment bookshelfFragment = new BookShelfFragment();
+	public Fragment bookshelfFragment = new BookShelfFragment();
 	private Fragment moreFragment = new MoreFragment();
 	private List<Fragment> fragmentList;
 
@@ -79,12 +82,12 @@ public class HomeActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 		ViewUtils.inject(this);
-		initEvent();
 		setRadioButtonDrawableSelector();
 		setRadioButtonTextColorSelector();
 		this.fragmentManager = getSupportFragmentManager();
 		initFragmentList();
-		setCurrentClickPoint(RB_VIEW_CHOICE);
+		setCurrentClickPoint(RB_VIEW_BOOKSHELF);
+		initEvent();
 		addFirstToast(this.getActivityName());
 
 		Log.d(SharedPreferences.getInstance().getString("host",
@@ -96,6 +99,7 @@ public class HomeActivity extends BaseActivity {
 	protected void initEvent() {
 		// TODO Auto-generated method stub
 		rGroup.setOnCheckedChangeListener(new OnRadioGroupCheckedChangeListener());
+		rBBookshelf.setChecked(true);
 	}
 
 	/**
@@ -201,25 +205,25 @@ public class HomeActivity extends BaseActivity {
 			}
 		}
 	}
-	
+
 	/**
 	 * 设置RadioButton选择器
 	 */
 	private void setRadioButtonDrawableSelector() {
 		StateListDrawable choiceDrawable = ViewSelector.creatWidgetSelector(
-				this, R.drawable.main_bottom_choice_green,
+				this, BookTheme.MAIN_CHOICE_DRAWABLE,
 				R.drawable.mian_bottom_choice);
 		StateListDrawable classifyDrawable = ViewSelector.creatWidgetSelector(
-				this, R.drawable.main_bottom_classify_green,
+				this, BookTheme.MAIN_CLASSIFY_DRAWABLE,
 				R.drawable.main_bottom_classify);
 		StateListDrawable searchDrawable = ViewSelector.creatWidgetSelector(
-				this, R.drawable.mian_bottom_search_green,
+				this, BookTheme.MAIN_SEARCH_DRAWABLE,
 				R.drawable.mian_bottom_search);
 		StateListDrawable bookShelfDrawable = ViewSelector.creatWidgetSelector(
-				this, R.drawable.main_bottom_bookshelf_green,
+				this, BookTheme.MAIN_BOOKSHELF_DRAWABLE,
 				R.drawable.main_bottom_bookshelf);
 		StateListDrawable moreDrawable = ViewSelector.creatWidgetSelector(this,
-				R.drawable.mian_bottom_more_green, R.drawable.mian_bottom_more);
+				BookTheme.MAIN_MORE_DRAWABLE, R.drawable.mian_bottom_more);
 		// 设置上
 		rBChoice.setCompoundDrawablesWithIntrinsicBounds(null, choiceDrawable,
 				null, null);
@@ -238,8 +242,8 @@ public class HomeActivity extends BaseActivity {
 	 */
 	private void setRadioButtonTextColorSelector() {
 
-		ColorStateList colorstate = ViewSelector.creatTextColorSelector(this);
-
+		ColorStateList colorstate = ViewSelector.createTextColorStateList(
+				BookTheme.THEME_COLOR, BookTheme.THEME_COLOR_DEFAULT);
 		rBChoice.setTextColor(colorstate);
 		rBClassify.setTextColor(colorstate);
 		rBSearch.setTextColor(colorstate);
@@ -247,9 +251,39 @@ public class HomeActivity extends BaseActivity {
 		rBMore.setTextColor(colorstate);
 	}
 
-	
-	
-	
-	
+	@Override
+	protected void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		stopDownloadService();
+	}
+
+	/**
+	 * 停止下载的服务
+	 */
+	private void stopDownloadService() {
+		Intent downloadIntent = new Intent("book.download.service.action");
+		downloadIntent.setPackage("com.himoo.ydsc");
+		stopService(downloadIntent);
+		BookDownloadService.DOWNLOAD_MANAGER = null;
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		if (BookTheme.isThemeChange)
+			setThemeChange();
+	}
+
+	/**
+	 * 设置新的主题背景色
+	 */
+	protected void setThemeChange() { // 通知栏所需颜色
+		tintManager.setStatusBarTintColor(BookTheme.THEME_COLOR);
+		setRadioButtonDrawableSelector();
+		setRadioButtonTextColorSelector();
+
+	}
 
 }

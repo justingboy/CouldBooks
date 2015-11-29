@@ -11,6 +11,9 @@ public class BaiduBookChapter {
 	private String text;
 	private String href;
 	private String cid;
+	
+	private String chapterName;
+	private String chapterUrl;
 
 	public void setCreate_time(String create_time) {
 		this.create_time = create_time;
@@ -58,6 +61,22 @@ public class BaiduBookChapter {
 
 	public String getCid() {
 		return this.cid;
+	}
+
+	public String getChapterName() {
+		return chapterName;
+	}
+
+	public void setChapterName(String chapterName) {
+		this.chapterName = chapterName;
+	}
+
+	public String getChapterUrl() {
+		return chapterUrl;
+	}
+
+	public void setChapterUrl(String chapterUrl) {
+		this.chapterUrl = chapterUrl;
 	}
 
 }

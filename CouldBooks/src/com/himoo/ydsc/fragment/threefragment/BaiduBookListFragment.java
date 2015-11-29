@@ -1,6 +1,7 @@
 package com.himoo.ydsc.fragment.threefragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONObject;
 
@@ -12,13 +13,15 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.adapter.BaiduBookClassifyAdapter;
 import com.himoo.ydsc.bean.BaiduBookClassify;
+import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.lidroid.xutils.HttpUtils;
@@ -33,11 +36,13 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
  * 
  */
 public class BaiduBookListFragment extends ListFragment {
-	
+
 	/** 分类-精选部分书库资源数据 */
-	private ArrayList<BaiduBookClassify> list;
+	private ArrayList<BaiduBookClassify> list = new ArrayList<BaiduBookClassify>();
 	/** 当前点击的ListView Item的位置 */
 	private int mCurrentClickPosition = -1;
+	private BookDb db;
+	private BaiduBookClassifyAdapter mAdapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -52,6 +57,7 @@ public class BaiduBookListFragment extends ListFragment {
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
+		db = BookDb.getInstance(getActivity(), "Book");
 		getBookClassList();
 	}
 
@@ -83,7 +89,14 @@ public class BaiduBookListFragment extends ListFragment {
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
-				Toast.showLong(getActivity(), "获取数据错误：" + msg);
+				List<BaiduBookClassify> bookList = db
+						.queryBookClassify(BaiduBookClassify.class);
+				if (bookList == null) {
+					Toast.showLong(getActivity(), "获取书籍分类错误,请检查网络状态是否正常！");
+					return;
+				}
+				list.addAll(bookList);
+				initAdapter(list);
 			}
 		});
 
@@ -102,23 +115,29 @@ public class BaiduBookListFragment extends ListFragment {
 				JSONObject subJsonObject = jsonObject.getJSONObject("result");
 				String result = subJsonObject.getString("cates");
 				Gson gosn = new Gson();
-				list = gosn.fromJson(result,
+				ArrayList<BaiduBookClassify> bookList = gosn.fromJson(result,
 						new TypeToken<ArrayList<BaiduBookClassify>>() {
 						}.getType());
-
-				String[] bookArray = new String[list.size()];
-				for (int i = 0; i < bookArray.length; i++) {
-					bookArray[i] = list.get(i).getCatename();
-				}
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-						getActivity(), R.layout.fragment_list_texti_item,
-						bookArray);
-				setListAdapter(adapter);
+				list.addAll(bookList);
+				db.saveBaiduBookClassify(bookList);
+				initAdapter(list);
 			}
 		} catch (Exception e) {
-			Toast.showLong(getActivity(), "解析百度书库分类出现错误！");
+			Toast.showLong(getActivity(), "解析书库分类出现错误！");
 		}
 
+	}
+
+	/**
+	 * 初始化Adapter
+	 * 
+	 * @param list
+	 */
+	private void initAdapter(ArrayList<BaiduBookClassify> list) {
+
+		mAdapter = new BaiduBookClassifyAdapter(getActivity(),
+				R.layout.fragment_list_texti_item, list);
+		setListAdapter(mAdapter);
 	}
 
 	/**
@@ -138,5 +157,14 @@ public class BaiduBookListFragment extends ListFragment {
 		args.putString("cateid", list.get(position).getCateid() + "");
 		bookClassFragment.setArguments(args);
 		transaction.commit();
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		if (BookTheme.isThemeChange)
+			if (mAdapter != null)
+				mAdapter.notifyDataSetChanged();
 	}
 }

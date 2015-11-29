@@ -1,6 +1,7 @@
 package com.himoo.ydsc.fragment.threefragment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,13 +11,15 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.adapter.BookClassifyAdapter;
 import com.himoo.ydsc.bean.BookClassify;
+import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -33,8 +36,10 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
  */
 public class BookListFragment extends ListFragment {
 
-	private ArrayList<BookClassify> list;
+	private ArrayList<BookClassify> list = new ArrayList<BookClassify>();
 	private int mCurrentClickPosition = 0;
+	private BookDb db;
+	private BookClassifyAdapter mAdapter;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,7 +54,7 @@ public class BookListFragment extends ListFragment {
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
-		
+		db = BookDb.getInstance(getActivity(), "Book");
 		getBookClassList();
 	}
 
@@ -77,14 +82,21 @@ public class BookListFragment extends ListFragment {
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
-
 				parseJson(responseInfo.result);
 			}
 
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
-				Toast.showLong(getActivity(), "获取数据错误：" + msg);
+				List<BookClassify> bookList = db
+						.queryBookClassify(BookClassify.class);
+				if (bookList == null) {
+					Toast.showLong(getActivity(), "获取书籍分类错误,请检查网络状态是否正常！");
+					return;
+				}
+				list.addAll(bookList);
+				initAdapter(list);
+
 			}
 		});
 
@@ -97,15 +109,26 @@ public class BookListFragment extends ListFragment {
 	 */
 	private void parseJson(String json) {
 		Gson gosn = new Gson();
-		list = gosn.fromJson(json, new TypeToken<ArrayList<BookClassify>>() {
-		}.getType());
-		String[] bookArray = new String[list.size()];
-		for (int i = 0; i < bookArray.length; i++) {
-			bookArray[i] = list.get(i).getClass_Name();
-		}
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-				R.layout.fragment_list_texti_item, bookArray);
-		setListAdapter(adapter);
+		ArrayList<BookClassify> bookList = gosn.fromJson(json,
+				new TypeToken<ArrayList<BookClassify>>() {
+				}.getType());
+		list.addAll(bookList);
+		db.saveBookClassify(list);
+		initAdapter(list);
+
+	}
+
+	/**
+	 * 初始化Adapter
+	 * 
+	 * @param list
+	 */
+	private void initAdapter(ArrayList<BookClassify> list) {
+
+		mAdapter = new BookClassifyAdapter(getActivity(),
+				R.layout.fragment_list_texti_item, list);
+
+		setListAdapter(mAdapter);
 	}
 
 	/**
@@ -125,5 +148,15 @@ public class BookListFragment extends ListFragment {
 		args.putString("class", list.get(position).getClass_ID() + "");
 		bookClassFragment.setArguments(args);
 		transaction.commit();
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		if (BookTheme.isThemeChange)
+			if (mAdapter != null) {
+				mAdapter.notifyDataSetChanged();
+			}
 	}
 }

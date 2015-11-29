@@ -45,6 +45,17 @@ public class DeviceUtil {
 		context.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		return dm;
 	}
+	/**
+	 * 获取DisplayMetrics，包括屏幕高宽，密度等
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static float getDisplayDensity(Activity context) {
+		DisplayMetrics dm = new DisplayMetrics();
+		context.getWindowManager().getDefaultDisplay().getMetrics(dm);
+		return dm.density;
+	}
 
 	/**
 	 * 获得屏幕宽度 px

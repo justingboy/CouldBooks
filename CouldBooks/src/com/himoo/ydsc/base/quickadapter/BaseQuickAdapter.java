@@ -136,7 +136,7 @@ public abstract class BaseQuickAdapter<T, H extends BaseAdapterHelper> extends B
 
     public void addAll(List<T> elem) {
         data.addAll(elem);
-        notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
     public void set(T oldElem, T newElem) {
@@ -157,6 +157,10 @@ public abstract class BaseQuickAdapter<T, H extends BaseAdapterHelper> extends B
         data.remove(index);
         notifyDataSetChanged();
     }
+    public void remove(List<T> elem) {
+    	data.removeAll(elem);
+    	notifyDataSetChanged();
+    }
 
     public void replaceAll(List<T> elem) {
         data.clear();
@@ -173,7 +177,7 @@ public abstract class BaseQuickAdapter<T, H extends BaseAdapterHelper> extends B
      */
     public void clear() {
         data.clear();
-        notifyDataSetChanged();
+//        notifyDataSetChanged();
     }
 
     public void showIndeterminateProgress(boolean display) {

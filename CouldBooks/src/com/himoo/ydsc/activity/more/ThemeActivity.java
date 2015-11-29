@@ -14,8 +14,13 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.quickadapter.BaseAdapterHelper;
 import com.himoo.ydsc.base.quickadapter.QuickAdapter;
 import com.himoo.ydsc.bean.ThemeSkin;
+import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.util.DeviceUtil;
+import com.himoo.ydsc.util.SharedPreferences;
+import com.ios.switchbutton.Configuration;
 import com.ios.switchbutton.SwitchButton;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
@@ -37,7 +42,7 @@ public class ThemeActivity extends SwipeBackActivity implements
 			R.drawable.theme_shape_yellow, R.drawable.theme_shape_gray };
 	/** 　封面 */
 	private int[] coverDrawable = { R.drawable.book_face_default,
-			R.drawable.book_face_default, R.drawable.book_face_default,
+			R.drawable.no_cover, R.drawable.book_face_default,
 			R.drawable.book_face_default };
 	private String[] title = { "封面一", "封面二", "封面三", "封面四" };
 
@@ -52,6 +57,12 @@ public class ThemeActivity extends SwipeBackActivity implements
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_more_theme);
+
+		mCurrentSkinColor = SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SKIN_TYPE, R.drawable.theme_shape_green);
+		mCurrentTitle = SharedPreferences.getInstance().getString(
+				SpConstant.BOOK_COVER_TYPE, title[0]);
+
 		initSkinGridView();
 		initCoverGridView();
 		switchButton.setOnCheckedChangeListener(this);
@@ -64,6 +75,11 @@ public class ThemeActivity extends SwipeBackActivity implements
 		mTitleBar.setLeftTitle(getResources().getString(R.string.main_more));
 		mTitleBar.setTitle(getResources().getString(R.string.more_topic));
 		mTitleBar.setRightLogoGone();
+
+		switchButton.setConfiguration(
+				Configuration.getDefault(DeviceUtil.getDisplayDensity(this)),
+				BookTheme.THEME_COLOR);
+
 	}
 
 	private void initSkinGridView() {
@@ -97,6 +113,13 @@ public class ThemeActivity extends SwipeBackActivity implements
 				// TODO Auto-generated method stub
 				mCurrentSkinColor = skinDrawable[position];
 				skinAdapter.notifyDataSetChanged();
+				SharedPreferences.getInstance().putInt(
+						SpConstant.BOOK_SKIN_TYPE, mCurrentSkinColor);
+				SharedPreferences.getInstance().putInt(
+						SpConstant.BOOK_SKIN_INDEX, position + 1);
+				BookTheme.setThemeColor(position + 1);
+				setThemeChange();
+				BookTheme.setChangeTheme(true);
 
 			}
 		});
@@ -133,9 +156,14 @@ public class ThemeActivity extends SwipeBackActivity implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-
 				mCurrentTitle = title[position];
+				SharedPreferences.getInstance().putString(
+						SpConstant.BOOK_COVER_TYPE, mCurrentTitle);
+				SharedPreferences.getInstance().putInt(
+						SpConstant.BOOK_COVER_INDEX, position);
+				BookTheme.setBookCover(position);
 				coverAdapter.notifyDataSetChanged();
+				
 
 			}
 		});
@@ -146,6 +174,18 @@ public class ThemeActivity extends SwipeBackActivity implements
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		// TODO Auto-generated method stub
 		Toast.showShort(this, isChecked ? "开启夜间模式" : "关闭夜间模式");
+	}
+
+	/**
+	 * 设置新的主题背景色
+	 */
+	protected void setThemeChange() { // 通知栏所需颜色
+		tintManager.setStatusBarTintColor(BookTheme.THEME_COLOR);
+		mTitleBar.setBackgroundColor(BookTheme.THEME_COLOR);
+		switchButton.setConfiguration(
+				Configuration.getDefault(DeviceUtil.getDisplayDensity(this)),
+				BookTheme.THEME_COLOR);
+
 	}
 
 }

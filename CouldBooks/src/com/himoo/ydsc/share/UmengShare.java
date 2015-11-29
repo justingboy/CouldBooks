@@ -151,8 +151,10 @@ public class UmengShare {
 	 *            分享的内容
 	 */
 	public void setShareContent(Activity context, String title,
-			String imageUrl, String content) {
+			String imageUrl, String bookName, String bookdownloadUrl) {
 
+		String content = "最近看了一本特别好的书《" + bookName + "》,推荐给大家一起看看,下载地址:"
+				+ bookdownloadUrl;
 		// QQ授权分享
 		QZoneSsoHandler qZoneSsoHandler = new QZoneSsoHandler(context,
 				"100424468", "c7394704798a158208a74ab60104f0ba");

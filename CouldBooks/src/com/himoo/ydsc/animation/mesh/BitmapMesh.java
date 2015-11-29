@@ -35,10 +35,12 @@ public class BitmapMesh {
         private Paint mPaint;
         private float[] mInhalePoint;
         private InhaleMesh mInhaleMesh;
+        private Context mContext;
 
         public SampleView(Context context,Bitmap bitmap,int with,int height) {
             super(context);
             setFocusable(true);
+            this.mContext = context;
             mBitmap = bitmap;
 
             mPaint = new Paint();
@@ -58,7 +60,7 @@ public class BitmapMesh {
             float bitmapWidth = mBitmap.getWidth();
             float bitmapHeight = mBitmap.getHeight();
 
-            buildPaths(bitmapWidth / 2, h/2);
+            buildPaths(DeviceUtil.dip2px(mContext, 104)/2, 10);
             buildMesh(bitmapWidth, bitmapHeight);
         }
 

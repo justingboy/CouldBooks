@@ -9,6 +9,7 @@ import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.base.quickadapter.BaseAdapterHelper;
 import com.himoo.ydsc.base.quickadapter.QuickAdapter;
 import com.himoo.ydsc.bean.BaiduBook;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.util.RegularUtil;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 
@@ -24,7 +25,7 @@ public class SearchBaiduBookAdapter extends QuickAdapter<BaiduBook> {
 	public SearchBaiduBookAdapter(Context context, int layoutResId) {
 		super(context, layoutResId);
 		option = BaseApplication.getInstance().displayImageOptionsBuider(
-				R.drawable.book_face_default);
+				BookTheme.BOOK_COVER);
 	}
 
 	public SearchBaiduBookAdapter(Context context, int layoutResId,
@@ -32,7 +33,7 @@ public class SearchBaiduBookAdapter extends QuickAdapter<BaiduBook> {
 		super(context, layoutResId, data);
 		// TODO Auto-generated constructor stub
 		option = BaseApplication.getInstance().displayImageOptionsBuider(
-				R.drawable.book_face_default);
+				BookTheme.BOOK_COVER);
 	}
 
 	@Override
@@ -44,6 +45,7 @@ public class SearchBaiduBookAdapter extends QuickAdapter<BaiduBook> {
 
 		helper.setImageUrl(R.id.search_book_image, imageUrl, option);
 		helper.setText(R.id.search_book_name, item.getTitle());
+		helper.setTextColor(R.id.search_book_name, BookTheme.THEME_COLOR);
 		helper.setText(R.id.search_book_author, item.getAuthor());
 		helper.setText(R.id.search_book_summary, item.getSummary().trim());
 		if (item.getStatus().equals("完结")) {

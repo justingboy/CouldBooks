@@ -16,6 +16,7 @@ import com.himoo.ydsc.activity.more.ThemeActivity;
 import com.himoo.ydsc.activity.more.UpdateSettingActivity;
 import com.himoo.ydsc.activity.more.WallActivity;
 import com.himoo.ydsc.base.BaseFragment;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.view.BookTitleBar;
@@ -62,15 +63,16 @@ public class MoreFragment extends BaseFragment implements
 	/** 标识是否开启自动更新设置 */
 	@ViewInject(R.id.more_book_update_identifiy)
 	private TextView bookUpdateIdentify;
-	
+
 	/** 用于防止多次点击 */
 	private boolean isClickable = false;
-	
 
 	/** ids */
 	public int ids[] = { R.id.more_topic, R.id.more_timeUpdate,
 			R.id.more_unlock, R.id.more_statistics, R.id.more_passwordProtect,
 			R.id.more_feedback };
+
+	private BookTitleBar titleBar;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,8 +80,8 @@ public class MoreFragment extends BaseFragment implements
 			PageManager pageManager) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.fragment_more, null);
-		BookTitleBar titleBar = (BookTitleBar) view
-				.findViewById(R.id.book_titleBar);
+		titleBar = (BookTitleBar) view.findViewById(R.id.book_titleBar);
+		titleBar.setBackgroundColor(BookTheme.THEME_COLOR);
 		titleBar.setShowSingleTile();
 		titleBar.setTitle(getResources().getString(R.string.main_more));
 		return view;
@@ -88,7 +90,7 @@ public class MoreFragment extends BaseFragment implements
 	@Override
 	public void initData() {
 		// TODO Auto-generated method stub
-		
+
 		// 设置监听器
 		segment_book_update.setOnCheckedChangeListener(this);
 		// 设置版本信息
@@ -102,8 +104,8 @@ public class MoreFragment extends BaseFragment implements
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		super.onClick(v);
-		if(isClickable)
-			return ;
+		if (isClickable)
+			return;
 		isClickable = true;
 		switch (v.getId()) {
 		case R.id.more_topic:
@@ -154,10 +156,15 @@ public class MoreFragment extends BaseFragment implements
 	public void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		if (BookTheme.isThemeChange)
+			titleBar.setBackgroundColor(BookTheme.THEME_COLOR);
 		boolean isOpenUpdate = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_UPATE_SETTING, false);
+		segment_book_update.setTintColor(BookTheme.THEME_COLOR);
+		bookUpdateIdentify.setTextColor(BookTheme.THEME_COLOR);
 		bookUpdateIdentify.setText(isOpenUpdate ? "已开启" : "已关闭");
 		isClickable = false;
+
 	}
 
 	/**

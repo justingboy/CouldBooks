@@ -1,6 +1,7 @@
 package com.himoo.ydsc.http;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -8,6 +9,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -22,8 +24,9 @@ import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.bean.BookDetails;
 import com.himoo.ydsc.dialog.BookDetailsDialog;
 import com.himoo.ydsc.listener.OnParseChapterListener;
+import com.himoo.ydsc.listener.OnRequestCallBack;
 import com.himoo.ydsc.ui.utils.Toast;
-import com.himoo.ydsc.util.MyLogger;
+import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -122,9 +125,13 @@ public class BookDetailsTask {
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
 				ArrayList<BaiduBookChapter> list = praseBaiduBookChapter(responseInfo.result);
-				if (list != null && list.size() > 0) {
-					if (mListener != null)
-						mListener.onParseSuccess(list);
+				if (list != null && !list.isEmpty()) {
+					ArrayList<BaiduBookChapter> newList = getNewList(list);
+					if (mListener != null) {
+						mListener.onParseSuccess(newList);
+						list.clear();
+						list = null;
+					}
 				} else {
 					if (mListener != null)
 						mListener.onParseFailure(null, "获取数据为空");
@@ -266,30 +273,105 @@ public class BookDetailsTask {
 	}
 
 	/**
+	 * get请求返回数据
+	 * 
+	 * @param urlString
+	 * @param callBack
+	 */
+	public void send(final String urlString, final String bookName,
+			final String index, final OnRequestCallBack callBack) {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				File dirFile = new File(FileUtils.mSdRootPath
+						+ "/CouldBook/baidu" + File.separator + bookName
+						+ File.separator);
+
+				File file = new File(dirFile, index + ".txt");
+				if (file.exists() || file.length() > 0) {
+					String content = com.himoo.ydsc.download.FileUtils
+							.readFormSd(file);
+					if (null != callBack) {
+						callBack.onSuccess(content);
+
+					}
+				} else {
+					try {
+						URL url = new URL(urlString);
+						HttpURLConnection conn = (HttpURLConnection) url
+								.openConnection();
+						conn.setConnectTimeout(5000);
+						conn.setRequestMethod("GET");
+						conn.setRequestProperty("Content-Type",
+								"application/x-www-form-urlencoded");
+						int code = conn.getResponseCode();
+						if (code == 200) {
+							InputStream is = conn.getInputStream();
+							String result = streamToString(is);
+							if (null != callBack) {
+								callBack.onSuccess(result);
+
+							}
+						} else {
+							if (null != callBack) {
+								callBack.onFailure("获取数据失败");
+							}
+						}
+					} catch (Exception e) {
+						if (null != callBack) {
+							callBack.onFailure("获取数据失败");
+						}
+					}
+				}
+			}
+		}).start();
+
+	}
+
+	/**
 	 * 将流转换成String
 	 * 
 	 * @param is
 	 * @return
+	 * @throws IOException
 	 */
-	private String streamToString(InputStream is) {
+	public String streamToString(InputStream is) throws IOException {
 		if (is != null) {
 			BufferedReader reader = new BufferedReader(
 					new InputStreamReader(is));
 			StringBuffer sb = new StringBuffer();
-			String line;
-			try {
-				while ((line = reader.readLine()) != null) {
-					sb.append(line);
-
-				}
-				return sb.toString();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				MyLogger.kLog().e(e);
-				return "";
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				sb.append(line);
 			}
+			return sb.toString();
 		}
 
 		return "";
 	}
+
+	/**
+	 * 去重复的对象
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public ArrayList<BaiduBookChapter> getNewList(
+			ArrayList<BaiduBookChapter> chapterList) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		for (int i = 0; i < chapterList.size(); i++) {
+			String chapterName = chapterList.get(i).getText().trim();
+			if (map.get(chapterName) != null) {
+				chapterList.remove(i);
+			} else {
+				map.put(chapterName, "ok");
+			}
+		}
+		map.clear();
+		map = null;
+		return chapterList; // 返回集合
+	}
+
 }

@@ -1,6 +1,9 @@
 package com.himoo.ydsc.config;
 
-import android.content.Context;
+import java.util.ArrayList;
+
+import com.himoo.ydsc.R;
+
 import android.graphics.Color;
 
 /**
@@ -9,293 +12,232 @@ import android.graphics.Color;
  */
 public class BookTheme {
 
-	public Context context = null;
-	// 默认色
-	public static int backGroundColor = BookTheme.color;
-	
-	public final static int REDTHEME = 1;
-	public final static int BLUETHEME = 2;
-	public final static int ORANGETHEME = 3;
-	public final static int GREENTHEME = 4;
-	public final static int WHITETHEME = 5;
-	public static int themeColor = 3;
-	
-	/** 绿色背景色*/
-	public static final int BOOK_GREEN = Color.parseColor("#FF00B64F");
-	
+	/** 设置那些图片是白色的书名 */
+	public static final ArrayList<String> coverErrorList = new ArrayList<String>();
+
+	/** 五种主题皮肤 的变量 */
+	public final static int RED_THEME = 1;
+	public final static int BLUE_THEME = 2;
+	public final static int GREEN_THEME = 3;
+	public final static int YELLOW_THEME = 4;
+	public final static int GRAY_THEME = 5;
+
+	/** 主题皮肤类型 */
+	public static int THEME_COLOR_TYPE = 3;
+
+	/** 五种主题皮肤 */
+	public static final int BOOK_RED = Color.parseColor("#FFF30911");
+	public static final int BOOK_BLUE = Color.parseColor("#FF00B6DF");
+	public static final int BOOK_GREEN = Color.parseColor("#FF00B758");
+	public static final int BOOK_YELLOW = Color.parseColor("#FFF5BB18");
+	public static final int BOOK_GRAY = Color.parseColor("#FF2C2000");
+	public static final int BOOK_WHITE = Color.parseColor("#FFFFFFFF");
+
+	/** 主题颜色默认 */
+	public static int THEME_COLOR = BookTheme.BOOK_GREEN;
+	/** 底部导航栏文字颜色默认 */
+	public static int THEME_COLOR_DEFAULT = Color.parseColor("#FF7E7D7B");
+	/** 主题颜色默认 */
+	public static int BUTTON_COLOR_PRESS = BookTheme.BOOK_GREEN_PRESS;
+
+	/** Button 选择器的绿色背景色 */
+	public static final int BOOK_RED_PRESS = Color.parseColor("#FF1000");
+	public static final int BOOK_BLUE_PRESS = Color.parseColor("#00A1BC");
 	public static final int BOOK_GREEN_PRESS = Color.parseColor("#007F45");
-	
-	
-	
-	
+	public static final int BOOK_YELLOW_PRESS = Color.parseColor("#F9C60E");
+	public static final int BOOK_GRAY_PRESS = Color.parseColor("#342808");
 
-	public final static int BLACKTRAN = Color.parseColor("#cc000000");
-	public final static int BLUETEXTCOLOR = Color.BLUE;
-	public final static int REDTEXTCOLOR = Color.RED;
+	/** 　封面 */
+	public static final int[] coverDrawable = { R.drawable.book_face_default,
+			R.drawable.no_cover, R.drawable.book_face_default,
+			R.drawable.book_face_default };
 
-	public final static int WHITETEXTCOLOR = Color.WHITE;
-	public final static int BLACKTEXTCOLOR = Color.BLACK;
+	/** 书籍默认封面 */
+	public static int BOOK_COVER = coverDrawable[0];
 
-	private final static int GRAYBGCOLOR = Color.parseColor("#cdcbcc");
-	public final static int GRAY2BGCOLOR = Color.parseColor("#f0eff4");
-	public final static int GRAY3BGCOLOR = Color.parseColor("#f9f9f9");
+	/** 是否需要在onResume中改变主题 */
+	public static boolean isThemeChange = false;
 
-	private final static int GRAY2TEXTCOLOR = Color.parseColor("#484747");
+	/** 　精选 */
+	public static final int[] CHOICE_DRAWABLE = {
+			R.drawable.main_bottom_choice_red,
+			R.drawable.main_bottom_choice_blue,
+			R.drawable.main_bottom_choice_green,
+			R.drawable.main_bottom_choice_yellow,
+			R.drawable.main_bottom_choice_gray };
 
-	public final static int TITLEBGCOLOR = Color.parseColor("#fafafa");
+	/** 分类 */
+	public static final int[] CLASSIFY_DRAWABLE = {
+			R.drawable.main_bottom_classify_red,
+			R.drawable.main_bottom_classify_blue,
+			R.drawable.main_bottom_classify_green,
+			R.drawable.main_bottom_classify_yellow,
+			R.drawable.main_bottom_classify_gray };
 
-	public final static int GRAYLINECOLOR = Color.parseColor("#cfced3");
+	/** 　搜索 */
+	public static final int[] SEARCH_DRAWABLE = {
+			R.drawable.mian_bottom_search_red,
+			R.drawable.mian_bottom_search_blue,
+			R.drawable.mian_bottom_search_green,
+			R.drawable.mian_bottom_search_yellow,
+			R.drawable.mian_bottom_search_gray };
 
-	private final static int BLUEHELPBGCOLOR = Color.parseColor("#0180a4");
-	private final static int BLUEHELPPPRESSBGCOLOR = Color
-			.parseColor("#01bbf0");
+	/** 　书架 */
+	public static final int[] BOOKSHELF_DRAWABLE = {
+			R.drawable.main_bottom_bookshelf_red,
+			R.drawable.main_bottom_bookshelf_blue,
+			R.drawable.main_bottom_bookshelf_green,
+			R.drawable.main_bottom_bookshelf_yellow,
+			R.drawable.main_bottom_bookshelf_gray };
 
-	private final static int GREENHELPBGCOLOR = Color.parseColor("#4a9e08");
-	private final static int GREENHELPPPRESSBGCOLOR = Color
-			.parseColor("#6de113");
+	/** 　更多 */
+	public static final int[] MORE_DRAWABLE = {
+			R.drawable.mian_bottom_more_rea, R.drawable.mian_bottom_more_blue,
+			R.drawable.mian_bottom_more_green,
+			R.drawable.mian_bottom_more_yellow,
+			R.drawable.mian_bottom_more_gray };
 
-	private final static int ORANGEHELPBGCOLOR = Color.parseColor("#d13e02");
-	private final static int ORANGEHELPPRESSBGCOLOR = Color
-			.parseColor("#ff6d01");
+	/** 　底部导航栏的颜色 */
+	public static int MAIN_CHOICE_DRAWABLE = CHOICE_DRAWABLE[1];
+	public static int MAIN_CLASSIFY_DRAWABLE = CLASSIFY_DRAWABLE[1];
+	public static int MAIN_SEARCH_DRAWABLE = SEARCH_DRAWABLE[1];
+	public static int MAIN_BOOKSHELF_DRAWABLE = BOOKSHELF_DRAWABLE[1];
+	public static int MAIN_MORE_DRAWABLE = MORE_DRAWABLE[1];
 
-	private final static int REDHELPBGCOLOR = Color.parseColor("#b9010d");
-	private final static int REDHELPPPRESSBGCOLOR = Color.parseColor("#ff0000");
-
-	private final static int WHITEHELPBGCOLOR = Color.parseColor("#f9f9f9");
-	private final static int WHITEHELPPPRESSBGCOLOR = Color
-			.parseColor("#ff0000");
-
-	public static boolean isStroke = false;
-
-	// 主题颜色
-	public static int color = Color.parseColor("#ff4a01");
-	// 总额文字颜色
-	public static int coinColor = WHITETEXTCOLOR;
-	// 帮助背景颜色
-	public static int helpBgColor = ORANGEHELPBGCOLOR;
-	// 帮助按下背景颜色
-	public static int helpPressBgColor = ORANGEHELPPRESSBGCOLOR;
-	// 彩球文字颜色
-	public static int ballColor = WHITETEXTCOLOR;
-	// 默认文字颜色
-	public static int defaultTextcolor = WHITETEXTCOLOR;
-
-	// selectView文字颜色
-	public static int selectViewBgColor = WHITETEXTCOLOR;
-
-	// hint文字颜色（浅色）
-	public static int hintTextcolor = GRAYBGCOLOR;
-
-	// 被选中的文字颜色
-	public static int reblindTextColor = WHITETEXTCOLOR;
-
-	// 被选中的文字颜色
-	public static int selectedColor = color;
-
-	// blindPhone的文字颜色
-	public static int blindPhoneColor = BLACKTEXTCOLOR;
-	// 未被选中的文字颜色
-	public static int unSelectedColor = BLACKTEXTCOLOR;
-	// 标题栏中的文字颜色
-	public static int titleColor = WHITETEXTCOLOR;
-
-	// 线颜色
-	public static int lineColor = WHITETEXTCOLOR;
-
-	// 标题栏中背景颜色
-	public static int titleBgColor = WHITETEXTCOLOR;
-
-	// 背景色
-	public static int backgroundColor = WHITETEXTCOLOR;
-	// 选区颜色
-	public static int selectionColor = GRAYBGCOLOR;
-
-	// enable颜色
-	public static int unableColor = GRAYBGCOLOR;
-
-	// 关键字颜色
-	public static int keyWordColor = REDTEXTCOLOR;
-
-	// 关键字颜色
-	public static int confirmColor = WHITETEXTCOLOR;
-
-	// 使用颜色色值
-	public final static int COMMONBTNCOLOR = Color.parseColor("#02b936");
-	public final static int COMMONBTNCOLORPRESSED = Color.parseColor("#03d94e");
-
-	// 橙色配色方案色值
-	private final static int ORANGEBTNCOLOR = Color.parseColor("#ff4a00");
-	private final static int ORANGEBTNCOLORPRESSED = Color
-			.parseColor("#ff4a00");
-
-	// 红色配色方案
-	private final static int REDBTNCOLOR = Color.parseColor("#e70917");
-	private final static int REDBTNCOLORPRESSED = Color.parseColor("#ff0000");
-
-	// 蓝色配色方案
-	private final static int BLUEBTNCOLOR = Color.parseColor("#0ba4d0");
-	private final static int BLUEBTNCOLORPRESSED = Color.parseColor("#01bbf0");
-
-	// 绿色配色方案
-	private final static int GREENBTNCOLOR = Color.parseColor("#74c831");
-	private final static int GREENBTNCOLORPRESSED = Color.parseColor("#6de113");
-
-	// 白色配色方案
-	private final static int WHITEBTNCOLOR = Color.parseColor("#f9f9f9");
-	// not used ?
-	// private final static int WHITEBTNCOLORPRESSED =
-	// Color.parseColor("#e33f40");
-
-	public static int POSITIVEBTNCOLOR = ORANGEBTNCOLOR;
-	public static int POSITIVEBTNCOLORPRESSED = ORANGEBTNCOLORPRESSED;
-
-	public static int NEGATIVEBTNCOLOR = COMMONBTNCOLOR;
-	public static int NEGATIVEBTNCOLORPRESSED = COMMONBTNCOLORPRESSED;
-
+	/**
+	 * 配置主题顏色
+	 * 
+	 * @param themeColor
+	 */
 	public static void setThemeColor(int themeColor) {
-		BookTheme.themeColor = themeColor;
+
+		MAIN_CHOICE_DRAWABLE = CHOICE_DRAWABLE[themeColor - 1];
+		MAIN_CLASSIFY_DRAWABLE = CLASSIFY_DRAWABLE[themeColor - 1];
+		MAIN_SEARCH_DRAWABLE = SEARCH_DRAWABLE[themeColor - 1];
+		MAIN_BOOKSHELF_DRAWABLE = BOOKSHELF_DRAWABLE[themeColor - 1];
+		MAIN_MORE_DRAWABLE = MORE_DRAWABLE[themeColor - 1];
+
 		switch (themeColor) {
-		case REDTHEME:
-			isStroke = false;
-			reblindTextColor = WHITETEXTCOLOR;
-			helpBgColor = REDHELPBGCOLOR;
-			helpPressBgColor = REDHELPPPRESSBGCOLOR;
-			hintTextcolor = GRAY2TEXTCOLOR;
-			ballColor = WHITETEXTCOLOR;
-			defaultTextcolor = WHITETEXTCOLOR;
-			keyWordColor = REDTEXTCOLOR;
-			backgroundColor = WHITETEXTCOLOR;
-			selectionColor = GRAYBGCOLOR;
-			unableColor = GRAYBGCOLOR;
-			color = REDBTNCOLOR;
-			backGroundColor = color;
-			selectedColor = color;
-			coinColor = color;
-			lineColor = color;
-			blindPhoneColor = BLACKTEXTCOLOR;
-			unSelectedColor = BLACKTEXTCOLOR;
-			confirmColor = color;
-			selectViewBgColor = color;
-			titleBgColor = color;
-			titleColor = WHITETEXTCOLOR;
-			POSITIVEBTNCOLOR = REDBTNCOLOR;
-			POSITIVEBTNCOLORPRESSED = REDBTNCOLORPRESSED;
-			NEGATIVEBTNCOLOR = COMMONBTNCOLOR;
-			NEGATIVEBTNCOLORPRESSED = COMMONBTNCOLORPRESSED;
+		case RED_THEME:
+			THEME_COLOR = BookTheme.BOOK_RED;
+			BUTTON_COLOR_PRESS = BOOK_RED_PRESS;
+
 			break;
-		case BLUETHEME:
-			isStroke = false;
-			reblindTextColor = WHITETEXTCOLOR;
-			helpBgColor = BLUEHELPBGCOLOR;
-			helpPressBgColor = BLUEHELPPPRESSBGCOLOR;
-			hintTextcolor = GRAY2TEXTCOLOR;
-			ballColor = WHITETEXTCOLOR;
-			defaultTextcolor = WHITETEXTCOLOR;
-			keyWordColor = BLUEBTNCOLOR;
-			backgroundColor = WHITETEXTCOLOR;
-			unableColor = GRAYBGCOLOR;
-			selectionColor = GRAYBGCOLOR;
-			color = BLUEBTNCOLOR;
-			selectedColor = color;
-			backGroundColor = color;
-			confirmColor = color;
-			lineColor = color;
-			coinColor = color;
-			selectViewBgColor = color;
-			titleBgColor = color;
-			blindPhoneColor = BLACKTEXTCOLOR;
-			unSelectedColor = BLACKTEXTCOLOR;
-			titleColor = WHITETEXTCOLOR;
-			POSITIVEBTNCOLOR = BLUEBTNCOLOR;
-			POSITIVEBTNCOLORPRESSED = BLUEBTNCOLORPRESSED;
-			NEGATIVEBTNCOLOR = COMMONBTNCOLOR;
-			NEGATIVEBTNCOLORPRESSED = COMMONBTNCOLORPRESSED;
+
+		case BLUE_THEME:
+			THEME_COLOR = BookTheme.BOOK_BLUE;
+			BUTTON_COLOR_PRESS = BOOK_BLUE_PRESS;
+			MAIN_CLASSIFY_DRAWABLE = CLASSIFY_DRAWABLE[1];
 			break;
-		case ORANGETHEME:
-			isStroke = false;
-			reblindTextColor = WHITETEXTCOLOR;
-			helpBgColor = ORANGEHELPBGCOLOR;
-			helpPressBgColor = ORANGEHELPPRESSBGCOLOR;
-			hintTextcolor = GRAY2TEXTCOLOR;
-			ballColor = WHITETEXTCOLOR;
-			defaultTextcolor = WHITETEXTCOLOR;
-			keyWordColor = ORANGEBTNCOLOR;
-			backgroundColor = WHITETEXTCOLOR;
-			unableColor = GRAYBGCOLOR;
-			selectionColor = GRAYBGCOLOR;
-			color = ORANGEBTNCOLOR;
-			selectedColor = color;
-			backGroundColor = color;
-			confirmColor = color;
-			lineColor = color;
-			coinColor = color;
-			selectViewBgColor = color;
-			titleBgColor = color;
-			blindPhoneColor = BLACKTEXTCOLOR;
-			unSelectedColor = BLACKTEXTCOLOR;
-			titleColor = WHITETEXTCOLOR;
-			POSITIVEBTNCOLOR = ORANGEBTNCOLOR;
-			POSITIVEBTNCOLORPRESSED = ORANGEBTNCOLORPRESSED;
-			NEGATIVEBTNCOLOR = COMMONBTNCOLOR;
-			NEGATIVEBTNCOLORPRESSED = COMMONBTNCOLORPRESSED;
+
+		case GREEN_THEME:
+			THEME_COLOR = BookTheme.BOOK_GREEN;
+			BUTTON_COLOR_PRESS = BOOK_GREEN_PRESS;
 			break;
-		case GREENTHEME:
-			isStroke = false;
-			reblindTextColor = WHITETEXTCOLOR;
-			helpBgColor = GREENHELPBGCOLOR;
-			helpPressBgColor = GREENHELPPPRESSBGCOLOR;
-			hintTextcolor = GRAY2TEXTCOLOR;
-			ballColor = WHITETEXTCOLOR;
-			defaultTextcolor = WHITETEXTCOLOR;
-			keyWordColor = GREENBTNCOLOR;
-			backgroundColor = WHITETEXTCOLOR;
-			unableColor = GRAYBGCOLOR;
-			selectionColor = GRAYBGCOLOR;
-			color = GREENBTNCOLOR;
-			coinColor = color;
-			backGroundColor = color;
-			confirmColor = color;
-			lineColor = color;
-			selectedColor = color;
-			titleBgColor = color;
-			selectViewBgColor = color;
-			blindPhoneColor = BLACKTEXTCOLOR;
-			unSelectedColor = BLACKTEXTCOLOR;
-			titleColor = WHITETEXTCOLOR;
-			POSITIVEBTNCOLOR = GREENBTNCOLOR;
-			POSITIVEBTNCOLORPRESSED = GREENBTNCOLORPRESSED;
-			NEGATIVEBTNCOLOR = REDBTNCOLOR;
-			NEGATIVEBTNCOLORPRESSED = REDBTNCOLORPRESSED;
+
+		case YELLOW_THEME:
+			THEME_COLOR = BookTheme.BOOK_YELLOW;
+			BUTTON_COLOR_PRESS = BOOK_YELLOW_PRESS;
 			break;
-		case WHITETHEME:
-			isStroke = true;
-			helpBgColor = WHITEHELPBGCOLOR;
-			helpPressBgColor = WHITEHELPPPRESSBGCOLOR;
-			reblindTextColor = WHITETEXTCOLOR;
-			lineColor = GRAYLINECOLOR;
-			coinColor = REDTEXTCOLOR;
-			hintTextcolor = GRAY2TEXTCOLOR;
-			ballColor = WHITETEXTCOLOR;
-			defaultTextcolor = REDTEXTCOLOR;
-			selectViewBgColor = REDTEXTCOLOR;
-			keyWordColor = REDTEXTCOLOR;
-			backgroundColor = GRAY2BGCOLOR;
-			unableColor = GRAYBGCOLOR;
-			selectionColor = WHITETEXTCOLOR;
-			color = WHITETEXTCOLOR;
-			backGroundColor = color;
-			blindPhoneColor = BLACKTEXTCOLOR;
-			confirmColor = BLACKTEXTCOLOR;
-			selectedColor = REDTEXTCOLOR;
-			unSelectedColor = BLACKTEXTCOLOR;
-			titleColor = BLACKTEXTCOLOR;
-			titleBgColor = TITLEBGCOLOR;
-			POSITIVEBTNCOLOR = WHITETEXTCOLOR;
-			POSITIVEBTNCOLORPRESSED = WHITEBTNCOLOR;
-			NEGATIVEBTNCOLOR = WHITETEXTCOLOR;
-			NEGATIVEBTNCOLORPRESSED = REDBTNCOLOR;
+
+		case GRAY_THEME:
+			THEME_COLOR = BookTheme.BOOK_GRAY;
+			BUTTON_COLOR_PRESS = BOOK_GRAY_PRESS;
 			break;
 		}
+	}
+
+	/**
+	 * 设置默认封面
+	 * 
+	 * @param bookCover
+	 */
+	public static void setBookCover(int bookCover) {
+
+		switch (bookCover) {
+		case 0:
+			BOOK_COVER = coverDrawable[0];
+			break;
+		case 1:
+			BOOK_COVER = coverDrawable[1];
+			break;
+		case 2:
+			BOOK_COVER = coverDrawable[2];
+			break;
+		case 3:
+			BOOK_COVER = coverDrawable[3];
+			break;
+
+		default:
+			break;
+		}
+
+	}
+
+	/**
+	 * 设置是否要通知主题发生改变
+	 * 
+	 * @param isChange
+	 */
+	public static void setChangeTheme(boolean isChange) {
+		isThemeChange = isChange;
+	}
+
+	/**
+	 * 初始化屏蔽图片为空白的书名
+	 */
+	public static ArrayList<String> initList() {
+		coverErrorList.add("大影帝");
+		coverErrorList.add("楚王妃");
+		coverErrorList.add("鬼藏人");
+		coverErrorList.add("状元辣妻");
+		coverErrorList.add("乡土之王");
+		coverErrorList.add("深渊主宰");
+		coverErrorList.add("只求安心");
+		coverErrorList.add("武祖血帝");
+		coverErrorList.add("天之武神");
+		coverErrorList.add("天之神武");
+		coverErrorList.add("绝脉武神");
+		coverErrorList.add("斗战西游");
+		coverErrorList.add("北宋闲王");
+		coverErrorList.add("得分之王");
+		coverErrorList.add("御用特工");
+		coverErrorList.add("暗黑大宋");
+		coverErrorList.add("重生尹志平");
+		coverErrorList.add("超级电脑系统");
+		coverErrorList.add("天才农家妻");
+		coverErrorList.add("最牛国医妃");
+		coverErrorList.add("至尊透视眼");
+		coverErrorList.add("契妻只欢不爱");
+		coverErrorList.add("闪婚老公不靠谱");
+		coverErrorList.add("穿越古代江湖行");
+		coverErrorList.add("最强修真高手");
+		coverErrorList.add("重生之先婚再爱");
+		coverErrorList.add("回到三国变成蟒");
+		coverErrorList.add("最后一个阴阳师");
+		coverErrorList.add("史上最强内线");
+		coverErrorList.add("爱劫难桃总裁独家盛宠");
+		coverErrorList.add("龙帝的萌狐妖妻");
+		coverErrorList.add("御兽女少主逆世小王妃");
+		coverErrorList.add("英雄联盟之点券召唤师");
+		coverErrorList.add("废材九小姐毒医邪飞");
+		coverErrorList.add("无限之配角的逆袭");
+		coverErrorList.add("绯闻总裁老婆复婚吧");
+		coverErrorList.add("全帝国都知道将军要离..");
+
+		return coverErrorList;
+	}
+
+	/**
+	 * 判断是否包含该书名
+	 * @param bookName
+	 * @return
+	 */
+	public static boolean isContainBookName(String bookName) {
+		if (coverErrorList != null && coverErrorList.isEmpty())
+			initList();
+		return coverErrorList.contains(bookName);
+
 	}
 
 }

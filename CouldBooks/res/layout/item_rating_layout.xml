@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ratingBar_layout"
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:paddingLeft="28dp"
+    android:paddingRight="12dp"
+    android:background="@android:color/transparent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal" >
+
+    <RatingBar
+        android:id="@+id/ratingBar"
+        style="@style/foodRatingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:isIndicator="false"
+        android:numStars="5"
+        android:rating="0"
+        android:stepSize="1.0" />
+
+    <ImageView
+        android:id="@+id/img_rate_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="1"
+        android:src="@drawable/btn_rate_ok" />
+
+    <ImageView
+         android:id="@+id/img_rate_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/btn_rate_cancel" />
+
+</LinearLayout>

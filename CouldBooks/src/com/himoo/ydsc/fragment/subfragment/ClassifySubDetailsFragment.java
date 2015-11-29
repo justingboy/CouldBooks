@@ -38,4 +38,7 @@ public class ClassifySubDetailsFragment extends BaseFragment {
 		transaction.commit();
 
 	}
+	
+	
+	
 }

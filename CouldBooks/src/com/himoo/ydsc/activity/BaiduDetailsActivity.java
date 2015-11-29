@@ -1,16 +1,21 @@
 package com.himoo.ydsc.activity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -21,13 +26,19 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.http.BookDetailsTask;
+import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.listener.OnParseChapterListener;
+import com.himoo.ydsc.notification.DownlaodNotification;
+import com.himoo.ydsc.reader.ReaderActivity;
+import com.himoo.ydsc.reader.utils.IOHelper;
 import com.himoo.ydsc.share.UmengShare;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.UIHelper;
 import com.himoo.ydsc.ui.utils.ViewSelector;
+import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.RegularUtil;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -36,7 +47,8 @@ import com.umeng.socialize.bean.SocializeConfig;
 import com.umeng.socialize.sso.UMSsoHandler;
 
 public class BaiduDetailsActivity extends SwipeBackActivity implements
-		OnScrollListener, OnParseChapterListener, OnClickListener {
+		OnScrollListener, OnParseChapterListener, OnClickListener,
+		OnItemClickListener {
 	/** 下载图片的配置参数 */
 	private DisplayImageOptions option;
 
@@ -54,7 +66,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	/** 用于判断是否是倒序 */
 	private boolean isReverse = false;
 
-	private ArrayList<BaiduBookChapter> bookList;
+	private ArrayList<BaiduBookChapter> bookList = new ArrayList<BaiduBookChapter>();
 
 	private String chapters[];
 
@@ -64,15 +76,20 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 
 	private Button bookEvaluation;
 
+	private DownlaodNotification downNotification;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_baidu_book_details);
+		BookTheme.setChangeTheme(false);
+		if (BookTheme.isContainBookName(book.getTitle()))
+			option = BaseApplication.getInstance().displayImageOptionsBuider(
+					BookTheme.BOOK_COVER);
 		initListView();
-		option = BaseApplication.getInstance().displayImageOptionsBuider(
-				R.drawable.book_face_default);
 		initListener();
+		// new ChapterAsyTask(book.getListurl()).execute();
 		initBookChapter(book.getGid());
 	}
 
@@ -89,7 +106,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				// TODO Auto-generated method stub
 				UmengShare.getInstance().setShareContent(
 						BaiduDetailsActivity.this, book.getTitle(),
-						book.getCoverImage(), book.getSummary());
+						book.getCoverImage(), book.getTitle(),
+						book.getListurl());
 				// 注册友盟分享
 				UmengShare.getInstance().addCustomPlatforms(
 						BaiduDetailsActivity.this);
@@ -117,6 +135,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				null);
 		floowView = (TextView) View.inflate(this, R.layout.activity_floow_view,
 				null);
+		ViewSelector.setViewBackGround(floowView);
 		ImageView bookCoverImg = (ImageView) headerView
 				.findViewById(R.id.baidu_book_image);
 		TextView bookAuthor = (TextView) headerView
@@ -136,8 +155,10 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		ViewSelector.setButtonSelector(this, bookEvaluation);
 		Log.i("CoverImage1 = " + book.getCoverImage());
 		String imageUrl = RegularUtil.converUrl(book.getCoverImage());
-		if (TextUtils.isEmpty(imageUrl)) {
-			bookCoverImg.setImageResource(R.drawable.book_face_default);
+		bookCoverImg.setImageResource(BookTheme.BOOK_COVER);
+		if (TextUtils.isEmpty(imageUrl)
+				|| BookTheme.isContainBookName(book.getTitle())) {
+			bookCoverImg.setImageResource(BookTheme.BOOK_COVER);
 		} else {
 
 			ImageLoader.getInstance().displayImage(imageUrl, bookCoverImg,
@@ -162,7 +183,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	 * 
 	 * @param gid
 	 */
-	private void initBookChapter(String gid) {
+	public void initBookChapter(String gid) {
 		showRefreshDialog("正在加载中");
 		BookDetailsTask.getInstance().executeBaidu(this, gid);
 		BookDetailsTask.getInstance().setOnParseChapterListener(this);
@@ -175,16 +196,19 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	 * @param list
 	 */
 	private void initData(ArrayList<BaiduBookChapter> list) {
-		bookList = list;
+		bookList.clear();
+		bookList.addAll(list);
+		ViewSelector.setViewBackGround(chapter_count);
 		chapter_count.setText("共有" + bookList.size() + "个章节");
 		floowView.setText("共有" + bookList.size() + "个章节");
 		chapters = new String[bookList.size()];
 		for (int i = 0; i < bookList.size(); i++) {
-			chapters[i] = bookList.get(i).getText().toString().trim();
+			chapters[i] = bookList.get(i).getText().trim();
 		}
 		adapter = new ArrayAdapter<String>(this,
 				R.layout.android_adapter_textview, chapters);
 		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(this);
 	}
 
 	@Override
@@ -210,7 +234,9 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	public void onParseSuccess(ArrayList<BaiduBookChapter> list) {
 		// TODO Auto-generated method stub
 		dismissRefreshDialog();
+		IOHelper.getBook(this,book.getTitle(),list);	
 		initData(list);
+		
 	}
 
 	@Override
@@ -241,13 +267,17 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 					drawable, null);
 
 			Collections.reverse(bookList);
+			
 			for (int i = 0; i < bookList.size(); i++) {
-				chapters[i] = bookList.get(i).getText().toString().trim();
+				chapters[i] = bookList.get(i).getText().trim();
 			}
 
 			adapter.notifyDataSetChanged();
 			// 下载书籍
 		} else if (v == bookDownload) {
+			downNotification = new DownlaodNotification(this);
+			new SaveAsyncTask(bookList).execute();
+
 			// 豆瓣评书
 		} else if (v == bookEvaluation) {
 			UIHelper.startToActivity(this, DoubanBookActivity.class,
@@ -267,12 +297,175 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 			ssoHandler.authorizeCallBack(requestCode, resultCode, data);
 		}
 	}
-	
+
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
 		bookEvaluation.setClickable(true);
+	}
+
+	/**
+	 * 异步任务 缓存小说的所有章节
+	 * 
+	 * 
+	 */
+	class SaveAsyncTask extends AsyncTask<Void, String, String> {
+		private File dirFile;
+		private ArrayList<BaiduBookChapter> list = null;
+
+		public SaveAsyncTask(ArrayList<BaiduBookChapter> list) {
+			this.list = list;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
+					+ File.separator + book.getTitle() + File.separator);
+			if (!dirFile.exists())
+				dirFile.mkdirs();
+		}
+
+		@Override
+		protected String doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			int len = 0;
+			int progress = 0;
+			int allChapterLength = list.size();
+			float partProgress = (float) allChapterLength / 100;
+			String bookName = book.getTitle();
+			for (BaiduBookChapter chapter : list) {
+				String url = getChapterUrl(chapter);
+				String chapterName =chapter.getText().trim()+chapter.getIndex() + ".txt";
+				File chapterFile = new File(dirFile.getAbsolutePath(),
+						chapterName);
+				//如何该章节已经下载则不需要下载,跳过,下载下一个章节
+				if (!chapterFile.exists() || chapterFile.length() == 0)
+					com.himoo.ydsc.download.FileUtils.writeTosSd(url,chapterFile);
+				len++;
+				if (partProgress <= 1) {
+					progress = getPartprogress(partProgress);
+					progress *= len;
+					if (downNotification != null) {
+						downNotification.creatNotification(bookName, "开始下载");
+						downNotification.setProgressAndNetSpeed(progress,
+								downNotification.getNetSpeed());
+					}
+
+				} else {
+					if (len % (int) partProgress == 0) {
+						progress++;
+						if (progress <= 99) {
+							if (progress % 2 == 0) {
+								if (downNotification != null) {
+									downNotification.creatNotification(
+											bookName, "开始下载");
+									downNotification.setProgressAndNetSpeed(
+											progress,
+											downNotification.getNetSpeed());
+								}
+							}
+
+						}
+					}
+				}
+
+				if (allChapterLength - len == 0) {
+					if (downNotification != null) {
+						downNotification.creatNotification(bookName, "下载完成");
+						downNotification.setProgressAndNetSpeed(100,
+								downNotification.getNetSpeed());
+					}
+				}
+
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			Toast.showLong(BaiduDetailsActivity.this, "《"+book.getTitle()+"》下载完成");
+			new Handler().postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					downNotification.notifiManger.cancelAll();
+				}
+			}, 3000);
+
+		}
+
+	}
+
+	/**
+	 * 获取下载几章为进度的1%
+	 * 
+	 * @param part
+	 * @return
+	 */
+	private int getPartprogress(float part) {
+		int partProgress = 0;
+		if (1 == (int) part)
+			partProgress = 1;
+		String num = String.valueOf(part);
+		int secondNum = Character.getNumericValue(num.charAt(2));
+		switch (secondNum) {
+		case 1:
+			partProgress = 10;
+			break;
+		case 2:
+			partProgress = 5;
+			break;
+		case 3:
+			partProgress = 3;
+			break;
+		case 4:
+			partProgress = 2;
+			break;
+		case 5:
+			partProgress = 2;
+			break;
+		default:
+			partProgress = 1;
+			break;
+		}
+
+		return partProgress;
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		// TODO Auto-generated method stub
+		BaiduBookChapter chapter = bookList.get(position - 2);
+//		Intent intent = new Intent(this, BookReaderActivity.class);
+		Intent intent = new Intent(this, ReaderActivity.class);
+		intent.putExtra("bookName", book.getTitle());
+		intent.putExtra("chapterName", chapter.getText().trim());
+		intent.putExtra("chapterUrl", getChapterUrl(chapter));
+		intent.putExtra("index", chapter.getIndex());
+		startActivity(intent);
+
+	}
+
+	/**
+	 * 拼接百度=书籍每章的地址
+	 * 
+	 * @param chapter
+	 */
+	protected String getChapterUrl(BaiduBookChapter chapter) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(HttpConstant.BAIDU_CHAPTER_URL).append("src=")
+				.append(chapter.getHref()).append("&cid=")
+				.append(chapter.getCid()).append("&chapterIndex=")
+				.append(chapter.getIndex()).append("&time=&skey=&id=wisenovel");
+
+		return sb.toString();
+
 	}
 
 }

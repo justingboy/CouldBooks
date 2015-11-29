@@ -18,6 +18,7 @@ import android.view.Window;
 import android.widget.FrameLayout;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.util.DeviceUtil;
 
 public class SwipeBackLayout extends FrameLayout {
 	/**

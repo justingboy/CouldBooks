@@ -1,5 +1,9 @@
 package com.himoo.ydsc.aescrypt;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -16,14 +20,13 @@ import android.util.Log;
  * Encrypt and decrypt messages using AES 256 bit encryption that are compatible
  * with AESCrypt-ObjC and AESCrypt Ruby.
  * <p/>
- * Created by scottab on 04/10/2014.
  */
 public final class AESCrypt {
 
 	private static final String TAG = "AESCrypt";
 
 	// AESCrypt-ObjC uses CBC and PKCS7Padding
-	private static final String AES_MODE = "AES/CBC/PKCS7Padding";
+	public static final String AES_MODE = "AES/CBC/PKCS7Padding";
 	private static final String CHARSET = "UTF-8";
 
 	// AESCrypt-ObjC uses SHA-256 (and so a 256-bit key)
@@ -47,7 +50,7 @@ public final class AESCrypt {
 	 *            used to generated key
 	 * @return SHA256 of the password
 	 */
-	private static SecretKeySpec generateKey(final String password)
+	public static SecretKeySpec generateKey(final String password)
 			throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		final MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
 		byte[] bytes = password.getBytes("UTF-8");
@@ -212,15 +215,13 @@ public final class AESCrypt {
 		return new String(hexChars);
 	}
 
-	/**解码　*/
-	public static String decryptBook() {
+	/** 解码　 */
+	public static String decryptBook(String encryptedText) {
 		String password = "hyy001";
-		String encryptedMsg = "neBJf7FHzSlXEaictOLjyORG55VXthzqi9eRbef0qBY=";
-
 		try {
 
 			String messageAfterDecrypt = AESCrypt.decrypt(password,
-					encryptedMsg);
+					encryptedText);
 			return messageAfterDecrypt;
 
 		} catch (GeneralSecurityException e) {
@@ -228,6 +229,39 @@ public final class AESCrypt {
 
 		}
 		return "";
+	}
+
+	/**
+	 * 返回解密的String
+	 * 
+	 * @param filePath
+	 * @return
+	 */
+	public static String readBookFile(String filePath) {
+		try {
+			File file = new File(filePath);
+			if (file.isFile() && file.exists()) { // 判断文件是否存在
+				InputStreamReader read = new InputStreamReader(
+						new FileInputStream(file));// 考虑到编码格式
+				BufferedReader bufferedReader = new BufferedReader(read);
+				StringBuilder sb = new StringBuilder();
+				String lineTxt = null;
+				while ((lineTxt = bufferedReader.readLine()) != null) {
+					sb.append(lineTxt);
+				}
+
+				read.close();
+				bufferedReader.close();
+				return decryptBook(sb.toString());
+			} else {
+				System.out.println("找不到指定的文件");
+			}
+		} catch (Exception e) {
+			System.out.println("读取文件内容出错");
+			e.printStackTrace();
+		}
+		return null;
+
 	}
 
 }

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
@@ -22,6 +23,7 @@ import com.himoo.ydsc.activity.BaiduDetailsActivity;
 import com.himoo.ydsc.adapter.BaiduBookAdapter;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.BaiduBook;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.HttpConstant;
@@ -54,8 +56,10 @@ public class BaiduBookClassFragment extends BaseFragment implements
 	/** 书的类别ID */
 	private String cateid = "1";
 	/** 标记当前点击Item的位置 */
-	private int mCurrentClickPosition  = -1;
-	
+	private int mCurrentClickPosition = -1;
+	/** 惰性控件，提高效率 */
+	private ViewStub stub;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -97,8 +101,8 @@ public class BaiduBookClassFragment extends BaseFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if(mCurrentClickPosition ==position)
-					return ;
+				if (mCurrentClickPosition != -1)
+					return;
 				mCurrentClickPosition = position;
 				BaiduBook book = (BaiduBook) parent.getItemAtPosition(position);
 				UIHelper.startToActivity(getActivity(), book,
@@ -198,8 +202,8 @@ public class BaiduBookClassFragment extends BaseFragment implements
 				// TODO Auto-generated method stub
 				Log.e(error + "msg=" + msg);
 				dismissRefreshDialog();
-				if (getActivity() != null)
-					Toast.showLong(getActivity(), "返回失败 ：" + msg);
+				stub = (ViewStub) findViewById(R.id.viewstub);
+				stub.inflate();
 
 			}
 		});
@@ -237,6 +241,8 @@ public class BaiduBookClassFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		if (list != null && list.size() > 0) {
 			if (mAdapter != null) {
+				if (stub != null)
+					stub.setVisibility(View.GONE);
 				mAdapter.clear();
 				mAdapter.addAll(list);
 				mGridView.setAdapter(mAdapter);
@@ -261,5 +267,8 @@ public class BaiduBookClassFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		super.onResume();
 		mCurrentClickPosition = -1;
+		if (BookTheme.isThemeChange)
+			if (mAdapter != null)
+				mAdapter.notifyDataSetChanged();
 	}
 }

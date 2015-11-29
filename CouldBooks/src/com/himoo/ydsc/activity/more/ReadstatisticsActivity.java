@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.download.BookDownloadManager;
+import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -33,12 +35,15 @@ public class ReadstatisticsActivity extends SwipeBackActivity {
 	@ViewInject(R.id.read_clear_btn)
 	private Button read_clear_btn;
 
+	private BookDownloadManager downloadManager;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_more_staticis);
 		initData();
+	
 	}
 
 	@Override
@@ -51,10 +56,11 @@ public class ReadstatisticsActivity extends SwipeBackActivity {
 	}
 
 	private void initData() {
-
+		downloadManager = BookDownloadService.getDownloadManager(this);
 		read_time.setText("共阅读0小时10分钟40秒");
 		read_book_count.setText("共看过11本书");
-		read_download_count.setText("共下载过4本书");
+		int bookCount = downloadManager.getDownloadInfoListCount();
+		read_download_count.setText("共下载过"+bookCount+"本书");
 		// 2G/3G 流量，上传+下载的总和
 		read_flow.setText("上网流量 ：" + getMobleTraffic());
 		ViewSelector.setButtonSelector(this, read_clear_btn);

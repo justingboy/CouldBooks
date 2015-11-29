@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
@@ -25,6 +26,7 @@ import com.himoo.ydsc.adapter.BookAdapter;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.Book;
 import com.himoo.ydsc.bean.BookDetails;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.HttpConstant;
@@ -60,7 +62,7 @@ public class SubChoiceFragment extends BaseFragment implements
 	private int currentPage = 1;
 	/** 当前点击的Item位置 */
 	private int mCurrentClickPosition = -1;
-	
+	private ViewStub stub;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -95,15 +97,13 @@ public class SubChoiceFragment extends BaseFragment implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				
-				if(mCurrentClickPosition ==position)
-					return ;
+
+				if (mCurrentClickPosition !=-1)
+					return;
 				mCurrentClickPosition = position;
 				Book book = (Book) parent.getItemAtPosition(position);
-			/*	BookDetailsTask.getInstance().excute(getActivity(),
-						book.getBook_ID());*/
 				showRefreshDialog("正在加载中");
-				getBookDetailsInfo(getActivity(),  book.getBook_ID());
+				getBookDetailsInfo(getActivity(), book.getBook_ID());
 			}
 		});
 		initLastRefreshTime(SpConstant.LAST_REF_TIME_SUBCHOICE,
@@ -153,6 +153,7 @@ public class SubChoiceFragment extends BaseFragment implements
 		String url = SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST)
 				+ "getBooksList.asp" + heardParams;
+		Log.i("请求地址：" + url);
 		HttpUtils http = new HttpUtils();
 		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
 
@@ -175,15 +176,14 @@ public class SubChoiceFragment extends BaseFragment implements
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
 				dismissRefreshDialog();
-				if (getActivity() != null)
-					Toast.showLong(getActivity(), "返回失败 ：" + msg);
+				stub = (ViewStub) findViewById(R.id.viewstub);
+				stub.inflate();
 
 			}
 		});
 
 	}
-	
-	
+
 	/**
 	 * 请求自己服务器的书的详情界面信息
 	 * 
@@ -210,8 +210,8 @@ public class SubChoiceFragment extends BaseFragment implements
 								responseInfo.result.length() - 1),
 						BookDetails.class);
 				dismissRefreshDialog();
-				mCurrentClickPosition = -1;
-				UIHelper.startToActivity(getActivity(), bookDetalis, BookDialogActivity.class);
+				UIHelper.startToActivity(getActivity(), bookDetalis,
+						BookDialogActivity.class);
 			}
 
 			@Override
@@ -224,8 +224,6 @@ public class SubChoiceFragment extends BaseFragment implements
 
 		});
 	}
-	
-	
 
 	/**
 	 * 通知数据改变，并且数据刷新完毕
@@ -258,6 +256,8 @@ public class SubChoiceFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		if (list != null && list.size() > 0) {
 			if (mAdapter != null) {
+				if (stub != null)
+					stub.setVisibility(View.GONE);
 				mAdapter.clear();
 				mAdapter.addAll(list);
 				mGridView.setAdapter(mAdapter);
@@ -271,10 +271,21 @@ public class SubChoiceFragment extends BaseFragment implements
 	public void onPullToRefreshFailure(Exception error, String msg) {
 		// TODO Auto-generated method stub
 		if (getActivity() != null) {
-			Toast.showLong(getActivity(), "加载数据错误 ：" + msg);
+			// Toast.showLong(getActivity(), "加载数据错误 ：" + msg);
 			notifyDataAndRefreshComplete();
+
 		}
 
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		mCurrentClickPosition = -1;
+		if (BookTheme.isThemeChange)
+			if (mAdapter != null)
+				mAdapter.notifyDataSetChanged();
 	}
 
 }

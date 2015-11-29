@@ -162,9 +162,10 @@ public class TimestampUtils {
 			return "";
 		}
 	}
-	
+
 	/**
-	 *  返回时间样式
+	 * 返回时间样式
+	 * 
 	 * @param key
 	 * @return
 	 */
@@ -176,4 +177,40 @@ public class TimestampUtils {
 				"yyyy-MM-dd HH:mm:ss");
 
 	}
+
+	/**
+	 * 时间差格式化
+	 * 
+	 * @param oldTimestap
+	 * @return
+	 */
+	public static String formatTimeDuration(String oldTimestap) {
+		long duration = gapTimestamp(getIntTimestamp(),
+				Long.valueOf(oldTimestap));
+		// 毫秒
+		long ssec = duration % 1000;
+		// 秒
+		long sec = (duration / 1000) % 60;
+		// 分钟
+		long min = (duration / 1000 / 60) % 60;
+		// 小时
+		long hour = (duration / 1000 / 60 / 60) % 24;
+		// 天
+		long day = duration / 1000 / 60 / 60 / 24;
+
+		if (day > 0) {
+			return day + "天" + hour + "小时" + min + "分钟";
+		}
+
+		if (hour > 0) {
+			return hour + "小时" + min + "分钟";
+		}
+
+		if (min > 0) {
+			return min + "分钟";
+		}
+
+		return sec + "秒";
+	}
+
 }

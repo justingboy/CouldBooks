@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:textSize="14sp"
-    android:textColor="@color/status_bar_bg"
+    android:textColor="@color/theme_skin_darkgray"
     android:padding="5dp"
     android:singleLine="true"
 	android:ellipsize="end"

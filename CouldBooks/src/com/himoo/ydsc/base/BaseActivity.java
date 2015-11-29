@@ -20,6 +20,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.dialog.RefreshDialog;
 import com.himoo.ydsc.mvc.BaseModel;
 import com.himoo.ydsc.mvc.ServiceListener;
@@ -48,6 +49,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 	public MyLogger Log;
 	public static int flag = 1; // 无实际意义，只是为了使用SparseArray类
 	private long exitTime = 0;
+	protected SystemBarTintManager tintManager;
 
 	/** 展示 刷新Dialog */
 	private static final int REFRESH_DIALOG_SHOW = 0;
@@ -67,7 +69,6 @@ public abstract class BaseActivity extends FragmentActivity implements
 				}
 				mDialog.setMessage(msg.obj.toString());
 				if (!mDialog.isShowing()) {
-					mDialog.dismiss();
 					mDialog.show();
 				}
 				break;
@@ -84,6 +85,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 
 		};
 	};
+
 
 	/**
 	 * 　显示 刷新Dialog
@@ -141,9 +143,9 @@ public abstract class BaseActivity extends FragmentActivity implements
 	 * 设置状态栏的背景
 	 */
 	protected void setStatusBarTintResource(int color) {
-		SystemBarTintManager tintManager = new SystemBarTintManager(this);
+		tintManager = new SystemBarTintManager(this);
 		tintManager.setStatusBarTintEnabled(true);
-		tintManager.setStatusBarTintResource(color);// 通知栏所需颜色
+		tintManager.setStatusBarTintColor(BookTheme.THEME_COLOR);// 通知栏所需颜色
 	}
 
 	protected abstract void initEvent();

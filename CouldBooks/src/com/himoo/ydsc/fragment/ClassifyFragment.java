@@ -11,12 +11,16 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseFragment;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.fragment.subfragment.ClassifySubDetailsFragment;
 import com.himoo.ydsc.fragment.subfragment.ClassifySubHotFragment;
 import com.himoo.ydsc.manager.PageManager;
+import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.viewpagerindicator.TabPageIndicator;
@@ -39,12 +43,18 @@ public class ClassifyFragment extends BaseFragment {
 	@ViewInject(R.id.viewpager_classify)
 	private ViewPager viewPager;
 
+	private RelativeLayout mTitleBar;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			SharedPreferences sp, Bundle savedInstanceState,
 			PageManager pageManager) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.fragment_classify, null);
+		mTitleBar = (RelativeLayout) view
+				.findViewById(R.id.classify_tltle_layout);
+		mTitleBar.setBackgroundColor(BookTheme.THEME_COLOR);
+
 		return view;
 	}
 
@@ -58,6 +68,19 @@ public class ClassifyFragment extends BaseFragment {
 		// 缓存当前界面每一侧的界面数(2个)
 		viewPager.setOffscreenPageLimit(1);
 		tabPageIndicator.setViewPager(viewPager);// 关联上
+		tabPageIndicator.setTextColor(ViewSelector.createColorStateList(
+				BookTheme.THEME_COLOR, BookTheme.BOOK_WHITE));
+	}
+
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		if (BookTheme.isThemeChange) {
+			mTitleBar.setBackgroundColor(BookTheme.THEME_COLOR);
+			tabPageIndicator.setTextColor(ViewSelector.createColorStateList(
+					BookTheme.THEME_COLOR, BookTheme.BOOK_WHITE));
+		}
 	}
 
 	/**

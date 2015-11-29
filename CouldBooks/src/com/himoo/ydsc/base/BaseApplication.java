@@ -10,12 +10,14 @@ import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.os.StrictMode;
 import android.util.SparseArray;
 
 import com.himoo.ydsc.common.AppException;
+import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.MyLogger;
+import com.himoo.ydsc.util.SharedPreferences;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -23,7 +25,6 @@ import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 /**
@@ -32,9 +33,9 @@ import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
  */
 public class BaseApplication extends Application {
 	/** 开启性能测试，检测应用程序所有有可能发生超时的操作，可以在Logcat中看到此类操作 */
-	private static final boolean DEVELOPER_MODE = true;
+	// private static final boolean DEVELOPER_MODE = true;
 	/** 需要退出提示的activity集合 */
-	private HashMap<Integer, String > UIS = new HashMap<Integer, String >();
+	private HashMap<Integer, String> UIS = new HashMap<Integer, String>();
 	/** 　异步任务的集合 */
 	private List<AsyncTask<?, ?, ?>> asyncs = new ArrayList<AsyncTask<?, ?, ?>>();
 	/** Application的唯一实例 */
@@ -45,6 +46,8 @@ public class BaseApplication extends Application {
 	private int SparseArray_flag = 1;
 	/** 界面集合 */
 	private SparseArray<Activity> activitys = new SparseArray<Activity>();
+
+	public HashMap<String, Object> hashMap = new HashMap<String, Object>();
 
 	/**
 	 * 获取该类的实例
@@ -57,21 +60,29 @@ public class BaseApplication extends Application {
 
 	@Override
 	public void onCreate() {
-//		if (DEVELOPER_MODE) {
-//			StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-//					.detectDiskReads().detectDiskWrites().detectNetwork()
-//					.penaltyLog().build());
-//			StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-//					.detectLeakedSqlLiteObjects().penaltyLog().penaltyDeath()
-//					.build());
-//		}
+		// if (DEVELOPER_MODE) {
+		// StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+		// .detectDiskReads().detectDiskWrites().detectNetwork()
+		// .penaltyLog().build());
+		// StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+		// .detectLeakedSqlLiteObjects().penaltyLog().penaltyDeath()
+		// .build());
+		// }
 		super.onCreate();
 		instance = this;
-		//初始化科大讯飞语音功能5638453a	5638453a 
-		SpeechUtility.createUtility(this, SpeechConstant.APPID +"=5638453a");  
+
+		// 设置主题皮肤
+		BookTheme.setThemeColor(SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SKIN_INDEX, 3));
+		// 设置主题皮肤
+		BookTheme.setBookCover(SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_COVER_INDEX, 0));
+
+		// 初始化科大讯飞语音功能5638453a 5638453a
+		SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5638453a");
 		// 以下语句用于设置日志开关（默认开启），设置成false时关闭语音云SDK日志打印
 		// Setting.setShowLog(false);
-		
+
 		// 配置ImageLoader
 		initImageLoader(this);
 		// 注册App异常崩溃处理器
@@ -123,7 +134,7 @@ public class BaseApplication extends Application {
 		Toast.showLong(this, "当前应用已经内存不足，请注意。。。");
 	}
 
-	public HashMap<Integer, String > getUIS() {
+	public HashMap<Integer, String> getUIS() {
 		return UIS;
 	}
 
@@ -201,15 +212,19 @@ public class BaseApplication extends Application {
 	 */
 	public DisplayImageOptions displayImageOptionsBuider(int resId) {
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
-				.showImageOnLoading(resId)
-				.showImageForEmptyUri(resId)
-				.showImageOnFail(resId)
-				.cacheInMemory(true)
-				.cacheOnDisk(true)
-				.considerExifParams(true)
-				.bitmapConfig(Bitmap.Config.ARGB_8888)
+				.showImageOnLoading(resId).showImageForEmptyUri(resId)
+				.showImageOnFail(resId).cacheInMemory(true).cacheOnDisk(true)
+				.considerExifParams(true).bitmapConfig(Bitmap.Config.ARGB_8888)
 				.build();
 		return options;
+	}
+
+	public void putHashMap(String key, Object object) {
+		hashMap.put(key, object);
+	}
+
+	public Object getHashMap(String key) {
+		return hashMap.get(key);
 	}
 
 }

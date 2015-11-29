@@ -10,12 +10,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.activity.HomeActivity;
 import com.himoo.ydsc.bean.KeyboardEnum;
 import com.himoo.ydsc.bean.KeyboardEnum.ActionEnum;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.UIHelper;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -92,11 +94,12 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 	@Override
 	protected void initTitleBar() {
 		// TODO Auto-generated method stub
+		LinearLayout password_layout = (LinearLayout) this.findViewById(R.id.password_layout);
+		password_layout.setBackgroundColor(BookTheme.THEME_COLOR);
 		mTitleBar.setLeftTitle("更多");
 		mTitleBar.setRightLogoGone();
 		value = getIntent().getStringExtra("key");
 		if (value != null && value.equals("SplashActivity")) {
-			tintManager.setStatusBarTintResource(R.color.password_bg_color);
 			mTitleBar.setVisibility(View.GONE);
 			password_title_line.setVisibility(View.GONE);
 		} else {

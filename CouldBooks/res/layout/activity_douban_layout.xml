@@ -8,20 +8,32 @@
 
     <include layout="@layout/titlebar_layout" />
 
-    <com.handmark.pulltorefresh.library.PullToRefreshListView
-        xmlns:ptr="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/douban_book_list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:cacheColorHint="#00000000"
-        android:fadingEdge="none"
-        android:gravity="fill"
-        android:padding="2dp"
-        android:scrollbarStyle="outsideOverlay"
-        ptr:ptrAnimationStyle="flip"
-        ptr:ptrDrawable="@drawable/pullto_refresh_listview_arrow"
-        ptr:ptrHeaderTextAppearance="@style/PulltorefreshListview_textStyle"
-        ptr:ptrListViewExtrasEnabled="false"
-        ptr:ptrScrollingWhileRefreshingEnabled="true" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <com.handmark.pulltorefresh.library.PullToRefreshListView
+            xmlns:ptr="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/douban_book_list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:cacheColorHint="#00000000"
+            android:fadingEdge="none"
+            android:gravity="fill"
+            android:padding="2dp"
+            android:scrollbarStyle="outsideOverlay"
+            ptr:ptrAnimationStyle="flip"
+            ptr:ptrDrawable="@drawable/pullto_refresh_listview_arrow"
+            ptr:ptrHeaderTextAppearance="@style/PulltorefreshListview_textStyle"
+            ptr:ptrListViewExtrasEnabled="false"
+            ptr:ptrScrollingWhileRefreshingEnabled="true" />
+
+        <RelativeLayout
+            android:id="@+id/Nifty_Lyout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="true" >
+        </RelativeLayout>
+    </RelativeLayout>
 
 </LinearLayout>

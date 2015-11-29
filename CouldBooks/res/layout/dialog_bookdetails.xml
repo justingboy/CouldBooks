@@ -88,6 +88,7 @@
             android:scrollbars="none" >
 
             <LinearLayout
+                android:paddingBottom="25dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
@@ -102,32 +103,74 @@
         </ScrollView>
 
         <LinearLayout
+            android:id="@+id/dialog_layout_rating"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:gravity="center"
-            android:orientation="horizontal" >
+            android:orientation="vertical" >
 
-            <Button
-                android:id="@+id/dialog_btn_share"
-                android:layout_width="wrap_content"
-                android:layout_height="45dp"
-                android:layout_weight="1"
-                android:background="@drawable/dialog_btn_comment" />
+            <LinearLayout
+                android:id="@+id/dialog_btn_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal" >
 
-            <Button
-                android:id="@+id/dialog_btn_rate"
-                android:layout_width="wrap_content"
-                android:layout_height="45dp"
-                android:layout_weight="1"
-                android:background="@drawable/dialog_btn_rate" />
+                <Button
+                    android:id="@+id/dialog_btn_share"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/dialog_btn_comment" />
 
-            <Button
-                android:id="@+id/dialog_btn_download"
-                android:layout_width="wrap_content"
-                android:layout_height="45dp"
-                android:layout_weight="1"
-                android:background="@drawable/dialog_btn_downloaddisable" />
+                <Button
+                    android:id="@+id/dialog_btn_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/dialog_btn_rate" />
+
+                <Button
+                    android:id="@+id/dialog_btn_download"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/dialog_btn_downloaddisable" />
+            </LinearLayout>
+
+          <!--   <LinearLayout
+                android:layout_marginBottom="-60dp"
+                android:id="@+id/ratingBar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                 >
+
+                <RatingBar
+                    android:id="@+id/ratingBar"
+                    style="@style/foodRatingBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="25dp"
+                    android:layout_marginLeft="5dp"
+                    android:isIndicator="false"
+                    android:numStars="5"
+                    android:rating="0"
+                    android:stepSize="1.0" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/btn_rate_ok" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:src="@drawable/btn_rate_cancel" />
+            </LinearLayout> -->
         </LinearLayout>
     </LinearLayout>
 

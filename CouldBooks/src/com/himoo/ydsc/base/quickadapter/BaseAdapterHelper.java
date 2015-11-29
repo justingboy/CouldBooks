@@ -404,6 +404,7 @@ public class BaseAdapterHelper {
 	public BaseAdapterHelper setProgress(int viewId, int progress) {
 		ProgressBar view = retrieveView(viewId);
 		view.setProgress(progress);
+		view.postInvalidate();
 		return this;
 	}
 

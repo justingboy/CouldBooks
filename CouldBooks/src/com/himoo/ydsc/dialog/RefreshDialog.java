@@ -19,7 +19,7 @@ public class RefreshDialog extends Dialog {
 		LayoutInflater mInflater = LayoutInflater.from(getContext());
 		View view = mInflater.inflate(R.layout.dialog_book_refresh, null);
 		refresh_msg = (TextView) view.findViewById(R.id.book_refresh_msg);
-		setCancelable(false);
+		setCancelable(true);
 		setContentView(view);
 	}
 

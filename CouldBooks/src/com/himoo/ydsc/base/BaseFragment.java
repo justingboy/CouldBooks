@@ -61,11 +61,9 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 			case REFRESH_DIALOG_SHOW:
 				if (mDialog == null) {
 					mDialog = new RefreshDialog(getActivity());
-					mDialog.setCancelable(false);
 				}
 				mDialog.setMessage(msg.obj.toString());
 				if (!mDialog.isShowing()) {
-					mDialog.dismiss();
 					mDialog.show();
 				}
 				break;
@@ -140,8 +138,6 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 		pager.setArguments(data);
 	}
 
-	
-
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -158,27 +154,19 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 			if (ids != null && ids.length > 0)
 				for (int id : ids) {
 					View view = findViewById(id);
-			/*		if (view instanceof ViewPager) {
-						((ViewPager) view).setOnPageChangeListener(this);
-						continue;
-					}
-					if (view instanceof CompoundButton) {
-						((CompoundButton) view)
-								.setOnCheckedChangeListener(this);
-						continue;
-					}
-					if (view instanceof AdapterView) {
-						if (view instanceof Spinner) {
-							((Spinner) view).setOnItemSelectedListener(this);
-							continue;
-						}
-						((AdapterView<?>) view).setOnItemClickListener(this);
-						((AdapterView<?>) view)
-								.setOnItemLongClickListener(this);
-						continue;
-					}*/
+					/*
+					 * if (view instanceof ViewPager) { ((ViewPager)
+					 * view).setOnPageChangeListener(this); continue; } if (view
+					 * instanceof CompoundButton) { ((CompoundButton) view)
+					 * .setOnCheckedChangeListener(this); continue; } if (view
+					 * instanceof AdapterView) { if (view instanceof Spinner) {
+					 * ((Spinner) view).setOnItemSelectedListener(this);
+					 * continue; } ((AdapterView<?>)
+					 * view).setOnItemClickListener(this); ((AdapterView<?>)
+					 * view) .setOnItemLongClickListener(this); continue; }
+					 */
 					view.setOnClickListener(this);
-//					view.setOnLongClickListener(this);
+					// view.setOnLongClickListener(this);
 				}
 		} catch (Exception e) {
 

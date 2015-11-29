@@ -5,6 +5,8 @@ import java.util.List;
 
 import android.content.Context;
 
+import com.himoo.ydsc.bean.BaiduBookClassify;
+import com.himoo.ydsc.bean.BookClassify;
 import com.himoo.ydsc.db.bean.BookSearchRecords;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
@@ -118,6 +120,54 @@ public class BookDb {
 		try {
 			db.deleteAll(className);
 
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 保存自己服务器的分类
+	 * 
+	 * @param book
+	 */
+	public void saveBookClassify(List<BookClassify> list) {
+
+		try {
+			db.deleteAll(BookClassify.class);
+			db.saveOrUpdateAll(list);
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	
+	/**
+	 * 查询的书的分类
+	 * @param entityType
+	 * @return
+	 */
+	public <T> List<T> queryBookClassify(Class<T> entityType) {
+
+		try {
+			return db.findAll(entityType);
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			return null;
+		}
+	}
+
+	/**
+	 * 保存百度服务器的分类
+	 * 
+	 * @param book
+	 */
+	public void saveBaiduBookClassify(List<BaiduBookClassify> list) {
+
+		try {
+			db.deleteAll(BaiduBookClassify.class);
+			db.saveOrUpdateAll(list);
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
