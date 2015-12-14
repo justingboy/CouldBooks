@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.content.res.Resources;
 
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.reader.bean.BookOperation;
 import com.himoo.ydsc.reader.bean.Chapter;
 import com.himoo.ydsc.util.FileUtils;
@@ -67,22 +69,26 @@ public class IOHelper {
 	 *            通过context来得到 Resources 对象，从而获取资源。
 	 * @return
 	 */
-	public static Chapter getChapter(String index) {
-		int length =  book.getChapterList().size();
-		if(Integer.valueOf(index)-1>=length)
-		return null;
+	public static Chapter getChapter(String index, int position) {
+		int length = book.getChapterList().size();
+		if (position - length == 0 || position == -1)
+			return null;
 		Chapter chapter = new Chapter();
-		chapter.setIndex(index);
+		chapter.setPosition(position);
+		chapter.setIndex(book.getChapterList().get(position).getIndex());
 		chapter.setBookName(book.getBookname());
-		String chapterName =book.getChapterList()
-				.get(Integer.valueOf(index) > 0 ? (Integer.valueOf(index) - 1)
-						: Integer.valueOf(index)).getText().trim();
+		BaiduBookChapter bookChapter = book.getChapterList().get(position);
+		String chapterName = bookChapter.getText().trim();
+		String chapterUrl = ChapterParseUtil.getChapterUrl(bookChapter);
 		chapter.setChapterName(chapterName);
-		
+		chapter.setChapterUrl(chapterUrl);
+
 		File dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
 				+ File.separator + book.getBookname() + File.separator);
 
-		File file = new File(dirFile, chapterName + index + ".txt");
+		File file = new File(dirFile, chapterName + "-"
+				+ book.getChapterList().get(position).getIndex() + "-"
+				+ position + ".txt");
 		if (file.exists() || file.length() > 0) {
 			final String content = com.himoo.ydsc.download.FileUtils
 					.readFormSd(file);
@@ -90,26 +96,50 @@ public class IOHelper {
 			chapter.setContent(content);
 
 		} else {
-			if (Integer.valueOf(index) > 0) {
-
-				InputStream is;
-				try {
-					is = mContext.getAssets().open("error.txt");
-					int size = is.available();
-					byte[] buffer = new byte[size];
-					is.read(buffer);
-					is.close();
-					String content = new String(buffer, "gbk");
-					chapter.setContent(content);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
+			String chapterContent = BookDetailsTask.getInstance()
+					.getChapterFormService(mContext, chapterUrl);
+			if (chapterContent != null && !chapterContent.equals(""))
+				chapter.setContent(chapterContent);
+			else {
+				if (Integer.valueOf(index) > 0) {
+					InputStream is;
+					try {
+						is = mContext.getAssets().open("error.txt");
+						int size = is.available();
+						byte[] buffer = new byte[size];
+						is.read(buffer);
+						is.close();
+						String content = new String(buffer, "gbk");
+						chapter.setContent(content);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						return null;
+					}
+				} else
 					return null;
-				}
-			} else
-				return null;
+			}
+
 		}
 
 		return chapter;
 
 	}
+
+	/**
+	 * 获取章节的大小
+	 * 
+	 * @return
+	 */
+	public static int getChapterLength() {
+		return book.getChapterList().size() - 1;
+	}
+
+	/**
+	 * 获得目录列表
+	 * @return
+	 */
+	public static List<BaiduBookChapter> getBookChapter() {
+		return book.getChapterList();
+	}
+
 }

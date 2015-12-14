@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.activity.BookQueryActivity;
 import com.himoo.ydsc.adapter.BookDownloadAdapter;
 import com.himoo.ydsc.base.BaseFragment;
+import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.dialog.BookDeletePopupWindow;
 import com.himoo.ydsc.dialog.BookDeletePopupWindow.OnPopupClickListener;
@@ -32,6 +34,11 @@ import com.himoo.ydsc.download.BookDownloadInfo;
 import com.himoo.ydsc.download.BookDownloadManager;
 import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.manager.PageManager;
+import com.himoo.ydsc.reader.ReaderActivity;
+import com.himoo.ydsc.reader.dao.BookMark;
+import com.himoo.ydsc.reader.dao.BookMarkDb;
+import com.himoo.ydsc.reader.utils.IOHelper;
+import com.himoo.ydsc.reader.utils.LocalReaderUtil;
 import com.himoo.ydsc.share.UmengShare;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.UIHelper;
@@ -203,22 +210,25 @@ public class BookShelfFragment extends BaseFragment implements
 
 				} else {
 
-					if (book.getProgress() < book.getFileLength()
-							|| book.getProgress() == 0) {
-						try {
-							Toast.showShort(getActivity(), "继续下载");
-							downloadManager
-									.resumeDownload(
-											book,
-											new BookDownloadAdapter.DownloadRequestCallBack(
-													book));
-						} catch (DbException e) {
-							// TODO Auto-generated catch block
-							android.util.Log.i("msg",
-									"DbException" + e.getMessage());
-						}
-						// mAdapter.notifyDataSetChanged();
-					}
+					new OpenBookAsyncTask(getActivity(), book.getBookName())
+							.execute();
+					//
+					// if (book.getProgress() < book.getFileLength()
+					// || book.getProgress() == 0) {
+					// try {
+					// Toast.showShort(getActivity(), "继续下载");
+					// downloadManager
+					// .resumeDownload(
+					// book,
+					// new BookDownloadAdapter.DownloadRequestCallBack(
+					// book));
+					// } catch (DbException e) {
+					// // TODO Auto-generated catch block
+					// android.util.Log.i("msg",
+					// "DbException" + e.getMessage());
+					// }
+					// // mAdapter.notifyDataSetChanged();
+					// }
 
 				}
 
@@ -561,12 +571,65 @@ public class BookShelfFragment extends BaseFragment implements
 	public void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		if (BookTheme.isThemeChange)
-		{
+		if (BookTheme.isThemeChange) {
 			titleBar.setBackgroundColor(BookTheme.THEME_COLOR);
 			ViewSelector.setButtonStrokeSelector(getActivity(), bookSort);
 			bookSort.setTextColor(BookTheme.THEME_COLOR);
 			searchText.setTextColor(BookTheme.THEME_COLOR);
 		}
 	}
+
+	/**
+	 * 异步初始化本地章节
+	 * 
+	 */
+	public class OpenBookAsyncTask extends AsyncTask<Void, Void, BookMark> {
+		public Context mContext;
+		public String bookName;
+
+		public OpenBookAsyncTask(Context context, String bookName) {
+			this.mContext = context;
+			this.bookName = bookName;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			showRefreshDialog("正在打开书籍");
+
+		}
+
+		@Override
+		protected BookMark doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+			ArrayList<BaiduBookChapter> list = LocalReaderUtil.getInstance()
+					.parseLocalBook(bookName);
+			IOHelper.getBook(mContext, bookName, list);
+			BookMark bookMark = BookMarkDb.getInstance(mContext, "book")
+					.querryReaderPos(bookName);
+
+			return bookMark;
+		}
+
+		@Override
+		protected void onPostExecute(BookMark result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			dismissRefreshDialog();
+			Intent intent = new Intent(mContext, ReaderActivity.class);
+			intent.putExtra("bookName", bookName);
+			intent.putExtra("index", 1);
+			intent.putExtra("position",
+					result == null ? 0 : result.getPosition());
+			intent.putExtra("currentPage",
+					result == null ? -1 : result.getCurrentPage());
+			intent.putExtra("pageCount",
+					result == null ? -1 : result.getPageCount());
+			intent.putExtra("isNeedSave", true);
+			startActivity(intent);
+		}
+
+	}
+
 }

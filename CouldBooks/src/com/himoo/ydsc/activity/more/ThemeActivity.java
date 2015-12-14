@@ -42,7 +42,7 @@ public class ThemeActivity extends SwipeBackActivity implements
 			R.drawable.theme_shape_yellow, R.drawable.theme_shape_gray };
 	/** 　封面 */
 	private int[] coverDrawable = { R.drawable.book_face_default,
-			R.drawable.no_cover, R.drawable.book_face_default,
+			R.drawable.no_cover, R.drawable.default_sign_free_book_cover,
 			R.drawable.book_face_default };
 	private String[] title = { "封面一", "封面二", "封面三", "封面四" };
 

@@ -63,6 +63,23 @@ public class BookDownloadInfo extends EntityBase {
 	@Column(column = "autoRename")
 	private boolean autoRename;
 
+	/** 　1表示自己服务器下载，不需要更新，2表示百度, */
+	@Column(column = "bookSourceType")
+	private int bookSourceType;
+
+	/** 是不是连载的状态 */
+	@Column(column = "isSerialize")
+	private boolean isSerialize;
+	
+	/** 书的地址，主要解析最新章节那块数据 */
+	@Column(column = "lastUrl")
+	private String lastUrl;
+	
+	/** 最新章节的名字 */
+	@Column(column = "lastChapterName")
+	private String lastChapterName;
+	
+
 	public HttpHandler<File> getHandler() {
 		return handler;
 	}
@@ -121,6 +138,22 @@ public class BookDownloadInfo extends EntityBase {
 
 	public boolean isAutoRename() {
 		return autoRename;
+	}
+
+	public String getLastUrl() {
+		return lastUrl;
+	}
+
+	public void setLastUrl(String lastUrl) {
+		this.lastUrl = lastUrl;
+	}
+
+	public String getLastChapterName() {
+		return lastChapterName;
+	}
+
+	public void setLastChapterName(String lastChapterName) {
+		this.lastChapterName = lastChapterName;
 	}
 
 	public void setAutoRename(boolean autoRename) {
@@ -189,6 +222,22 @@ public class BookDownloadInfo extends EntityBase {
 
 	public void setBookReadHository(String bookReadHository) {
 		this.bookReadHository = bookReadHository;
+	}
+
+	public int getBookSourceType() {
+		return bookSourceType;
+	}
+
+	public void setBookSourceType(int bookSourceType) {
+		this.bookSourceType = bookSourceType;
+	}
+
+	public boolean isSerialize() {
+		return isSerialize;
+	}
+
+	public void setSerialize(boolean isSerialize) {
+		this.isSerialize = isSerialize;
 	}
 
 	@Override

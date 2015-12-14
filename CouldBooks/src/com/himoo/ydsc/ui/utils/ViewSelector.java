@@ -13,6 +13,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.config.BookTheme;
@@ -142,13 +143,27 @@ public class ViewSelector {
 	 * @param button
 	 */
 	@SuppressWarnings("deprecation")
-	public static void setButtonStrokeSelector(Context context, Button button) {
+	public static void setButtonStrokeSelector(Context context, TextView button) {
 		Drawable[] mButtonStateRed_down = {
 				getStrokColorDrawable(context, 8, BookTheme.THEME_COLOR),
 				getStrokColorDrawable(context, 8, BookTheme.BUTTON_COLOR_PRESS),
 				getStrokColorDrawable(context, 8, BookTheme.BUTTON_COLOR_PRESS) };
 		button.setBackgroundDrawable(new ButtonSelector(context)
 				.setbg(mButtonStateRed_down));
+	}
+	/**
+	 * 设置Button点击selector，描边
+	 * 
+	 * @param button
+	 */
+	@SuppressWarnings("deprecation")
+	public static void setButtonStrokeSelector(Context context, TextView button,int color) {
+		Drawable[] mButtonStateRed_down = {
+				getStrokColorDrawable(context, 5, color),
+				getStrokColorDrawable(context, 5, color),
+				getStrokColorDrawable(context, 5, color) };
+		button.setBackgroundDrawable(new ButtonSelector(context)
+		.setbg(mButtonStateRed_down));
 	}
 
 	/**

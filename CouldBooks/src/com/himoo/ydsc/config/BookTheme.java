@@ -3,6 +3,7 @@ package com.himoo.ydsc.config;
 import java.util.ArrayList;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.util.SharedPreferences;
 
 import android.graphics.Color;
 
@@ -49,7 +50,7 @@ public class BookTheme {
 
 	/** 　封面 */
 	public static final int[] coverDrawable = { R.drawable.book_face_default,
-			R.drawable.no_cover, R.drawable.book_face_default,
+			R.drawable.no_cover, R.drawable.default_sign_free_book_cover,
 			R.drawable.book_face_default };
 
 	/** 书籍默认封面 */
@@ -103,6 +104,15 @@ public class BookTheme {
 	public static int MAIN_SEARCH_DRAWABLE = SEARCH_DRAWABLE[1];
 	public static int MAIN_BOOKSHELF_DRAWABLE = BOOKSHELF_DRAWABLE[1];
 	public static int MAIN_MORE_DRAWABLE = MORE_DRAWABLE[1];
+	
+	/** 阅读节界面的背景 */
+	public static int READBOOK_BACKGROUND =  R.drawable.book_yellow_background;
+	/**阅读节界面的背景集合*/
+	public static final int[] READBOOK_BACKGROUND_ID = {
+			R.drawable.read_bg_7, R.drawable.read_bg_1,
+			R.drawable.book_yellow_background,
+			R.drawable.read_mode_soft_bg,
+			R.drawable.book_yellow_background };
 
 	/**
 	 * 配置主题顏色
@@ -239,5 +249,36 @@ public class BookTheme {
 		return coverErrorList.contains(bookName);
 
 	}
+	
+	/**
+	 * 设置阅读界面的背景
+	 */
+	public static void setReaderBookTextBg(int index)
+	{
+		SharedPreferences.getInstance().putInt(SpConstant.BOOK_SETTING_TEXT_BG, index);
+		switch (index) {
+		case 1:
+			READBOOK_BACKGROUND = READBOOK_BACKGROUND_ID[0];
+			break;
+		case 2:
+			READBOOK_BACKGROUND = READBOOK_BACKGROUND_ID[1];
+			break;
+		case 3:
+			READBOOK_BACKGROUND = READBOOK_BACKGROUND_ID[2];
+			break;
+		case 4:
+			READBOOK_BACKGROUND = READBOOK_BACKGROUND_ID[3];
+			break;
+		case 5:
+			READBOOK_BACKGROUND = READBOOK_BACKGROUND_ID[4];
+			break;
+
+		default:
+			break;
+		}
+		
+	}
+	
+	
 
 }

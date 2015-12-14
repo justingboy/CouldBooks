@@ -25,6 +25,7 @@ import com.himoo.ydsc.bean.BookDetails;
 import com.himoo.ydsc.dialog.BookDetailsDialog;
 import com.himoo.ydsc.listener.OnParseChapterListener;
 import com.himoo.ydsc.listener.OnRequestCallBack;
+import com.himoo.ydsc.reader.utils.ChapterParseUtil;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -126,11 +127,11 @@ public class BookDetailsTask {
 				// TODO Auto-generated method stub
 				ArrayList<BaiduBookChapter> list = praseBaiduBookChapter(responseInfo.result);
 				if (list != null && !list.isEmpty()) {
-					ArrayList<BaiduBookChapter> newList = getNewList(list);
+//					ArrayList<BaiduBookChapter> newList = getNewList(list);
 					if (mListener != null) {
-						mListener.onParseSuccess(newList);
-						list.clear();
-						list = null;
+						mListener.onParseSuccess(list);
+//						list.clear();
+//						list = null;
 					}
 				} else {
 					if (mListener != null)
@@ -331,6 +332,60 @@ public class BookDetailsTask {
 	}
 
 	/**
+	 * 从后台获取数据
+	 * 
+	 * @return
+	 */
+	public String getChapterFormService(Context context,String urlString) {
+		try {
+			URL url = new URL(urlString);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setConnectTimeout(5000);
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
+			int code = conn.getResponseCode();
+			if (code == 200) {
+				InputStream is = conn.getInputStream();
+				String result = streamToString(is);
+				return ChapterParseUtil.Parse(context, result);
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			return null;
+		}
+
+	}
+
+	/**
+	 * 从后台获取数据
+	 * 
+	 * @return
+	 */
+	public String geLasttChapterFormService(Context context,String urlString) {
+		try {
+			URL url = new URL(urlString);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setConnectTimeout(5000);
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
+			int code = conn.getResponseCode();
+			if (code == 200) {
+				InputStream is = conn.getInputStream();
+				return  streamToString(is);
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			return null;
+		}
+
+	}
+
+	
+	/**
 	 * 将流转换成String
 	 * 
 	 * @param is
@@ -374,4 +429,5 @@ public class BookDetailsTask {
 		return chapterList; // 返回集合
 	}
 
+	
 }

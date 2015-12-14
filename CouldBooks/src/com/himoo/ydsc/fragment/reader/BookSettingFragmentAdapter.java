@@ -1,4 +1,4 @@
-package com.himoo.ydsc.adapter;
+package com.himoo.ydsc.fragment.reader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,19 +8,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.himoo.ydsc.fragment.reader.BookSettingFragment1;
-import com.himoo.ydsc.fragment.reader.BookSettingFragment2;
-import com.himoo.ydsc.fragment.reader.BookSettingFragment3;
 import com.viewpagerindicator.IconPagerAdapter;
 
-public class TestFragmentAdapter extends FragmentPagerAdapter implements
+public class BookSettingFragmentAdapter extends FragmentPagerAdapter implements
 		IconPagerAdapter {
 	private List<Fragment> fragmentList = new ArrayList<Fragment>();
 	private int mCount = 3;
 
-	public TestFragmentAdapter(FragmentManager fm, Context context) {
+	public BookSettingFragmentAdapter(FragmentManager fm, Context context,String bookName,int position) {
 		super(fm);
-		fragmentList.add(BookSettingFragment1.newInstance());
+		fragmentList.add(BookSettingFragment1.newInstance(bookName,position));
 		fragmentList.add(BookSettingFragment2.newInstance());
 		fragmentList.add(BookSettingFragment3.newInstance(context));
 	}

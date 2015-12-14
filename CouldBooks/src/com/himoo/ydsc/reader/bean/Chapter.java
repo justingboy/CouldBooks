@@ -11,8 +11,12 @@ public class Chapter {
 	private String content;
 	/** 顺序 */
 	private String index;
+	/** 每章节的位置 */
+	private int position;
 	/** 章节的名字 */
 	private String chapterName;
+	/** 章节内容的地址 */
+	private String chapterUrl;
 
 	public String getContent() {
 		return content;
@@ -44,6 +48,22 @@ public class Chapter {
 
 	public void setChapterName(String chapterName) {
 		this.chapterName = chapterName;
+	}
+
+	public String getChapterUrl() {
+		return chapterUrl;
+	}
+
+	public void setChapterUrl(String chapterUrl) {
+		this.chapterUrl = chapterUrl;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
 	}
 
 }

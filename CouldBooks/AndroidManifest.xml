@@ -52,10 +52,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" 
             android:name="com.himoo.ydsc.activity.HomeActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/StyledIndicators" >
+            android:theme="@style/StyledIndicators"
+            android:windowSoftInputMode="stateVisible|adjustPan|adjustUnspecified|stateHidden" >
         </activity>
         <activity
             android:name="com.himoo.ydsc.activity.SearchResultActivity"
@@ -86,6 +86,11 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name="com.himoo.ydsc.activity.BookMarkActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/StyledIndicators" >
+        </activity>
+        <activity
             android:name="com.himoo.ydsc.activity.BaiduDetailsActivity"
             android:screenOrientation="portrait" >
         </activity>
@@ -97,11 +102,10 @@
             android:name="com.himoo.ydsc.activity.more.PasswordSettingActivity"
             android:screenOrientation="portrait" >
         </activity>
-        
         <activity
             android:name="com.himoo.ydsc.activity.BookDialogActivity"
-            android:theme="@style/BookDetailsStyle"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:theme="@style/BookDetailsStyle" >
         </activity>
         <activity
             android:name="com.himoo.ydsc.activity.DoubanBookActivity"
@@ -127,12 +131,25 @@
             android:name="com.himoo.ydsc.reader.ReaderActivity"
             android:screenOrientation="portrait" >
         </activity>
-     
-        <service android:name="com.himoo.ydsc.download.BookDownloadService">
-            <intent-filter  >
-                <action android:name="book.download.service.action"/>
+
+        <service android:name="com.himoo.ydsc.download.BookDownloadService" >
+            <intent-filter>
+                <action android:name="book.download.service.action" />
             </intent-filter>
         </service>
+        <service android:name="com.himoo.ydsc.update.BookUpdateService" >
+            <intent-filter>
+                <action android:name="com.himoo.ydsc.update.BookUpdateService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="com.himoo.ydsc.update.BootBroadcastReceiver"
+            android:exported="false" >
+            <intent-filter android:priority="1000" >
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <!-- 友盟分享相关注册 -->
         <meta-data

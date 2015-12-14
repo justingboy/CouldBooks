@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_more_rel"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/pagewidget_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/booksetting_titlebar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/book_setting_bg_color"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/booksetting_back"
+            style="@style/book_setting_image_title_style"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/iphone_b_backbtn" />
+
+        <ImageView
+            style="@style/book_setting_image_title_style"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/iphone_yuan" />
+
+        <ImageView
+            style="@style/book_setting_image_title_style"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/iphone_update" />
+
+        <ImageView
+            android:id="@+id/booksetting_speech"
+            style="@style/book_setting_image_title_style"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/iphone_yuyin" />
+
+        <ImageView
+            android:id="@+id/booksetting_bookmark"
+            style="@style/book_setting_image_title_style"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/iphone_b_bookmark" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bookseeting_bottombar"
+        android:layout_width="fill_parent"
+        android:layout_height="180dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/book_setting_bg_color"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <com.viewpagerindicator.CirclePageIndicator
+            android:id="@+id/indicator"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            app:fillColor="#2BAA97"
+            app:pageColor="#7C7C7C"
+            app:radius="6dp" />
+    </LinearLayout>
+
+</RelativeLayout>

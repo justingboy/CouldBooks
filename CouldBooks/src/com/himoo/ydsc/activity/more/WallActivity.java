@@ -1,7 +1,6 @@
 package com.himoo.ydsc.activity.more;
 
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.TranslateAnimation;
@@ -11,13 +10,11 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
 import com.himoo.ydsc.R;
-import com.himoo.ydsc.adapter.TestFragmentAdapter;
 import com.himoo.ydsc.animation.AnimationUtils;
 import com.himoo.ydsc.fragment.reader.BookSettingFragment1.OnFragment1Listener;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.lidroid.xutils.view.annotation.ViewInject;
-import com.viewpagerindicator.CirclePageIndicator;
 
 public class WallActivity extends SwipeBackActivity implements OnFragment1Listener{
 
@@ -63,8 +60,7 @@ public class WallActivity extends SwipeBackActivity implements OnFragment1Listen
 		setContentView(R.layout.activity_more_wall);
 		dialog_layout_rating = (LinearLayout) this
 				.findViewById(R.id.dialog_layout_rating);
-		Button dialog_btn_rate = (Button) this
-				.findViewById(R.id.dialog_btn_rate);
+		Button dialog_btn_rate = (Button) this.findViewById(R.id.dialog_btn_rate);
 		LayoutParams parmas = (LayoutParams) tv_bottom.getLayoutParams();
 		parmas.height = 520;
 		LayoutParams parmas2 = (LayoutParams) tv_titlebar.getLayoutParams();
@@ -74,14 +70,14 @@ public class WallActivity extends SwipeBackActivity implements OnFragment1Listen
 		AnimationUtils.setViewTranslateDownY(tv_bottom, 0f, 520);
 		AnimationUtils.setViewTranslateDownY(tv_titlebar, 0, -100f);
 
-		TestFragmentAdapter mAdapter = new TestFragmentAdapter(
-				getSupportFragmentManager(),this);
+//		BookSettingFragmentAdapter mAdapter = new BookSettingFragmentAdapter(
+//				getSupportFragmentManager(),this);
 
-		ViewPager mPager = (ViewPager) findViewById(R.id.pager);
-		mPager.setAdapter(mAdapter);
-
-		CirclePageIndicator mIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
-		mIndicator.setViewPager(mPager);
+//		ViewPager mPager = (ViewPager) findViewById(R.id.pager);
+//		mPager.setAdapter(mAdapter);
+//
+//		CirclePageIndicator mIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
+//		mIndicator.setViewPager(mPager);
 
 		tv_bottom.setOnClickListener(new OnClickListener() {
 
@@ -237,11 +233,35 @@ public class WallActivity extends SwipeBackActivity implements OnFragment1Listen
 		mTitleBar.setRightLogoGone();
 	}
 
+
+
 	@Override
-	public void onTextSizChange(float textSize) {
+	public void onSeekBarChapter(int chapterIndex) {
 		// TODO Auto-generated method stub
-		Toast.showLong(this, "字体大小发生了改变！"+textSize);
 		
+	}
+
+	@Override
+	public void onTextTypeChange() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTextTypeChildrenChange() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onPreChapter() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onNextChapter() {
+		// TODO Auto-generated method stub
 		
 	}
 

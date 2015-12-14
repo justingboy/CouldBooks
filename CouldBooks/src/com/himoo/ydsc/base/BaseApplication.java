@@ -60,23 +60,17 @@ public class BaseApplication extends Application {
 
 	@Override
 	public void onCreate() {
-		// if (DEVELOPER_MODE) {
-		// StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-		// .detectDiskReads().detectDiskWrites().detectNetwork()
-		// .penaltyLog().build());
-		// StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-		// .detectLeakedSqlLiteObjects().penaltyLog().penaltyDeath()
-		// .build());
-		// }
 		super.onCreate();
 		instance = this;
-
 		// 设置主题皮肤
 		BookTheme.setThemeColor(SharedPreferences.getInstance().getInt(
 				SpConstant.BOOK_SKIN_INDEX, 3));
 		// 设置主题皮肤
 		BookTheme.setBookCover(SharedPreferences.getInstance().getInt(
 				SpConstant.BOOK_COVER_INDEX, 0));
+		// 设置阅读背景
+		BookTheme.setReaderBookTextBg(SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SETTING_TEXT_BG, 3));
 
 		// 初始化科大讯飞语音功能5638453a 5638453a
 		SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5638453a");

@@ -38,6 +38,15 @@
        <!-- 阅读界面设置字体颜色 -->
     <color name="book_setting_text_color">#C4C2BF</color>
     
+       <!-- 阅读界面背景颜色 -->
+    <color name="book_setting_bg_color">#F4F5F5</color>
+    
+       <!-- 阅读界面背景颜色 -->
+    <color name="book_setting_bg_press_color">#D0D0D0</color>
+    
+       <!-- 字体类型选中的颜色 -->
+    <color name="book_setting_text_type_color">#7F7F7F</color>
+    
     
     
     

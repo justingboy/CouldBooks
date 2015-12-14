@@ -14,6 +14,7 @@ import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.download.BookDownloadInfo;
 import com.himoo.ydsc.download.BookDownloadManager;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.util.RegularUtil;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.HttpHandler;
 import com.lidroid.xutils.http.ResponseInfo;
@@ -43,7 +44,8 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 	@Override
 	protected void convert(BaseAdapterHelper helper, BookDownloadInfo item) {
 		// TODO Auto-generated method stub
-		helper.setImageUrl(R.id.shelf_book_image, item.getBookCoverImageUrl(),
+		String imageUrl = RegularUtil.converUrl(item.getBookCoverImageUrl());
+		helper.setImageUrl(R.id.shelf_book_image,imageUrl,
 				option);
 		helper.setVisible(R.id.shelf_delected_box, isSelectedState);
 		if (isChoice)
@@ -58,7 +60,6 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 			progress = (int) (item.getProgress() * 100 / item.getFileLength());
 		}
 		helper.setProgress(R.id.book_download_pb, progress);
-
 		HttpHandler<File> handler = item.getHandler();
 		if (handler != null) {
 			Log.d("handler");

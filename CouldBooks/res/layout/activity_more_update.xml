@@ -108,7 +108,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:checked="true"
                         android:text="1小时"
                         android:textSize="16sp" />
 
@@ -181,7 +180,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:checked="true"
                         android:text="所有网络"
                         android:textSize="16sp" />
                 </com.ios.radiogroup.SegmentedGroup>
@@ -216,7 +214,6 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:checked="true"
                         android:text="聚合详细通知"
                         android:textSize="15sp" />
 

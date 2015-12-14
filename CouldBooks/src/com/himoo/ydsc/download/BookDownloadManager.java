@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.himoo.ydsc.base.BaseApplication;
+import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BookDetails;
 import com.himoo.ydsc.util.FileUtils;
 import com.lidroid.xutils.DbUtils;
@@ -214,9 +215,11 @@ public class BookDownloadManager {
 		bookDownloadInfo.setDownloadUrl(bookDetails.getBook_Download());
 		bookDownloadInfo.setAutoRename(autoRename);
 		bookDownloadInfo.setAutoResume(autoResume);
+		bookDownloadInfo.setSerialize(false);
+		bookDownloadInfo.setBookSourceType(1);
 		bookDownloadInfo.setBookName(bookDetails.getBook_Name());
 		bookDownloadInfo.setBookAuthor(bookDetails.getBook_Author());
-		bookDownloadInfo.setBookLastUpdateTime(System.currentTimeMillis()+"");
+		bookDownloadInfo.setBookLastUpdateTime(System.currentTimeMillis() + "");
 		bookDownloadInfo.setBookCoverImageUrl(bookDetails.getBook_Image());
 		bookDownloadInfo.setBookIsRead(false);
 		bookDownloadInfo.setBookReadHository("您还没阅读这本书呢");
@@ -234,6 +237,30 @@ public class BookDownloadManager {
 		BaseApplication.getInstance().putHashMap(
 				bookDetails.getBook_Download(), bookDownloadInfo);
 
+	}
+
+	/**
+	 * 下载百度书籍
+	 * 
+	 * @param book
+	 * @throws DbException 
+	 */
+	public void addBaiduBookDownload(BaiduBook book) throws DbException {
+	    BookDownloadInfo bookDownloadInfo = new BookDownloadInfo();
+		bookDownloadInfo.setSerialize(book.getStatus().equals("完结"));
+		bookDownloadInfo.setBookSourceType(2);
+		bookDownloadInfo.setBookName(book.getTitle());
+		bookDownloadInfo.setBookAuthor(book.getAuthor());
+		bookDownloadInfo.setBookLastUpdateTime(System.currentTimeMillis() + "");
+		bookDownloadInfo.setBookCoverImageUrl(book.getCoverImage());
+		bookDownloadInfo.setBookIsRead(false);
+		bookDownloadInfo.setBookReadHository("您还没阅读这本书呢");
+		bookDownloadInfo.setBookReadProgress(100L);
+		bookDownloadInfo.setLastChapterName(book.getLastChapter().getText());
+		bookDownloadInfo.setLastChapterName(book.getListurl());
+		downloadInfoList.add(bookDownloadInfo);
+		db.saveBindingId(bookDownloadInfo);
+		
 	}
 
 	/**

@@ -9,21 +9,34 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp" >
+        android:paddingRight="5dp" >
 
         <ImageView
             android:id="@+id/brightness_down"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/read_brightness_down" />
+
+        <TextView
+            android:id="@+id/light_xitong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/text_shape_linght"
+            android:padding="5dp"
+            android:text="跟随系统" />
 
         <ImageView
             android:id="@+id/brightness_up"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/light_xitong"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/read_brightness_up" />
 
         <SeekBar
@@ -32,11 +45,10 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
             android:layout_toLeftOf="@id/brightness_up"
-            android:layout_toRightOf="@id/brightness_down"
-            android:max="200" />
+            android:layout_toRightOf="@id/brightness_down" />
     </RelativeLayout>
 
     <View
@@ -51,7 +63,10 @@
         android:orientation="horizontal" >
 
         <ImageView
+            android:id="@+id/textsiz_reduce"
             style="@style/book_setting_image_style"
+            android:background="@drawable/booksetting_textsize_selector"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/read_typeface_decrease" />
 
         <View
@@ -60,7 +75,10 @@
             android:background="#DCD8D5" />
 
         <ImageView
+            android:id="@+id/textsiz_increase"
             style="@style/book_setting_image_style"
+            android:background="@drawable/booksetting_textsize_selector"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/read_typeface_increase" />
     </LinearLayout>
 
@@ -75,23 +93,33 @@
         android:orientation="horizontal" >
 
         <ImageView
+            android:id="@+id/booksetting_iv_bg1"
             style="@style/book_setting_image_style"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/reading_bg_eye" />
 
         <ImageView
+            android:id="@+id/booksetting_iv_bg2"
             style="@style/book_setting_image_style"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/reading_bg_kraft" />
 
         <ImageView
+            android:id="@+id/booksetting_iv_bg3"
             style="@style/book_setting_image_style"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/reading_bg_default" />
 
         <ImageView
+            android:id="@+id/booksetting_iv_bg4"
             style="@style/book_setting_image_style"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/reading_bg_5" />
 
         <ImageView
+            android:id="@+id/booksetting_iv_bg5"
             style="@style/book_setting_image_style"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/rukou_xuanzhong" />
     </LinearLayout>
 
@@ -106,19 +134,27 @@
         android:orientation="horizontal" >
 
         <ImageView
+            android:id="@+id/booksetting_linespace_1"
             style="@style/book_setting_image_style"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/liner_space_0_2" />
 
         <ImageView
+            android:id="@+id/booksetting_linespace_2"
             style="@style/book_setting_image_style"
-            android:src="@drawable/liner_space_default_checked" />
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/liner_space_default" />
 
         <ImageView
+            android:id="@+id/booksetting_linespace_3"
             style="@style/book_setting_image_style"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/liner_space_1" />
 
         <ImageView
+            android:id="@+id/booksetting_linespace_4"
             style="@style/book_setting_image_style"
+            android:contentDescription="@string/app_name"
             android:src="@drawable/liner_space_1_5" />
     </LinearLayout>
 

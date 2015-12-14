@@ -27,6 +27,7 @@ import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.download.BaiduBookDownload;
 import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.listener.OnParseChapterListener;
@@ -40,6 +41,7 @@ import com.himoo.ydsc.ui.utils.UIHelper;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.RegularUtil;
+import com.lidroid.xutils.exception.DbException;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -77,6 +79,9 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	private Button bookEvaluation;
 
 	private DownlaodNotification downNotification;
+
+	/** 当前点击的Item位置 */
+	private int mCurrentClickPosition = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -163,8 +168,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 
 			ImageLoader.getInstance().displayImage(imageUrl, bookCoverImg,
 					option);
+			Log.i("CoverImage2－－option = " + imageUrl);
 		}
-		Log.i("CoverImage2 = " + imageUrl);
 		bookAuthor.setText("作者 ：" + book.getAuthor());
 		bookStatue.setText("状态 ：" + book.getStatus());
 		bookCategory.setText("类别 ：" + book.getCategory());
@@ -234,9 +239,9 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	public void onParseSuccess(ArrayList<BaiduBookChapter> list) {
 		// TODO Auto-generated method stub
 		dismissRefreshDialog();
-		IOHelper.getBook(this,book.getTitle(),list);	
+		IOHelper.getBook(this, book.getTitle(), list);
 		initData(list);
-		
+
 	}
 
 	@Override
@@ -267,7 +272,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 					drawable, null);
 
 			Collections.reverse(bookList);
-			
+
 			for (int i = 0; i < bookList.size(); i++) {
 				chapters[i] = bookList.get(i).getText().trim();
 			}
@@ -276,6 +281,12 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 			// 下载书籍
 		} else if (v == bookDownload) {
 			downNotification = new DownlaodNotification(this);
+			try {
+				BaiduBookDownload.getInstance(this).addBaiduBookDownload(book);
+			} catch (DbException e) {
+				// TODO Auto-generated catch block
+				Log.e("插入数据库失败" + e.getMessage());
+			}
 			new SaveAsyncTask(bookList).execute();
 
 			// 豆瓣评书
@@ -302,6 +313,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		mCurrentClickPosition = -1;
 		bookEvaluation.setClickable(true);
 	}
 
@@ -315,7 +327,13 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		private ArrayList<BaiduBookChapter> list = null;
 
 		public SaveAsyncTask(ArrayList<BaiduBookChapter> list) {
+
+			String index = list.get(0).getIndex();
+			if (Integer.valueOf(index) > 1) {
+				Collections.reverse(list);
+			}
 			this.list = list;
+
 		}
 
 		@Override
@@ -334,14 +352,17 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 			int allChapterLength = list.size();
 			float partProgress = (float) allChapterLength / 100;
 			String bookName = book.getTitle();
-			for (BaiduBookChapter chapter : list) {
+			for (int i = 0; i < allChapterLength; i++) {
+				BaiduBookChapter chapter = list.get(i);
 				String url = getChapterUrl(chapter);
-				String chapterName =chapter.getText().trim()+chapter.getIndex() + ".txt";
+				String chapterName = chapter.getText().trim() + "-"
+						+ chapter.getIndex() + "-" + i + ".txt";
 				File chapterFile = new File(dirFile.getAbsolutePath(),
 						chapterName);
-				//如何该章节已经下载则不需要下载,跳过,下载下一个章节
+				// 如何该章节已经下载则不需要下载,跳过,下载下一个章节
 				if (!chapterFile.exists() || chapterFile.length() == 0)
-					com.himoo.ydsc.download.FileUtils.writeTosSd(url,chapterFile);
+					com.himoo.ydsc.download.FileUtils.writeTosSd(url,
+							chapterFile);
 				len++;
 				if (partProgress <= 1) {
 					progress = getPartprogress(partProgress);
@@ -387,7 +408,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		protected void onPostExecute(String result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			Toast.showLong(BaiduDetailsActivity.this, "《"+book.getTitle()+"》下载完成");
+			Toast.showLong(BaiduDetailsActivity.this, "《" + book.getTitle()
+					+ "》下载完成");
 			new Handler().postDelayed(new Runnable() {
 
 				@Override
@@ -441,13 +463,19 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		// TODO Auto-generated method stub
+		if (mCurrentClickPosition != -1)
+			return;
+		mCurrentClickPosition = position;
+
+		int size = bookList.size();
 		BaiduBookChapter chapter = bookList.get(position - 2);
-//		Intent intent = new Intent(this, BookReaderActivity.class);
 		Intent intent = new Intent(this, ReaderActivity.class);
 		intent.putExtra("bookName", book.getTitle());
 		intent.putExtra("chapterName", chapter.getText().trim());
 		intent.putExtra("chapterUrl", getChapterUrl(chapter));
 		intent.putExtra("index", chapter.getIndex());
+		intent.putExtra("position", isReverse ? size - position + 1
+				: position - 2);
 		startActivity(intent);
 
 	}

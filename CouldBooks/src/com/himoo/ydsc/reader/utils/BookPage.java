@@ -1,18 +1,22 @@
 package com.himoo.ydsc.reader.utils;
 
-import java.text.DecimalFormat;
 import java.util.Vector;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
+import android.graphics.Typeface;
 import android.text.format.Time;
 
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.reader.bean.Chapter;
 import com.himoo.ydsc.util.DeviceUtil;
+import com.himoo.ydsc.util.JccUtil;
+import com.himoo.ydsc.util.SharedPreferences;
 
 /**
  * 这个类的目的是为在看书翻页时，需要进行的动作提供接口。
@@ -26,6 +30,8 @@ import com.himoo.ydsc.util.DeviceUtil;
  * 
  */
 public class BookPage {
+
+	private int currentSeekBarPos = 0;
 	// configuration information
 	private int screenWidth; // 屏幕宽度
 	private int screenHeight; // 屏幕高度
@@ -41,7 +47,7 @@ public class BookPage {
 	private Paint paintBottom;
 	private int visibleWidth; // 屏幕中可显示文本的宽度
 	private int visibleHeight;
-	private Chapter chapter; // 需要处理的章节对象
+	public Chapter chapter; // 需要处理的章节对象
 	private Vector<String> linesVe; // 将章节內容分成行，并将每页按行存储到vector对象中
 	private int lineCount; // 一个章节在当前配置下一共有多少行
 
@@ -53,8 +59,13 @@ public class BookPage {
 	public boolean isfirstPage;
 	public boolean islastPage;
 
-	private Vector<Vector<String>> pagesVe;
-	int pageNum;
+	public Vector<Vector<String>> pagesVe;
+	public int pageNum;
+
+	private int textType = 1;
+	private Context mContext;
+	private Typeface typeface;
+	private int typefaceIndex;
 
 	/**
 	 * 在新建一个BookPage对象时，需要向其提供数据，以支持屏幕翻页功能。
@@ -67,40 +78,67 @@ public class BookPage {
 	 *            章节对象
 	 */
 	public BookPage(Context context, int screenWidth, int screenHeight,
-			Chapter chapter) {
+			Chapter chapter, int currentPage, int pageCount) {
+		mContext = context;
 		this.screenHeight = screenHeight;
 		this.screenWidth = screenWidth;
 		this.chapter = chapter;
+		initSetting();
+		setTextTypeChildren(true);
+		setTextLineSpace(true);
 		init(context);
+		if (currentPage != -1 && pageCount != -1)
+			pageNum = (currentPage * (pagesVe.size())) / pageCount;
+	}
+
+	/**
+	 * 初始化已经设置好
+	 */
+	private void initSetting() {
+		textType = SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SETTING_TEXT_TYPE, 1);
 	}
 
 	/**
 	 * 初始最好按照定义变量的顺序来初始化，统一。在将来需要修改某个变量的时候，容易找到。 对代码维护应该也很有用吧。
 	 */
 	protected void init(Context context) {
-		bgBitmap = null;
+		// bgBitmap = null;;
+
 		bgColor = 0xffff9e85;
 		textColor = Color.BLACK;
-		content = chapter.getContent();
+		if (chapter == null)
+			return;
+		content = textType == 1 ? JccUtil.changeToSimplified(chapter
+				.getContent()) : JccUtil.changeToTraditional(chapter
+				.getContent());
+		if (typefaceIndex == 3)
+			content = content.replaceAll("        ", "    ");
 		chapterLen = content.length();
 		// curCharPos = 0;
 		charBegin = 0;
 		charEnd = 0;
 		marginWidth = DeviceUtil.dip2px(context, 20);
 		marginHeight = DeviceUtil.dip2px(context, 20);
-		fontSize = DeviceUtil.dip2px(context, 20);
-		lineHgight = fontSize + 8;
+		fontSize = SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SETTING_TEXT_SIZE,
+				DeviceUtil.dip2px(context, 20));
+		// lineHgight = fontSize + DeviceUtil.dip2px(context, 4);
 		linesVe = new Vector<String>();
 
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setTextAlign(Align.LEFT);
 		paint.setTextSize(fontSize);
 		paint.setColor(textColor);
+		if (typeface != null)
+			paint.setTypeface(typeface);
 
 		paintBottom = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paintBottom.setTextAlign(Align.LEFT);
-		paintBottom.setTextSize(fontSize / 2 + 2);
+		paintBottom.setTextSize(fontSize / 2);
 		paintBottom.setColor(textColor);
+		if (typeface != null)
+			paintBottom.setTypeface(typeface);
 
 		visibleWidth = screenWidth - marginWidth * 2;
 		visibleHeight = screenHeight - marginHeight * 2;
@@ -109,6 +147,7 @@ public class BookPage {
 		islastPage = false;
 		pagesVe = new Vector<Vector<String>>();
 		pageNum = -1;
+
 		slicePage();
 	}
 
@@ -210,14 +249,20 @@ public class BookPage {
 	 * 跳到下一章，若返回值为false，则当前章节已经为最后一章
 	 */
 	public boolean nextChapter() {
+		if (chapter == null)
+			return false;
 		String index = chapter.getIndex();
+		int position = chapter.getPosition() + 1;
+		Chapter tempChapter = IOHelper.getChapter(index, position);
 
-		Chapter tempChapter = IOHelper.getChapter(
-				(Integer.valueOf(index) + 1) + "");
 		if (tempChapter == null)
 			return false;
 		chapter = tempChapter;
-		content = chapter.getContent();
+		content = textType == 1 ? JccUtil.changeToSimplified(chapter
+				.getContent()) : JccUtil.changeToTraditional(chapter
+				.getContent());
+		if (typefaceIndex == 3)
+			content = content.replaceAll("        ", "    ");
 		chapterLen = content.length();
 		// curCharPos = 0;
 		charBegin = 0;
@@ -231,19 +276,26 @@ public class BookPage {
 	 * 跳到上一章,若返回值为false，则当前章节已经为第一章
 	 */
 	public boolean preChapter() {
+		if (chapter == null)
+			return false;
 		String index = chapter.getIndex();
-		Chapter tempChapter = IOHelper.getChapter((Integer.valueOf(index) - 1)
-				+ "");
+		int position = chapter.getPosition();
+		Chapter tempChapter = IOHelper.getChapter(index, position - 1);
 		if (tempChapter == null)
 			return false;
 		chapter = tempChapter;
-		content = chapter.getContent();
+		content = textType == 1 ? JccUtil.changeToSimplified(chapter
+				.getContent()) : JccUtil.changeToTraditional(chapter
+				.getContent());
+		if (typefaceIndex == 3)
+			content = content.replaceAll("        ", "    ");
 		chapterLen = content.length();
 		// curCharPos = chapterLen;
 		charBegin = chapterLen;
 		charEnd = chapterLen;
 		slicePage();
 		pageNum = pagesVe.size();
+
 		return true;
 	}
 
@@ -274,12 +326,7 @@ public class BookPage {
 				c.drawText(line, marginWidth, y, paint);
 			}
 		}
-
-		// float percent = (float) (charBegin * 1.0 / chapterLen);
-		float percent = (float) ((pageNum + 1) * 1.0 / pagesVe.size());
-		DecimalFormat df = new DecimalFormat("#0.0");
-		String percetStr = df.format(percent * 100) + "%";
-
+		String percetStr = "第" + (pageNum + 1) + "/" + pagesVe.size() + "页";
 		Time time = new Time();
 		time.setToNow();
 		String timeStr;
@@ -288,22 +335,142 @@ public class BookPage {
 		else
 			timeStr = "" + time.hour + " : " + time.minute;
 
-		int pSWidth = (int) paintBottom.measureText("100.0%") + DeviceUtil.dip2px(context, 3);
+		int pSWidth = (int) paintBottom.measureText("第12/10页")
+				+ DeviceUtil.dip2px(context, 3);
 		int titWidth = (int) paintBottom.measureText(chapter.getBookName());
 
 		c.drawText(timeStr, marginWidth / 2, screenHeight - 5, paintBottom);
 		c.drawText(chapter.getBookName(), screenWidth / 2 - titWidth / 2,
 				screenHeight - DeviceUtil.dip2px(context, 4), paintBottom);
-		c.drawText(chapter.getChapterName(),
-				DeviceUtil.dip2px(context, 20),
+		c.drawText(chapter.getChapterName(), DeviceUtil.dip2px(context, 20),
 				DeviceUtil.dip2px(context, 20), paintBottom);
 		c.drawText(percetStr, screenWidth - pSWidth,
 				screenHeight - DeviceUtil.dip2px(context, 4), paintBottom);
 	}
 
-	public void setBgBitmap(Bitmap bMap) {
-		bgBitmap = Bitmap.createScaledBitmap(bMap, screenWidth, screenHeight,
-				true);
+	/**
+	 * 设置小说的阅读背景图片
+	 * 
+	 * @param context
+	 * @param resId
+	 */
+	public void setBgBitmap(Context context, int resId) {
+		bgBitmap = Bitmap.createScaledBitmap(
+				BitmapFactory.decodeResource(context.getResources(), resId),
+				screenWidth, screenHeight, true);
+	}
+
+	/**
+	 * 设置字体大小
+	 * 
+	 * @param textSize
+	 */
+	public void setTextSzie(int textSize) {
+		fontSize = textSize;
+		init(mContext);
+	}
+
+	/**
+	 * 设置简繁体
+	 */
+	public void setTextType() {
+		textType = SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SETTING_TEXT_TYPE, 1);
+		init(mContext);
+	}
+
+	/**
+	 * 设置字体间的行间距
+	 */
+	public void setTextLineSpace(boolean isFirstInit) {
+		int index = SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SETTING_TEXT_LINE, 1);
+		fontSize = SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SETTING_TEXT_SIZE,
+				DeviceUtil.dip2px(mContext, 20));
+		switch (index) {
+		case 1:
+			lineHgight = fontSize + DeviceUtil.dip2px(mContext, 4);
+			break;
+		case 2:
+			lineHgight = fontSize + DeviceUtil.dip2px(mContext, 10);
+			break;
+		case 3:
+			lineHgight = fontSize + DeviceUtil.dip2px(mContext, 20);
+			break;
+		case 4:
+			lineHgight = fontSize + DeviceUtil.dip2px(mContext, 30);
+			break;
+
+		default:
+			break;
+		}
+		if (!isFirstInit)
+			init(mContext);
+
+	}
+
+	/**
+	 * 设置楷体还是宋体
+	 */
+	public void setTextTypeChildren(boolean isFirstInit) {
+		typefaceIndex = SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SETTING_TEXT_CHILDREN_TYPE, 1);
+		switch (typefaceIndex) {
+		case 1:
+			typeface = null;
+			break;
+		case 2:
+			typeface = Typeface.createFromAsset(mContext.getResources()
+					.getAssets(), "texttype/jian.ttf");
+			break;
+		case 3:
+			typeface = Typeface.createFromAsset(mContext.getResources()
+					.getAssets(), "texttype/kai.ttf");
+			break;
+		case 4:
+			typeface = Typeface.createFromAsset(mContext.getResources()
+					.getAssets(), "texttype/xkai.ttf");
+			break;
+		case 5:
+			typeface = Typeface.createFromAsset(mContext.getResources()
+					.getAssets(), "texttype/wei.ttf");
+			break;
+
+		default:
+			break;
+		}
+		if (!isFirstInit)
+			init(mContext);
+	}
+
+	/**
+	 * 下一章
+	 */
+	public void initNextChapter() {
+		nextChapter();
+		init(mContext);
+
+	}
+
+	/**
+	 * 上一章
+	 */
+	public void initPreChapter() {
+		preChapter();
+		init(mContext);
+
+	}
+
+	public void initSeekBarChapter(int position) {
+		chapter = IOHelper.getChapter("1", position);
+		if (currentSeekBarPos < position) {
+			nextChapter();
+		} else {
+			preChapter();
+		}
+		init(mContext);
+		currentSeekBarPos = position;
 	}
 
 }
