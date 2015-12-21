@@ -19,6 +19,7 @@ package com.viewpagerindicator;
 import com.handmark.pulltorefresh.library.R;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -171,4 +172,13 @@ public class IconPageIndicator extends HorizontalScrollView implements PageIndic
     public void setOnPageChangeListener(OnPageChangeListener listener) {
         mListener = listener;
     }
+    
+    @Override
+	protected void onRestoreInstanceState(Parcelable state) {
+		try {
+			super.onRestoreInstanceState(state);
+		} catch (ClassCastException e) {
+			e.printStackTrace();
+		}
+	}
 }

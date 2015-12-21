@@ -1,7 +1,5 @@
 package com.ios.edittext;
 
-import com.handmark.pulltorefresh.library.R;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -10,14 +8,16 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnKeyListener;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import com.handmark.pulltorefresh.library.R;
 
 /**
  * 仿IOS右边可删除的
@@ -50,6 +50,10 @@ public class SearchEditText extends EditText implements OnFocusChangeListener,
 	private Context mContext;
 
 	private boolean isPopup = true;
+
+	public void setIconLeft(boolean isLeft) {
+		isIconLeft = isLeft;
+	}
 
 	public void setOnSearchClickListener(OnSearchClickListener listener) {
 		this.listener = listener;
@@ -86,6 +90,11 @@ public class SearchEditText extends EditText implements OnFocusChangeListener,
 	}
 
 	private void init() {
+		//设置键盘右下角的标识为中文搜索
+		this.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+		this.setInputType(EditorInfo.TYPE_CLASS_TEXT);
+		this.setSingleLine(true);
+		
 		setOnFocusChangeListener(this);
 		setOnKeyListener(this);
 		addTextChangedListener(this);
@@ -97,6 +106,8 @@ public class SearchEditText extends EditText implements OnFocusChangeListener,
 		if (isIconLeft) { // 如果是默认样式，直接绘制
 			if (length() < 1) {
 				drawableDel = null;
+				drawableLeft = this.getResources().getDrawable(
+						R.drawable.search_icon);
 			}
 			this.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, null,
 					drawableDel, null);
@@ -130,7 +141,7 @@ public class SearchEditText extends EditText implements OnFocusChangeListener,
 
 	@Override
 	public boolean onKey(View v, int keyCode, KeyEvent event) {
-		
+
 		pressSearch = (keyCode == KeyEvent.KEYCODE_ENTER);
 		if (pressSearch && listener != null) {
 			/* 隐藏软键盘 */

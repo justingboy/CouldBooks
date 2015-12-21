@@ -33,7 +33,7 @@ public class SwitchButton extends CompoundButton {
 
 	private boolean mIsChecked = false;
 
-	private Configuration mConf;
+	public Configuration mConf;
 
 	/**
 	 * zone for thumb to move inside
@@ -167,12 +167,12 @@ public class SwitchButton extends CompoundButton {
 		return tempDrawable;
 	}
 
-	public void setConfiguration(Configuration conf) {
+	public void setConfiguration(Configuration conf,int onColor) {
 		if (mConf == null) {
 			mConf = Configuration.getDefault(conf.getDensity());
 		}
 		mConf.setOffDrawable(conf.getOffDrawableWithFix());
-		mConf.setOnDrawable(conf.getOnDrawableWithFix());
+		mConf.setOnDrawable(conf.getOnDrawableWithFix(onColor));
 		mConf.setThumbDrawable(conf.getThumbDrawableWithFix());
 		mConf.setThumbMarginInPixel(conf.getThumbMarginTop(),
 				conf.getThumbMarginBottom(), conf.getThumbMarginLeft(),

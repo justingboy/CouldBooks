@@ -16,21 +16,27 @@
  */
 package com.viewpagerindicator;
 
-import com.handmark.pulltorefresh.library.R;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import com.handmark.pulltorefresh.library.R;
 
 /**
  * This widget implements the dynamic action bar tab behavior that can change
@@ -56,6 +62,8 @@ public class TabPageIndicator extends HorizontalScrollView implements
 	/** The drawable of text direction on bottom */
 	public static final int DRAWABLE_BOTTOM = 4;
 
+	private List<TabView> tabViews = new ArrayList<TabPageIndicator.TabView>();
+
 	/**
 	 * Interface for a callback when the selected tab has been reselected.
 	 */
@@ -77,7 +85,11 @@ public class TabPageIndicator extends HorizontalScrollView implements
 			final int oldSelected = mViewPager.getCurrentItem();
 			final int newSelected = tabView.getIndex();
 			mViewPager.setCurrentItem(newSelected);
-			if (oldSelected == newSelected && mTabReselectedListener != null) {
+			// if (oldSelected == newSelected && mTabReselectedListener != null)
+			// {
+			// mTabReselectedListener.onTabReselected(newSelected);
+			// }
+			if (mTabReselectedListener != null) {
 				mTabReselectedListener.onTabReselected(newSelected);
 			}
 		}
@@ -93,6 +105,8 @@ public class TabPageIndicator extends HorizontalScrollView implements
 
 	private OnTabReselectedListener mTabReselectedListener;
 
+	private TabView tabView;
+
 	public TabPageIndicator(Context context) {
 		this(context, null);
 	}
@@ -101,7 +115,7 @@ public class TabPageIndicator extends HorizontalScrollView implements
 		super(context, attrs);
 		setHorizontalScrollBarEnabled(false);
 
-		mTabLayout = new IcsLinearLayout(context,attrs,
+		mTabLayout = new IcsLinearLayout(context, attrs,
 				R.attr.vpiTabPageIndicatorStyle);
 		addView(mTabLayout, new ViewGroup.LayoutParams(WRAP_CONTENT,
 				MATCH_PARENT));
@@ -173,7 +187,8 @@ public class TabPageIndicator extends HorizontalScrollView implements
 	}
 
 	private void addTab(int index, CharSequence text, int iconResId) {
-		final TabView tabView = new TabView(getContext());
+		tabView = new TabView(getContext());
+		tabViews.add(tabView);
 		tabView.mIndex = index;
 		tabView.setFocusable(true);
 		tabView.setOnClickListener(mTabClickListener);
@@ -337,6 +352,21 @@ public class TabPageIndicator extends HorizontalScrollView implements
 
 		DRAWABLE_DIRECTION = direction;
 
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Parcelable state) {
+		try {
+			super.onRestoreInstanceState(state);
+		} catch (Exception e) {
+			Log.e("msg", e.getMessage());
+		}
+	}
+
+	public void setTextColor(ColorStateList colors) {
+		for (TabView tabview : tabViews) {
+			tabview.setTextColor(colors);
+		}
 	}
 
 }

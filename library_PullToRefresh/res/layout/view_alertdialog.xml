@@ -12,9 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="18dp"
         android:gravity="center"
-        android:textColor="@color/black"
+        android:textColor="#4B4B4A"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -22,17 +22,17 @@
         android:id="@+id/txt_msg"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="18dp"
+        android:layout_marginTop="5dp"
         android:gravity="center"
-        android:textColor="@color/black"
+        android:textColor="#FF454545"
         android:textSize="16sp" />
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="18dp"
         android:background="@color/alertdialog_line" />
 
     <LinearLayout
@@ -43,29 +43,28 @@
         <Button
             android:id="@+id/btn_neg"
             android:layout_width="wrap_content"
-            android:layout_height="43dp"
+            android:layout_height="45dp"
             android:layout_weight="1"
             android:background="@drawable/alertdialog_left_selector"
             android:gravity="center"
             android:textColor="@color/actionsheet_blue"
-            android:textSize="16sp" />
+            android:textSize="17sp" />
 
         <ImageView
             android:id="@+id/img_line"
             android:layout_width="0.5dp"
-            android:layout_height="43dp"
+            android:layout_height="45dp"
             android:background="@color/alertdialog_line" />
 
         <Button
             android:id="@+id/btn_pos"
             android:layout_width="wrap_content"
-            android:layout_height="43dp"
+            android:layout_height="45dp"
             android:layout_weight="1"
             android:background="@drawable/alertdialog_right_selector"
             android:gravity="center"
             android:textColor="@color/actionsheet_blue"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textSize="17sp" />
     </LinearLayout>
 
 </LinearLayout>

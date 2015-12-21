@@ -9,8 +9,6 @@ import android.graphics.drawable.GradientDrawable;
  * class for configuring the Switchbutton
  * used when you want to change the face of this view in code
  * 
- * @author kyleduo
- * @since 2014-09-24
  */
 public class Configuration implements Cloneable {
 
@@ -250,11 +248,11 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-	public Drawable getOnDrawableWithFix() {
+	public Drawable getOnDrawableWithFix(int onColor) {
 		if (mOnDrawable != null) {
 			return mOnDrawable;
 		} else {
-			return getDrawableFromColor(mOnColor);
+			return getDrawableFromColor(onColor==-1? mOnColor:onColor);
 		}
 	}
 

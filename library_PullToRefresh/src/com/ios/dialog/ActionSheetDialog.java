@@ -1,6 +1,5 @@
 package com.ios.dialog;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +30,9 @@ public class ActionSheetDialog {
 	private boolean showTitle = false;
 	private List<SheetItem> sheetItemList;
 	private Display display;
+	/** 是否需TextView背景色 */
+	private boolean isNeedBackground = false;
+	private int mCurrentIndex = -1;
 
 	public ActionSheetDialog(Context context) {
 		this.context = context;
@@ -86,8 +88,23 @@ public class ActionSheetDialog {
 		return this;
 	}
 
+	public ActionSheetDialog setDefaultBackground(boolean isNeed) {
+		isNeedBackground = isNeed;
+		return this;
+	}
+
+	public ActionSheetDialog setTitleCancelColor(int color) {
+		txt_cancel.setTextColor(color);
+		return this;
+	}
+
 	public ActionSheetDialog setCanceledOnTouchOutside(boolean cancel) {
 		dialog.setCanceledOnTouchOutside(cancel);
+		return this;
+	}
+
+	public ActionSheetDialog setCurrentItemIndex(int index) {
+		mCurrentIndex = index;
 		return this;
 	}
 
@@ -101,6 +118,14 @@ public class ActionSheetDialog {
 	 * @return
 	 */
 	public ActionSheetDialog addSheetItem(String strItem, SheetItemColor color,
+			OnSheetItemClickListener listener) {
+		if (sheetItemList == null) {
+			sheetItemList = new ArrayList<SheetItem>();
+		}
+		sheetItemList.add(new SheetItem(strItem, color, listener));
+		return this;
+	}
+	public ActionSheetDialog addSheetItem(String strItem, int color,
 			OnSheetItemClickListener listener) {
 		if (sheetItemList == null) {
 			sheetItemList = new ArrayList<SheetItem>();
@@ -132,6 +157,7 @@ public class ActionSheetDialog {
 			final int index = i;
 			SheetItem sheetItem = sheetItemList.get(i - 1);
 			String strItem = sheetItem.name;
+			int textColor = sheetItem.textColor;
 			SheetItemColor color = sheetItem.color;
 			final OnSheetItemClickListener listener = (OnSheetItemClickListener) sheetItem.itemClickListener;
 
@@ -167,10 +193,20 @@ public class ActionSheetDialog {
 
 			// 字体颜色
 			if (color == null) {
-				textView.setTextColor(Color.parseColor(SheetItemColor.Blue
-						.getName()));
+				textView.setTextColor(textColor);
+//				textView.setTextColor(Color.parseColor(SheetItemColor.Blue
+//						.getName()));
 			} else {
-				textView.setTextColor(Color.parseColor(color.getName()));
+//				textView.setTextColor(Color.parseColor(color.getName()));
+				textView.setTextColor(textColor);
+			}
+
+			if (isNeedBackground) {
+				if (index == mCurrentIndex) {
+					textView.setTextColor(Color.WHITE);
+//					textView.setBackgroundColor(Color.parseColor("#FF00B64F"));
+					textView.setBackgroundColor(textColor);
+				}
 			}
 
 			// 高度
@@ -183,8 +219,8 @@ public class ActionSheetDialog {
 			textView.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					listener.onClick(index);
-					dialog.dismiss();
+					listener.onClick((TextView) v, index);
+					 dialog.dismiss();
 				}
 			});
 
@@ -198,13 +234,14 @@ public class ActionSheetDialog {
 	}
 
 	public interface OnSheetItemClickListener {
-		void onClick(int which);
+		void onClick(TextView v, int which);
 	}
 
 	public class SheetItem {
 		String name;
 		OnSheetItemClickListener itemClickListener;
 		SheetItemColor color;
+		int textColor = Color.parseColor("#037BFF");
 
 		public SheetItem(String name, SheetItemColor color,
 				OnSheetItemClickListener itemClickListener) {
@@ -212,10 +249,16 @@ public class ActionSheetDialog {
 			this.color = color;
 			this.itemClickListener = itemClickListener;
 		}
+		public SheetItem(String name, int color,
+				OnSheetItemClickListener itemClickListener) {
+			this.name = name;
+			this.textColor = color;
+			this.itemClickListener = itemClickListener;
+		}
 	}
 
 	public enum SheetItemColor {
-		Blue("#037BFF"), Red("#FD4A2E");
+		Blue("#037BFF"), Green("#FF00B64F"), Red("#FD4A2E");
 
 		private String name;
 
