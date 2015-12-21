@@ -46,6 +46,8 @@ public class BookMarkFragment extends BaseFragment {
 	private BookMarkAdapter adapter;
 
 	private BookMarkDb db;
+	
+	private String nnn;
 
 	public static BookMarkFragment newInstance(String bookName,int bookType) {
 		BookMarkFragment fragment = new BookMarkFragment();

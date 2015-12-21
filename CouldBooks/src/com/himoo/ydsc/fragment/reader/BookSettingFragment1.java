@@ -31,6 +31,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 public class BookSettingFragment1 extends Fragment implements OnClickListener,
 		OnSeekBarChangeListener {
 
+	private String nnn;
 	private OnFragment1Listener mListener;
 
 	@ViewInject(R.id.booksetting_traditional)
