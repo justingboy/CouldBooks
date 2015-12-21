@@ -5,6 +5,7 @@ import java.util.List;
 import android.content.Context;
 
 import com.himoo.ydsc.db.BookDb;
+import com.himoo.ydsc.util.MyLogger;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
 import com.lidroid.xutils.exception.DbException;
@@ -41,6 +42,7 @@ public class BookMarkDb {
 			if (list != null && !list.isEmpty()) {
 				BookMark bookMark = list.get(0);
 				bookMark.setPosition(mark.getPosition());
+				bookMark.setChapterName(mark.getChapterName());
 				bookMark.setPageCount(mark.getPageCount());
 				bookMark.setCurrentPage(mark.getCurrentPage());
 				db.update(bookMark);
@@ -54,8 +56,7 @@ public class BookMarkDb {
 		}
 
 	}
-	
-	
+
 	/**
 	 * 保存阅读的位置
 	 */
@@ -63,9 +64,11 @@ public class BookMarkDb {
 		try {
 			List<BookMark> list = db.findAll(Selector.from(BookMark.class)
 					.where("bookName", "=", mark.getBookName())
-					.and("chapterName", "=", mark.getChapterName()).and("type", "=", 2).and("currentPage", "=", mark.getCurrentPage()));
+					.and("chapterName", "=", mark.getChapterName())
+					.and("type", "=", 2)
+					.and("currentPage", "=", mark.getCurrentPage()));
 			if (list != null && !list.isEmpty()) {
-				return ;
+				return;
 			} else {
 				db.save(mark);
 			}
@@ -109,7 +112,7 @@ public class BookMarkDb {
 	public BookMark querryReaderPos(String bookName) {
 		try {
 			List<BookMark> list = db.findAll(Selector.from(BookMark.class)
-					.where("bookName", "=", bookName));
+					.where("bookName", "=", bookName).and("type", "=", 1));
 			if (list != null && !list.isEmpty()) {
 				return list.get(0);
 			} else {
@@ -139,6 +142,20 @@ public class BookMarkDb {
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
 			return null;
+		}
+	}
+
+	/**
+	 * 删除书签
+	 * 
+	 * @param bookMarko
+	 */
+	public void deletBookMark(BookMark bookMark) {
+		try {
+			db.delete(bookMark);
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			MyLogger.kLog().e(e);
 		}
 	}
 

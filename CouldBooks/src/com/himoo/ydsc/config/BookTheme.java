@@ -33,6 +33,7 @@ public class BookTheme {
 	public static final int BOOK_YELLOW = Color.parseColor("#FFF5BB18");
 	public static final int BOOK_GRAY = Color.parseColor("#FF2C2000");
 	public static final int BOOK_WHITE = Color.parseColor("#FFFFFFFF");
+	public static final int BOOK_TEXT_WHITE = Color.parseColor("#FFA6A5A2");
 
 	/** 主题颜色默认 */
 	public static int THEME_COLOR = BookTheme.BOOK_GREEN;
@@ -48,6 +49,18 @@ public class BookTheme {
 	public static final int BOOK_YELLOW_PRESS = Color.parseColor("#F9C60E");
 	public static final int BOOK_GRAY_PRESS = Color.parseColor("#342808");
 
+	/** 　书架横着图片 */
+	public static final int[] BOOK_SHELF_HDRAWABLE = {
+			R.drawable.book_horzial_red, R.drawable.book_horzial_blue,
+			R.drawable.book_horzial_green, R.drawable.book_horzial_yellow,
+			R.drawable.book_horzial_black };
+
+	/** 　书架竖着图片 */
+	public static final int[] BOOK_SHELF_VDRAWABLE = {
+			R.drawable.book_vertica_red, R.drawable.book_vertica_blue,
+			R.drawable.book_vertica_green, R.drawable.book_vertica_yellow,
+			R.drawable.book_vertica_black };
+
 	/** 　封面 */
 	public static final int[] coverDrawable = { R.drawable.book_face_default,
 			R.drawable.no_cover, R.drawable.default_sign_free_book_cover,
@@ -55,6 +68,9 @@ public class BookTheme {
 
 	/** 书籍默认封面 */
 	public static int BOOK_COVER = coverDrawable[0];
+
+	/** 夜间模式的背景图片 */
+	public static int BOOK_SETTING_NIGHT_DRAWABLE = R.drawable.book_setting_night;
 
 	/** 是否需要在onResume中改变主题 */
 	public static boolean isThemeChange = false;
@@ -104,15 +120,18 @@ public class BookTheme {
 	public static int MAIN_SEARCH_DRAWABLE = SEARCH_DRAWABLE[1];
 	public static int MAIN_BOOKSHELF_DRAWABLE = BOOKSHELF_DRAWABLE[1];
 	public static int MAIN_MORE_DRAWABLE = MORE_DRAWABLE[1];
-	
+
+	/** 　书架书的排列顺序 */
+	public static int BOOK_SHELF_HORIZONTAL = BOOKSHELF_DRAWABLE[1];
+	public static int BOOK_SHELF_VERTICAL = MORE_DRAWABLE[1];
+
 	/** 阅读节界面的背景 */
-	public static int READBOOK_BACKGROUND =  R.drawable.book_yellow_background;
-	/**阅读节界面的背景集合*/
-	public static final int[] READBOOK_BACKGROUND_ID = {
-			R.drawable.read_bg_7, R.drawable.read_bg_1,
-			R.drawable.book_yellow_background,
-			R.drawable.read_mode_soft_bg,
-			R.drawable.book_yellow_background };
+	public static int READBOOK_BACKGROUND = R.drawable.book_yellow_background;
+
+	/** 阅读节界面的背景集合 */
+	public static final int[] READBOOK_BACKGROUND_ID = { R.drawable.read_bg_7,
+			R.drawable.read_bg_1, R.drawable.book_yellow_background,
+			R.drawable.read_mode_soft_bg, R.drawable.book_yellow_background };
 
 	/**
 	 * 配置主题顏色
@@ -126,7 +145,8 @@ public class BookTheme {
 		MAIN_SEARCH_DRAWABLE = SEARCH_DRAWABLE[themeColor - 1];
 		MAIN_BOOKSHELF_DRAWABLE = BOOKSHELF_DRAWABLE[themeColor - 1];
 		MAIN_MORE_DRAWABLE = MORE_DRAWABLE[themeColor - 1];
-
+		BOOK_SHELF_HORIZONTAL = BOOK_SHELF_HDRAWABLE[themeColor - 1];
+		BOOK_SHELF_VERTICAL = BOOK_SHELF_VDRAWABLE[themeColor - 1];
 		switch (themeColor) {
 		case RED_THEME:
 			THEME_COLOR = BookTheme.BOOK_RED;
@@ -240,6 +260,7 @@ public class BookTheme {
 
 	/**
 	 * 判断是否包含该书名
+	 * 
 	 * @param bookName
 	 * @return
 	 */
@@ -249,13 +270,13 @@ public class BookTheme {
 		return coverErrorList.contains(bookName);
 
 	}
-	
+
 	/**
 	 * 设置阅读界面的背景
 	 */
-	public static void setReaderBookTextBg(int index)
-	{
-		SharedPreferences.getInstance().putInt(SpConstant.BOOK_SETTING_TEXT_BG, index);
+	public static void setReaderBookTextBg(int index) {
+		SharedPreferences.getInstance().putInt(SpConstant.BOOK_SETTING_TEXT_BG,
+				index);
 		switch (index) {
 		case 1:
 			READBOOK_BACKGROUND = READBOOK_BACKGROUND_ID[0];
@@ -276,9 +297,7 @@ public class BookTheme {
 		default:
 			break;
 		}
-		
+
 	}
-	
-	
 
 }

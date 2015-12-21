@@ -164,8 +164,9 @@
             android:src="@drawable/iphone_b_menu" />
 
         <ImageView
+            android:id="@+id/booksetting_night"
             style="@style/book_setting_image_style"
-            android:src="@drawable/iphone_b_switch" />
+            android:src="@drawable/iphone_daytime" />
 
         <ImageView
             style="@style/book_setting_image_style"

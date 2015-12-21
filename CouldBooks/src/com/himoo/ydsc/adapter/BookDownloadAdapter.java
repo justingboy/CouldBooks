@@ -5,18 +5,22 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.base.quickadapter.BaseAdapterHelper;
 import com.himoo.ydsc.base.quickadapter.QuickAdapter;
 import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.download.BookDownloadInfo;
-import com.himoo.ydsc.download.BookDownloadManager;
+import com.himoo.ydsc.reader.utils.ZipExtractorTask;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.RegularUtil;
+import com.himoo.ydsc.util.SharedPreferences;
+import com.himoo.ydsc.util.TimestampUtils;
 import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.HttpHandler;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -44,36 +48,76 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 	@Override
 	protected void convert(BaseAdapterHelper helper, BookDownloadInfo item) {
 		// TODO Auto-generated method stub
+		boolean isHorizontal = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SHELF_DIRECTION, true);
 		String imageUrl = RegularUtil.converUrl(item.getBookCoverImageUrl());
-		helper.setImageUrl(R.id.shelf_book_image,imageUrl,
-				option);
-		helper.setVisible(R.id.shelf_delected_box, isSelectedState);
-		if (isChoice)
-			helper.setImageResource(R.id.shelf_delected_box,
-					R.drawable.shelf_left_feedback_help_check);
-		else
-			helper.setImageResource(R.id.shelf_delected_box,
-					R.drawable.help_uncheck);
-		helper.setText(R.id.shelf_book_name, item.getBookName());
-		int progress = 0;
-		if (item.getFileLength() > 0) {
-			progress = (int) (item.getProgress() * 100 / item.getFileLength());
-		}
-		helper.setProgress(R.id.book_download_pb, progress);
-		HttpHandler<File> handler = item.getHandler();
-		if (handler != null) {
-			Log.d("handler");
-			@SuppressWarnings("rawtypes")
-			RequestCallBack callBack = handler.getRequestCallBack();
-			if (callBack instanceof BookDownloadManager.ManagerCallBack) {
-				BookDownloadManager.ManagerCallBack managerCallBack = (BookDownloadManager.ManagerCallBack) callBack;
-				if (managerCallBack.getBaseCallBack() == null) {
-					managerCallBack
-							.setBaseCallBack(new DownloadRequestCallBack(item));
-				}
+		helper.setImageUrl(R.id.shelf_book_image, imageUrl, option);
+		helper.setVisible(R.id.book_new_label, item.getBookIsRead() ? false
+				: true);
+		if (isHorizontal) {
+			helper.setVisible(R.id.shelf_delected_box, isSelectedState);
+			helper.setVisible(R.id.shelf_book_name, true);
+			helper.setVisible(R.id.book_shelf_middle_layout, false);
+			helper.setVisible(R.id.book_shelf_right_layout, false);
+			if (isChoice)
+				helper.setImageResource(R.id.shelf_delected_box,
+						R.drawable.shelf_left_feedback_help_check);
+			else
+				helper.setImageResource(R.id.shelf_delected_box,
+						R.drawable.help_uncheck);
+			helper.setText(R.id.shelf_book_name, item.getBookName());
+			helper.setTextColor(R.id.shelf_book_name, BookTheme.THEME_COLOR);
+		} else {
+			if (isChoice)
+				helper.setImageResource(R.id.book_shelf_delected_box,
+						R.drawable.shelf_left_feedback_help_check);
+			else
+				helper.setImageResource(R.id.book_shelf_delected_box,
+						R.drawable.help_uncheck);
+			helper.setInVisible(R.id.book_shelf_delected_box, isSelectedState);
+			helper.setVisible(R.id.book_shelf_middle_layout, true);
+			helper.setVisible(R.id.book_shelf_right_layout, true);
+			helper.setVisible(R.id.shelf_book_name, false);
+			helper.setText(R.id.shelf_book_name_Vertical, item.getBookName());
+			helper.setTextColor(R.id.shelf_book_name_Vertical, BookTheme.THEME_COLOR);
+			helper.setText(R.id.shelf_book_Author, item.getBookAuthor());
+			helper.setText(
+					R.id.shelf_book_update_time,
+					TimestampUtils.formatTimeDuration(item
+							.getBookLastUpdateTime()) + "前更新");
+			if (item.getBookReadHository().equals("此书您还没有阅读!")) {
+				helper.setTextColor(R.id.shelf_book_current_chapter, Color.RED);
+			} else {
+				helper.setTextColor(R.id.shelf_book_current_chapter,
+						Color.BLACK);
 			}
-			callBack.setUserTag(new WeakReference<BaseAdapterHelper>(helper));
+			helper.setText(R.id.shelf_book_current_chapter,
+					"读至:" + item.getBookReadHository());
+			helper.setText(R.id.shelf_book_current_progress,
+					item.getLastReaderProgress());
+
 		}
+
+		// int progress = 0;
+		// if (item.getFileLength() > 0) {
+		// progress = (int) (item.getProgress() * 100 / item.getFileLength());
+		// }
+		// helper.setProgress(R.id.book_download_pb, progress);
+		// HttpHandler<File> handler = item.getHandler();
+		// if (handler != null) {
+		// Log.d("handler");
+		// @SuppressWarnings("rawtypes")
+		// RequestCallBack callBack = handler.getRequestCallBack();
+		// if (callBack instanceof BookDownloadManager.ManagerCallBack) {
+		// BookDownloadManager.ManagerCallBack managerCallBack =
+		// (BookDownloadManager.ManagerCallBack) callBack;
+		// if (managerCallBack.getBaseCallBack() == null) {
+		// managerCallBack
+		// .setBaseCallBack(new DownloadRequestCallBack(item));
+		// }
+		// }
+		// callBack.setUserTag(new WeakReference<BaseAdapterHelper>(helper));
+		// }
 
 	}
 
@@ -101,8 +145,8 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 							.getFileLength());
 				}
 				holder.setProgress(R.id.book_download_pb, progress);
-				
-				android.util.Log.i("msg","progress="+progress);
+
+				android.util.Log.i("msg", "progress=" + progress);
 			}
 		}
 
@@ -114,25 +158,49 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 		@Override
 		public void onLoading(long total, long current, boolean isUploading) {
 			refreshListItem();
-			
+
 		}
 
 		@Override
 		public void onSuccess(ResponseInfo<File> responseInfo) {
 			refreshListItem();
-			Toast.showLong(mContext, "《"+item.getBookName()+"》下载完成");
+			FileUtils fileUtils = new FileUtils(mContext);
+			String inPath = fileUtils.getStorageDirectory()
+					+ item.getBookName() + ".zip";
+			String outPath = fileUtils.getStorageDirectory()
+					+ item.getBookName();
+			doZipExtractorWork(inPath, outPath);
+			Toast.showLong(mContext, "《" + item.getBookName() + "》下载完成");
 		}
 
 		@Override
 		public void onFailure(HttpException error, String msg) {
 			refreshListItem();
-			Toast.showLong(mContext, "《"+item.getBookName()+"》下载失败,请查看网络！");
+			Toast.showLong(mContext, "《" + item.getBookName() + "》下载失败,请查看网络！");
+			FileUtils fileUtils = new FileUtils(mContext);
+			String inPath = fileUtils.getStorageDirectory()
+					+ item.getBookName() + ".zip";
+			String outPath = fileUtils.getStorageDirectory()
+					+ item.getBookName();
+			doZipExtractorWork(inPath, outPath);
 		}
 
 		@Override
 		public void onCancelled() {
 			refreshListItem();
 		}
+	}
+
+	/**
+	 * 加压zip文件
+	 * 
+	 * @param inPath
+	 * @param outPath
+	 */
+	public static void doZipExtractorWork(String inPath, String outPath) {
+		ZipExtractorTask task = new ZipExtractorTask(inPath, outPath, mContext,
+				true);
+		task.execute();
 	}
 
 }

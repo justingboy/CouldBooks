@@ -3,7 +3,6 @@ package com.himoo.ydsc.aescrypt;
 import javax.crypto.Cipher;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class EncryptionOrDecryptionTask extends AsyncTask<Void, Void, Boolean> {
 

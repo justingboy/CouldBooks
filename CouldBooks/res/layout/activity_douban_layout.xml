@@ -12,6 +12,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
+          <TextView
+            android:id="@+id/tv_book_empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:drawablePadding="15dp"
+            android:drawableTop="@drawable/icon_local_no_books"
+            android:gravity="center"
+            android:text="暂无图书列表,请移驾到别处吧!"
+            android:textColor="@color/main_bottom_textcolor_default"
+            android:textSize="16sp"
+            android:visibility="gone" />
+        
         <com.handmark.pulltorefresh.library.PullToRefreshListView
             xmlns:ptr="http://schemas.android.com/apk/res-auto"
             android:id="@+id/douban_book_list"

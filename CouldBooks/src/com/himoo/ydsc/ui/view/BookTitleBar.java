@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
@@ -96,6 +97,7 @@ public class BookTitleBar extends LinearLayout {
 	 * @return
 	 */
 	public ImageView getRightLogo() {
+		titlebar_refresh.setEnabled(true);
 		return titlebar_refresh;
 	}
 
@@ -108,6 +110,18 @@ public class BookTitleBar extends LinearLayout {
 		titlebar_refresh.setImageDrawable(mActivity.getResources().getDrawable(
 				resId));
 
+	}
+
+	/**
+	 * 设置宽度和高度
+	 * @param width
+	 * @param height
+	 */
+	public void setRightWidthAndHeight(int width, int height) {
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) titlebar_refresh.getLayoutParams();
+		params.height = DeviceUtil.dip2px(mActivity, height);
+		params.width = DeviceUtil.dip2px(mActivity, width);
+		titlebar_refresh.setLayoutParams(params);
 	}
 
 	/**
@@ -132,7 +146,16 @@ public class BookTitleBar extends LinearLayout {
 	 * 设置右边View为 GONE 状态
 	 */
 	public void setRightLogoGone() {
+		titlebar_refresh.setEnabled(false);
 		titlebar_refresh.setVisibility(View.GONE);
+	}
+
+	/**
+	 * 设置右边View为 GONE 状态
+	 */
+	public void setRightLogoVisible() {
+		titlebar_refresh.setEnabled(true);
+		titlebar_refresh.setVisibility(View.VISIBLE);
 	}
 
 	/**

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -24,6 +25,7 @@ import com.himoo.ydsc.util.AppUtils;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.ios.radiogroup.SegmentedGroup;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.umeng.onlineconfig.OnlineConfigAgent;
 
 public class MoreFragment extends BaseFragment implements
 		RadioGroup.OnCheckedChangeListener {
@@ -56,9 +58,17 @@ public class MoreFragment extends BaseFragment implements
 	@ViewInject(R.id.more_version_code)
 	private TextView more_version;
 
-	/** 版本信息 */
+	/** 书籍更新设置 */
 	@ViewInject(R.id.segmented_book_update)
 	private SegmentedGroup segment_book_update;
+
+	/** 整本书籍都更新 */
+	@ViewInject(R.id.rb_all_book)
+	private RadioButton rb_all_book;
+
+	/** 只更新最新章节 */
+	@ViewInject(R.id.rb_last_chapter)
+	private RadioButton rb_last_chapter;
 
 	/** 标识是否开启自动更新设置 */
 	@ViewInject(R.id.more_book_update_identifiy)
@@ -90,9 +100,14 @@ public class MoreFragment extends BaseFragment implements
 	@Override
 	public void initData() {
 		// TODO Auto-generated method stub
-
+		String value = OnlineConfigAgent.getInstance().getConfigParams(
+				getActivity(), "adstatue");
+		if (value != null && value.equals("1"))
+			more_unLock.setText("关于我们");
 		// 设置监听器
 		segment_book_update.setOnCheckedChangeListener(this);
+		//初始化书籍更新类型
+		initBookUpdateType();
 		// 设置版本信息
 		String versionCode = AppUtils.getVersionName(getActivity());
 		more_version.setText(getActivity().getString(
@@ -139,12 +154,10 @@ public class MoreFragment extends BaseFragment implements
 		case R.id.rb_all_book:
 			SharedPreferences.getInstance().putInt("book_update_type",
 					SpConstant.BOOK_UPDATE_TYPE_ALL);
-			Log.d("rb_all_book");
 			break;
 		case R.id.rb_last_chapter:
 			SharedPreferences.getInstance().putInt("book_update_type",
 					SpConstant.BOOK_UPDATE_TYPE_CHAPTER);
-			Log.d("rb_last_chapter");
 			break;
 
 		default:
@@ -176,6 +189,21 @@ public class MoreFragment extends BaseFragment implements
 		Intent intent = new Intent(getActivity(), className);
 		getActivity().startActivity(intent);
 		getActivity().overridePendingTransition(R.anim.activity_zoom_in, 0);
+
+	}
+
+	/**
+	 * 初始化书籍更新类型
+	 */
+	private void initBookUpdateType() {
+		int type = SharedPreferences.getInstance()
+				.getInt("book_update_type", 2);
+		if (type == 1) {
+			rb_all_book.setChecked(true);
+		} else if (type == 2) {
+			rb_last_chapter.setChecked(true);
+
+		}
 
 	}
 

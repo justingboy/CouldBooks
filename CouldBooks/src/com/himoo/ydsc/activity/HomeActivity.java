@@ -29,6 +29,7 @@ import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.umeng.onlineconfig.OnlineConfigAgent;
 
 public class HomeActivity extends BaseActivity {
 
@@ -89,7 +90,8 @@ public class HomeActivity extends BaseActivity {
 		setCurrentClickPoint(RB_VIEW_BOOKSHELF);
 		initEvent();
 		addFirstToast(this.getActivityName());
-
+		OnlineConfigAgent.getInstance().updateOnlineConfig(this);
+		
 		Log.d(SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST));
 
@@ -284,6 +286,17 @@ public class HomeActivity extends BaseActivity {
 		setRadioButtonDrawableSelector();
 		setRadioButtonTextColorSelector();
 
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		try {
+			super.onRestoreInstanceState(savedInstanceState);
+		} catch (Exception e) {
+			// TODO: handle exception
+			Log.e(e);
+		}
 	}
 
 }

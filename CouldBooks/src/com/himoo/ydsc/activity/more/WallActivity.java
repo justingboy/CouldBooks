@@ -1,22 +1,28 @@
 package com.himoo.ydsc.activity.more;
 
+import java.util.ArrayList;
+
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.aescrypt.AESCrypt;
 import com.himoo.ydsc.animation.AnimationUtils;
-import com.himoo.ydsc.fragment.reader.BookSettingFragment1.OnFragment1Listener;
+import com.himoo.ydsc.reader.utils.ZipExtractorTask;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.util.FileUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.umeng.onlineconfig.OnlineConfigAgent;
 
-public class WallActivity extends SwipeBackActivity implements OnFragment1Listener{
+public class WallActivity extends SwipeBackActivity {
 
 	@ViewInject(R.id.tv_bottombar)
 	private LinearLayout tv_bottom;
@@ -60,24 +66,24 @@ public class WallActivity extends SwipeBackActivity implements OnFragment1Listen
 		setContentView(R.layout.activity_more_wall);
 		dialog_layout_rating = (LinearLayout) this
 				.findViewById(R.id.dialog_layout_rating);
-		Button dialog_btn_rate = (Button) this.findViewById(R.id.dialog_btn_rate);
+		final Button dialog_btn_rate = (Button) this
+				.findViewById(R.id.dialog_btn_rate);
 		LayoutParams parmas = (LayoutParams) tv_bottom.getLayoutParams();
 		parmas.height = 520;
 		LayoutParams parmas2 = (LayoutParams) tv_titlebar.getLayoutParams();
 		parmas2.height = 100;
 		tv_bottom.setLayoutParams(parmas);
 		tv_titlebar.setLayoutParams(parmas2);
-		AnimationUtils.setViewTranslateDownY(tv_bottom, 0f, 520);
-		AnimationUtils.setViewTranslateDownY(tv_titlebar, 0, -100f);
 
-//		BookSettingFragmentAdapter mAdapter = new BookSettingFragmentAdapter(
-//				getSupportFragmentManager(),this);
+		// BookSettingFragmentAdapter mAdapter = new BookSettingFragmentAdapter(
+		// getSupportFragmentManager(),this);
 
-//		ViewPager mPager = (ViewPager) findViewById(R.id.pager);
-//		mPager.setAdapter(mAdapter);
-//
-//		CirclePageIndicator mIndicator = (CirclePageIndicator) findViewById(R.id.indicator);
-//		mIndicator.setViewPager(mPager);
+		// ViewPager mPager = (ViewPager) findViewById(R.id.pager);
+		// mPager.setAdapter(mAdapter);
+		//
+		// CirclePageIndicator mIndicator = (CirclePageIndicator)
+		// findViewById(R.id.indicator);
+		// mIndicator.setViewPager(mPager);
 
 		tv_bottom.setOnClickListener(new OnClickListener() {
 
@@ -87,142 +93,82 @@ public class WallActivity extends SwipeBackActivity implements OnFragment1Listen
 				Toast.showShort(WallActivity.this, "可以被点");
 			}
 		});
-		// dialog_btn_rate.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		// // int index = (int) (Math.random()*10);
-		// // FileUtils fileUtils = new FileUtils(WallActivity.this);
-		// // String filePath =
-		// // fileUtils.getStorageDirectory()+"1"+index+".txt";
-		// // String bookContent = AESCrypt.readBookFile(filePath);
-		// // Toast.showLong(WallActivity.this, bookContent);
-		// AnimationUtils.setViewTranslateUpY(tv_titlebar, 0, 120f);
-		// if (!isUp) {
-		//
-		// AnimationUtils.setViewTranslateUpY(tv_bottom, 280, 0f);
-		// } else {
-		// AnimationUtils.setViewTranslateDownY(tv_bottom, 0f, 280);
-		//
-		// AnimationUtils.setViewTranslateDownY(tv_titlebar, 0, -120f);
-		// }
-		//
-		// isUp = !isUp;
-		// }
-		//
-		// });
-		layout_more_rel.setOnClickListener(new OnClickListener() {
+		dialog_btn_rate.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+				
+				AnimationUtils.setViewRotating(WallActivity.this,dialog_btn_rate);
+				
+//				String value = OnlineConfigAgent.getInstance().getConfigParams(
+//						WallActivity.this, "adstatue");
+//				if (value.equals("1")) {
+//					Toast.showLong(WallActivity.this, "在线参数为" + value);
+//				}
+//				int index = (int) (Math.random() * 10);
+//				FileUtils fileUtils = new FileUtils(WallActivity.this);
+//				String filePath = fileUtils.getStorageDirectory()
+//						+ "一问一世界-2334/index" + ".txt";
+//				// String inPath = fileUtils.getStorageDirectory() +
+//				// "一问一世界-2334.zip";
+//				// String outPath = fileUtils.getStorageDirectory() +
+//				// "一问一世界-2334";
+//				// doZipExtractorWork(inPath, outPath);
+//				String bookContent = AESCrypt.readBookFile(filePath);
+//				ArrayList<MyChapter> list = new ArrayList<MyChapter>();
+//				String chapter[] = bookContent.split("\n");
+//				for (int i = 0; i < chapter.length; i++) {
+//					MyChapter ch = new MyChapter();
+//					String[] str = chapter[i].split("\\|\\|\\|");
+//					ch.setChapterName(str[0]);
+//					ch.setPosition(Integer.valueOf(str[1].split("\\.")[0].trim()));
+//					list.add(ch);
+//				}
+//				Log.i("chapter = " + list.size());
+//
+//				Toast.showLong(WallActivity.this, bookContent);
 
-				// Toast.showShort(WallActivity.this, "Relative --->可以点击");
-				if (!isUp) {
-					AnimationUtils.setViewTranslateUpY(tv_titlebar, -100f, 0f);
-					AnimationUtils.setViewTranslateUpY(tv_bottom, 520, 0f);
-				} else {
-					AnimationUtils.setViewTranslateDownY(tv_bottom, 0f, 520);
-					AnimationUtils.setViewTranslateDownY(tv_titlebar, 0f, -100);
-				}
-
-				isUp = !isUp;
 			}
+
+			// BookView bookView = (BookView) findViewById(R.id.book);
+			// bookView.setImageResource(R.drawable.book_face_default);
+			// // String url =
+			// //
+			// "http://bj.bs.baidu.com/wise-novel-authority-logo/4d6be3fc2772e80faf13b69dc8557fa3.jpg";
+			// // String url2 =
+			// //
+			// "http://bj.bs.baidu.com/wise-novel-authority-logo/88022e5b48ce48b636ed1b24aba09653.jpg";
+			// String url3 =
+			// "http://bj.bs.baidu.com/wise-novel-authority-logo/adf66ea1f9f6c7a3f73b924161d5c793.jpg";
+			// getBitamp(url3);
+			//
+			// button = (ArrowDownloadButton)
+			// findViewById(R.id.arrow_download_button);
+			// button.setOnClickListener(new View.OnClickListener() {
+			// @Override
+			// public void onClick(View v) {
+			// if ((count % 2) == 0) {
+			// button.startAnimating();
+			// Timer timer = new Timer();
+			// timer.schedule(new TimerTask() {
+			// @Override
+			// public void run() {
+			// runOnUiThread(new Runnable() {
+			// @Override
+			// public void run() {
+			// progress = progress + 1;
+			// button.setProgress(progress);
+			// }
+			// });
+			// }
+			// }, 800, 500);
+			// } else {
+			// button.reset();
+			// }
+			// count++;
+			// }
 		});
 
-		// layout_more_rel.setOnTouchListener(new OnTouchListener() {
-		//
-		// private float startX;
-		// private float startY;
-		//
-		// @Override
-		// public boolean onTouch(View v, MotionEvent event) {
-		// // TODO Auto-generated method stub
-		// int action = event.getAction();
-		// switch (action) {
-		// case MotionEvent.ACTION_DOWN:
-		// Toast.showShort(WallActivity.this, "ACTION_DOWN");
-		// startX = event.getX();
-		// startY = event.getY();
-		// break;
-		// case MotionEvent.ACTION_MOVE:
-		// // Toast.showShort(WallActivity.this,
-		// // "移动--------------？？？？");
-		// isMove = true;
-		// break;
-		// case MotionEvent.ACTION_UP:
-		//
-		// if (Math.abs(event.getX() - startX) < 15
-		// || Math.abs(event.getY() - startY)< 15) {
-		// Toast.showShort(WallActivity.this, "点击-----》");
-		// } else {
-		// Toast.showShort(WallActivity.this, "滑动---》");
-		// }
-		//
-		// break;
-		//
-		// default:
-		// break;
-		// }
-		//
-		// return true;
-		// }
-		// });
-
-		// BookView bookView = (BookView) findViewById(R.id.book);
-		// bookView.setImageResource(R.drawable.book_face_default);
-		// // String url =
-		// //
-		// "http://bj.bs.baidu.com/wise-novel-authority-logo/4d6be3fc2772e80faf13b69dc8557fa3.jpg";
-		// // String url2 =
-		// //
-		// "http://bj.bs.baidu.com/wise-novel-authority-logo/88022e5b48ce48b636ed1b24aba09653.jpg";
-		// String url3 =
-		// "http://bj.bs.baidu.com/wise-novel-authority-logo/adf66ea1f9f6c7a3f73b924161d5c793.jpg";
-		// getBitamp(url3);
-		//
-		// button = (ArrowDownloadButton)
-		// findViewById(R.id.arrow_download_button);
-		// button.setOnClickListener(new View.OnClickListener() {
-		// @Override
-		// public void onClick(View v) {
-		// if ((count % 2) == 0) {
-		// button.startAnimating();
-		// Timer timer = new Timer();
-		// timer.schedule(new TimerTask() {
-		// @Override
-		// public void run() {
-		// runOnUiThread(new Runnable() {
-		// @Override
-		// public void run() {
-		// progress = progress + 1;
-		// button.setProgress(progress);
-		// }
-		// });
-		// }
-		// }, 800, 500);
-		// } else {
-		// button.reset();
-		// }
-		// count++;
-		// }
-		// });
-
-	}
-
-	private void startRatingAni() {
-		/** 设置位移动画 向右位移150 */
-		// TranslateAnimation animation = new TranslateAnimation(
-		// Animation.RELATIVE_TO_PARENT, 0, Animation.RELATIVE_TO_PARENT, 0,
-		// Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT,
-		// 0.5f);
-		TranslateAnimation animation = new TranslateAnimation(0, 0, 0, -100);
-		animation.setDuration(1000);// 设置动画持续时间
-		animation.setFillAfter(true);
-		dialog_layout_rating.setAnimation(animation);
-		animation.startNow();
-		// ratingBar_layout.setVisibility(View.VISIBLE);
-		// dialog_btn_layout.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -233,51 +179,38 @@ public class WallActivity extends SwipeBackActivity implements OnFragment1Listen
 		mTitleBar.setRightLogoGone();
 	}
 
-
-
-	@Override
-	public void onSeekBarChapter(int chapterIndex) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * 加压zip文件
+	 * 
+	 * @param inPath
+	 * @param outPath
+	 */
+	public void doZipExtractorWork(String inPath, String outPath) {
+		ZipExtractorTask task = new ZipExtractorTask(inPath, outPath, this,
+				true);
+		task.execute();
 	}
 
-	@Override
-	public void onTextTypeChange() {
-		// TODO Auto-generated method stub
-		
-	}
+	public class MyChapter {
+		private String chapterName;
+		private int position;
 
-	@Override
-	public void onTextTypeChildrenChange() {
-		// TODO Auto-generated method stub
-		
-	}
+		public String getChapterName() {
+			return chapterName;
+		}
 
-	@Override
-	public void onPreChapter() {
-		// TODO Auto-generated method stub
-		
-	}
+		public void setChapterName(String chapterName) {
+			this.chapterName = chapterName;
+		}
 
-	@Override
-	public void onNextChapter() {
-		// TODO Auto-generated method stub
-		
-	}
+		public int getPosition() {
+			return position;
+		}
 
-	// private void getBitamp(final String urlString) {
-	// new Thread(new Runnable() {
-	//
-	// @Override
-	// public void run() {
-	// // TODO Auto-generated method stub
-	// InputStream in = BookDetailsTask.getInstance().executeByGet(
-	// urlString);
-	// Message msg = mHandler.obtainMessage();
-	// msg.obj = in;
-	// mHandler.sendMessage(msg);
-	// }
-	// }).start();
-	// }
+		public void setPosition(int position) {
+			this.position = position;
+		}
+
+	}
 
 }

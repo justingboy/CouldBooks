@@ -18,6 +18,8 @@ package com.himoo.ydsc.util;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import android.text.format.Time;
+
 /**
  * @Title TimestampUtil
  * @Package com.ta.util
@@ -45,6 +47,19 @@ public class TimestampUtils {
 
 	}
 
+	/**
+	 * 获取当前的时间小时
+	 * 
+	 * @return
+	 */
+	public static int getCurrentHour() {
+		Time time = new Time("GMT+8");
+		time.setToNow();
+		int hour = time.hour + 8;
+		return hour;
+	}
+	
+	
 	/**
 	 * 获得当前时间戳
 	 * 

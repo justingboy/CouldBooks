@@ -3,6 +3,7 @@ package com.himoo.ydsc.reader.bean;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
 
 /**
@@ -22,6 +23,8 @@ public class BookOperation {
 	private List<BaiduBookChapter> mChapterList = new ArrayList<BaiduBookChapter>();
 
 	private static BookOperation book = null;
+	
+	private BaiduBook baiduBook;
 
 	private BookOperation() {
 	}
@@ -64,6 +67,14 @@ public class BookOperation {
 
 	public String getChapterName(int order) {
 		return (String) mChapterList.get(order).getChapterName();
+	}
+
+	public BaiduBook getBaiduBook() {
+		return baiduBook;
+	}
+
+	public void setBaiduBook(BaiduBook baiduBook) {
+		this.baiduBook = baiduBook;
 	}
 
 	

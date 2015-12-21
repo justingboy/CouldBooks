@@ -33,12 +33,14 @@ import com.himoo.ydsc.bean.BookDetails;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.download.BookDownloadManager;
 import com.himoo.ydsc.download.BookDownloadService;
+import com.himoo.ydsc.download.DownLoaderTask;
 import com.himoo.ydsc.fragment.BookShelfFragment;
 import com.himoo.ydsc.fragment.BookShelfFragment.BookDownloadReceiver;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.share.UmengShare;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.DeviceUtil;
+import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.DbException;
@@ -90,6 +92,7 @@ public class BookDialogActivity extends FragmentActivity implements
 	private ImageView img_rate_cancel;
 	/** 评分 */
 	private int rate;
+	private FileUtils fileUtils;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,7 @@ public class BookDialogActivity extends FragmentActivity implements
 		option = BaseApplication.getInstance().displayImageOptionsBuider(
 				BookTheme.BOOK_COVER);
 		BookTheme.setChangeTheme(false);
+		fileUtils = new FileUtils(this);
 		findViewById();
 		initListener();
 		initData();
@@ -297,7 +301,7 @@ public class BookDialogActivity extends FragmentActivity implements
 		case R.id.dialog_btn_share:
 			UmengShare.getInstance().setShareContent(this,
 					bookDetails.getBook_Name(), bookDetails.getBook_Image(),
-					bookDetails.getBook_Name(),bookDetails.getBook_Download());
+					bookDetails.getBook_Name(), bookDetails.getBook_Download());
 			// 注册友盟分享
 			UmengShare.getInstance().addCustomPlatforms(this);
 
@@ -316,7 +320,8 @@ public class BookDialogActivity extends FragmentActivity implements
 
 			try {
 				downloadManager.addNewBookDownload(bookDetails,
-						System.currentTimeMillis() + ".zip", true, true, null);
+						bookDetails.getBook_Name() + ".zip", true, true, null);
+				doDownLoadWork(bookDetails.getBook_Download(), bookDetails.getBook_Name());
 				bookDownlaodCountUpload(bookDetails.getBook_ID());
 			} catch (DbException e) {
 				// TODO Auto-generated catch block
@@ -400,8 +405,8 @@ public class BookDialogActivity extends FragmentActivity implements
 		String url = SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST);
 		url = url + "bookrate.asp";
-		Log.i("msg","请求地址："+url);
-		http.send(HttpMethod.POST, url,params, new RequestCallBack<String>() {
+		Log.i("msg", "请求地址：" + url);
+		http.send(HttpMethod.POST, url, params, new RequestCallBack<String>() {
 
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
@@ -433,7 +438,7 @@ public class BookDialogActivity extends FragmentActivity implements
 		String url = SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST);
 		url = url + "getdl.asp";
-		http.send(HttpMethod.POST, url, params,new RequestCallBack<String>() {
+		http.send(HttpMethod.POST, url, params, new RequestCallBack<String>() {
 
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
@@ -449,4 +454,16 @@ public class BookDialogActivity extends FragmentActivity implements
 		});
 	}
 
+	/**
+	 * 下载书籍
+	 * @param downloadUrl
+	 * @param bookName
+	 */ 
+	private void doDownLoadWork(String downloadUrl,String bookName) {
+		
+		String filePath = fileUtils.getStorageDirectory()+ bookName + ".zip";
+		DownLoaderTask task = new DownLoaderTask(downloadUrl,bookName,
+				filePath, this);
+		task.execute();
+	}
 }

@@ -17,6 +17,8 @@ public class Chapter {
 	private String chapterName;
 	/** 章节内容的地址 */
 	private String chapterUrl;
+	/** 书的封面地址 */
+	private String coverImageUrl;
 
 	public String getContent() {
 		return content;
@@ -64,6 +66,14 @@ public class Chapter {
 
 	public void setPosition(int position) {
 		this.position = position;
+	}
+
+	public String getCoverImageUrl() {
+		return coverImageUrl;
+	}
+
+	public void setCoverImageUrl(String coverImageUrl) {
+		this.coverImageUrl = coverImageUrl;
 	}
 
 }

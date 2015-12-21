@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -19,7 +20,6 @@ import com.himoo.ydsc.adapter.DouBanBookAdapter;
 import com.himoo.ydsc.bean.DoubanBook;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
-import com.himoo.ydsc.ui.utils.Toast;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.ResponseInfo;
@@ -31,6 +31,10 @@ public class DoubanBookActivity extends SwipeBackActivity {
 
 	@ViewInject(R.id.douban_book_list)
 	private PullToRefreshListView mRefrshListView;
+
+	@ViewInject(R.id.tv_book_empty)
+	private TextView tv_book_empty;
+
 	/** 标记当前点击的位置 */
 	private int mCurrentClickPosition = -1;
 
@@ -106,26 +110,41 @@ public class DoubanBookActivity extends SwipeBackActivity {
 				// TODO Auto-generated method stub
 				try {
 					ArrayList<DoubanBook> bookList = parseDoubanJson(responseInfo.result);
-					DouBanBookAdapter mAdapter = new DouBanBookAdapter(
-							DoubanBookActivity.this,
-							R.layout.adapter_douban_item, bookList);
-					dismissRefreshDialog();
-					mRefrshListView.setAdapter(mAdapter);
+					if (bookList != null && !bookList.isEmpty()) {
+						DouBanBookAdapter mAdapter = new DouBanBookAdapter(
+								DoubanBookActivity.this,
+								R.layout.adapter_douban_item, bookList);
+						dismissRefreshDialog();
+						mRefrshListView.setAdapter(mAdapter);
+					} else {
+						dismissRefreshDialog();
+						setEmptyView();
+					}
 
 				} catch (JSONException e) {
 					dismissRefreshDialog();
-					Toast.showLong(DoubanBookActivity.this,
-							"解析评书信息失败：" + e.getMessage());
+					setEmptyView();
+					// Toast.showLong(DoubanBookActivity.this,
+					// "解析评书信息失败：" + e.getMessage());
 				}
 			}
 
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				dismissRefreshDialog();
-				showNiftyNotification( "获取评书信息失败：" + msg, R.id.Nifty_Lyout);
-//				Toast.showLong(DoubanBookActivity.this,"获取评书信息失败：" + msg);
+				setEmptyView();
+				showNiftyNotification("获取评书信息失败：" + msg, R.id.Nifty_Lyout);
+				// Toast.showLong(DoubanBookActivity.this,"获取评书信息失败：" + msg);
 			}
 		});
+	}
+
+	/**
+	 * 无数据的显示View
+	 */
+	private void setEmptyView() {
+		mRefrshListView.setVisibility(View.GONE);
+		tv_book_empty.setVisibility(View.VISIBLE);
 	}
 
 	/**

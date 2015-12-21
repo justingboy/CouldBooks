@@ -21,6 +21,9 @@ public class BookDownloadInfo extends EntityBase {
 	@Column(column = "bookAuthor")
 	private String bookAuthor;
 
+	@Column(column = "bookStatue")
+	private String bookStatue;
+
 	@Column(column = "bookReadProgress")
 	private long bookReadProgress;
 
@@ -70,15 +73,18 @@ public class BookDownloadInfo extends EntityBase {
 	/** 是不是连载的状态 */
 	@Column(column = "isSerialize")
 	private boolean isSerialize;
-	
+
 	/** 书的地址，主要解析最新章节那块数据 */
 	@Column(column = "lastUrl")
 	private String lastUrl;
-	
+
+	/** 最新阅读的位置 */
+	@Column(column = "lastReaderProgress")
+	private String lastReaderProgress;
+
 	/** 最新章节的名字 */
 	@Column(column = "lastChapterName")
 	private String lastChapterName;
-	
 
 	public HttpHandler<File> getHandler() {
 		return handler;
@@ -240,6 +246,22 @@ public class BookDownloadInfo extends EntityBase {
 		this.isSerialize = isSerialize;
 	}
 
+	public String getBookStatue() {
+		return bookStatue;
+	}
+
+	public void setBookStatue(String bookStatue) {
+		this.bookStatue = bookStatue;
+	}
+
+	public String getLastReaderProgress() {
+		return lastReaderProgress;
+	}
+
+	public void setLastReaderProgress(String lastReaderProgress) {
+		this.lastReaderProgress = lastReaderProgress;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -259,4 +281,5 @@ public class BookDownloadInfo extends EntityBase {
 	public int hashCode() {
 		return (int) (id ^ (id >>> 32));
 	}
+
 }

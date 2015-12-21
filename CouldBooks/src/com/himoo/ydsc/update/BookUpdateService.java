@@ -18,6 +18,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.activity.HomeActivity;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.download.BaiduBookDownload;
 import com.himoo.ydsc.download.BaiduInfo;
@@ -70,7 +71,7 @@ public class BookUpdateService extends Service {
 		}
 
 		// Creates an explicit intent for an Activity in your app
-		Intent resultIntent = new Intent();
+		Intent resultIntent = new Intent(this, HomeActivity.class);
 		// The stack builder object will contain an artificial back stack for
 		// the
 		// started Activity.
@@ -127,8 +128,8 @@ public class BookUpdateService extends Service {
 								LastChapter chapter = new LastChapter(
 										book.getBookName(), newChapter);
 								onProgressUpdate(chapter);
-								 BaiduBookDownload.getInstance(context)
-								 .updateChapterName(book, newChapter);
+								BaiduBookDownload.getInstance(context)
+										.updateChapterName(book, newChapter);
 
 							}
 						}
@@ -186,14 +187,5 @@ public class BookUpdateService extends Service {
 		return null;
 	}
 
-	public class LastChapter {
-		String bookName;
-		String chapterName;
-
-		public LastChapter(String bookName, String chapterName) {
-			this.bookName = bookName;
-			this.chapterName = chapterName;
-		}
-	}
 
 }

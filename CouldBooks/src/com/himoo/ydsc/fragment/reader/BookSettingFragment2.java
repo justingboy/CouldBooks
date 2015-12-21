@@ -3,6 +3,8 @@ package com.himoo.ydsc.fragment.reader;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -21,6 +23,7 @@ import android.widget.TextView;
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
+import com.himoo.ydsc.fragment.reader.BookSettingFragment1.ChangeNightReceiver;
 import com.himoo.ydsc.reader.utils.SystemBrightManager;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.DeviceUtil;
@@ -35,6 +38,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 public final class BookSettingFragment2 extends Fragment implements
 		OnClickListener {
 
+	private static final String ACTION = "com.himoo.ydsc.booksettingfragment1.receiver";
 	private boolean isFollowSystem = false;
 
 	private OnFragment2Listener mListener;
@@ -79,8 +83,12 @@ public final class BookSettingFragment2 extends Fragment implements
 
 	@ViewInject(R.id.booksetting_linespace_4)
 	private ImageView booksetting_linespace_4;
-
+	/** 默认字体的大小 */
 	private int textSize = 20;
+	/** 是否是手动开启夜间模式 */
+	private boolean isNigthModeHand;
+
+	private ChangeNightReceiver receiver;
 
 	public static BookSettingFragment2 newInstance() {
 		BookSettingFragment2 fragment = new BookSettingFragment2();
@@ -123,9 +131,8 @@ public final class BookSettingFragment2 extends Fragment implements
 		setBookImageSeleted();
 		setImageLineSeleted();
 		setListener();
-		
-		
-		
+		isNigthModeHand = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
 		if (!SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_LIGHT_SYSTEM, false)) {
 			ViewSelector.setButtonStrokeSelector(getActivity(), tv_SystemLight,
@@ -137,6 +144,7 @@ public final class BookSettingFragment2 extends Fragment implements
 			ViewSelector.setButtonStrokeSelector(getActivity(), tv_SystemLight,
 					BookTheme.THEME_COLOR);
 		}
+		registeBroadcast();
 
 	}
 
@@ -194,6 +202,7 @@ public final class BookSettingFragment2 extends Fragment implements
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
+		// changeNightMode();
 		switch (v.getId()) {
 		case R.id.textsiz_reduce:
 			if (textSize < 20)
@@ -298,7 +307,9 @@ public final class BookSettingFragment2 extends Fragment implements
 			break;
 		}
 
+		changeNightMode();
 		mListener.onTextBackgroundChange();
+		sendBrocastReceiver();
 
 	}
 
@@ -422,7 +433,6 @@ public final class BookSettingFragment2 extends Fragment implements
 		default:
 			break;
 		}
-
 		mListener.onTextLineSpaceChange();
 
 	}
@@ -469,6 +479,7 @@ public final class BookSettingFragment2 extends Fragment implements
 		}
 	};
 
+
 	/**
 	 * 设置亮度
 	 */
@@ -479,4 +490,44 @@ public final class BookSettingFragment2 extends Fragment implements
 
 	}
 
+	/**
+	 * 改变夜间模式
+	 */
+	public void changeNightMode() {
+		if (isNigthModeHand) {
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_SETTING_AUTO_NIGHT_MODE_YES, false);
+		}
+		SharedPreferences.getInstance().putBoolean(
+				SpConstant.BOOK_SETTING_NIGHT_MODE, false);
+	}
+
+	/**
+	 * 注册广播
+	 */
+	private void registeBroadcast() {
+		receiver = new BookSettingFragment1.ChangeNightReceiver();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(ACTION);
+		getActivity().registerReceiver(receiver, filter);
+
+	}
+
+	/**
+	 * 发送广播
+	 */
+	private void sendBrocastReceiver() {
+		Intent intent = new Intent(ACTION);
+		getActivity().sendBroadcast(intent);
+	}
+
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+		if (receiver != null)
+			getActivity().unregisterReceiver(receiver);
+	}
 }

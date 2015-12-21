@@ -107,11 +107,11 @@ public class BookDetailsTask {
 		});
 	}
 
+	
 	/**
-	 * 请求自己服务器的书的详情界面信息
-	 * 
+	 * 百度章节列表
 	 * @param context
-	 * @param bookId
+	 * @param gid
 	 */
 	public void executeBaidu(final Context context, String gid) {
 		if (http == null) {

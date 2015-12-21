@@ -154,7 +154,7 @@
         <!-- 友盟分享相关注册 -->
         <meta-data
             android:name="UMENG_APPKEY"
-            android:value="562a101ee0f55a5998000bc7" />
+            android:value="56415050e0f55a042200000c" />
 
         <activity
             android:name="com.umeng.socialize.view.ShareActivity"

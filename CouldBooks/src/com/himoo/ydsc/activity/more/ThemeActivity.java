@@ -17,7 +17,6 @@ import com.himoo.ydsc.bean.ThemeSkin;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
-import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.ios.switchbutton.Configuration;
@@ -43,7 +42,7 @@ public class ThemeActivity extends SwipeBackActivity implements
 	/** 　封面 */
 	private int[] coverDrawable = { R.drawable.book_face_default,
 			R.drawable.no_cover, R.drawable.default_sign_free_book_cover,
-			R.drawable.book_face_default };
+			R.drawable.fm_big};
 	private String[] title = { "封面一", "封面二", "封面三", "封面四" };
 
 	/** 当前选择皮肤的颜色 */
@@ -75,10 +74,12 @@ public class ThemeActivity extends SwipeBackActivity implements
 		mTitleBar.setLeftTitle(getResources().getString(R.string.main_more));
 		mTitleBar.setTitle(getResources().getString(R.string.more_topic));
 		mTitleBar.setRightLogoGone();
-
 		switchButton.setConfiguration(
 				Configuration.getDefault(DeviceUtil.getDisplayDensity(this)),
 				BookTheme.THEME_COLOR);
+		boolean isAutoNightMode = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
+		switchButton.setChecked(isAutoNightMode);
 
 	}
 
@@ -163,7 +164,6 @@ public class ThemeActivity extends SwipeBackActivity implements
 						SpConstant.BOOK_COVER_INDEX, position);
 				BookTheme.setBookCover(position);
 				coverAdapter.notifyDataSetChanged();
-				
 
 			}
 		});
@@ -173,7 +173,12 @@ public class ThemeActivity extends SwipeBackActivity implements
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		// TODO Auto-generated method stub
-		Toast.showShort(this, isChecked ? "开启夜间模式" : "关闭夜间模式");
+		SharedPreferences.getInstance().putBoolean(
+				SpConstant.BOOK_SETTING_AUTO_NIGHT, isChecked);
+		SharedPreferences.getInstance().putBoolean(
+				SpConstant.BOOK_SETTING_AUTO_NIGHT_MODE_YES, isChecked);
+		SharedPreferences.getInstance().putBoolean(
+				SpConstant.BOOK_SETTING_NITGHT_HAND , isChecked);
 	}
 
 	/**

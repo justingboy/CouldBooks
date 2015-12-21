@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -24,6 +25,10 @@ import com.himoo.ydsc.animation.AnimationUtils;
 import com.himoo.ydsc.base.BaseReaderActivity;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
+import com.himoo.ydsc.download.BaiduBookDownload;
+import com.himoo.ydsc.download.BaiduInfo;
+import com.himoo.ydsc.download.BookDownloadManager;
+import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.fragment.reader.BookSettingFragment1.OnFragment1Listener;
 import com.himoo.ydsc.fragment.reader.BookSettingFragment2.OnFragment2Listener;
 import com.himoo.ydsc.fragment.reader.BookSettingFragmentAdapter;
@@ -33,11 +38,17 @@ import com.himoo.ydsc.reader.dao.BookMarkDb;
 import com.himoo.ydsc.reader.utils.BookPage;
 import com.himoo.ydsc.reader.utils.IOHelper;
 import com.himoo.ydsc.reader.view.PageWidget;
+import com.himoo.ydsc.share.UmengShare;
 import com.himoo.ydsc.speech.SpeechReader;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.update.BookUpdateTask;
+import com.himoo.ydsc.update.BookUpdateTask.OnNewChapterUpdateListener;
+import com.himoo.ydsc.update.LastChapter;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.MyLogger;
 import com.himoo.ydsc.util.SharedPreferences;
+import com.himoo.ydsc.util.TimestampUtils;
+import com.ios.dialog.AlertDialog;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -47,8 +58,8 @@ import com.viewpagerindicator.CirclePageIndicator;
  */
 public class ReaderActivity extends BaseReaderActivity implements
 		OnClickListener, OnTouchListener, OnFragment1Listener,
-		OnFragment2Listener {
-
+		OnFragment2Listener, OnNewChapterUpdateListener {
+	private BookDownloadManager downloadManager;
 	private PageWidget pageWidget;
 	private Bitmap curBitmap, nextBitmap;
 	private Canvas curCanvas, nextCanvas;
@@ -61,6 +72,12 @@ public class ReaderActivity extends BaseReaderActivity implements
 
 	@ViewInject(R.id.booksetting_titlebar)
 	private LinearLayout booksetting_titlebar;
+
+	@ViewInject(R.id.booksetting_source)
+	private ImageView booksetting_source;
+
+	@ViewInject(R.id.booksetting_update)
+	private ImageView booksetting_update;
 
 	@ViewInject(R.id.bookseeting_bottombar)
 	private LinearLayout bookseeting_bottombar;
@@ -75,6 +92,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 	private ImageView booksetting_bookmark;
 
 	private boolean isUp = false;
+	private boolean isSpeech = false;
 	private View view;
 	private int topHight;
 	private int bottomHight;
@@ -83,14 +101,23 @@ public class ReaderActivity extends BaseReaderActivity implements
 	private String index;
 	private int currentPage, pageCount;
 	private boolean isNeedSaveProgress = false;
+	/** 该type表示是从哪个界面跳转的 */
+	private int type;
+	/** 书的状态，连载还是完结 */
+	private String statue;
+	/** 2是百度的书还 1是自己的书 */
+	private int bookType;
+	/** 跳转目录中下载需要的Gid */
+	private String gid;
+	private String lastUrl;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 		setNetWorkOnMainMode();
+		downloadManager = BookDownloadService.getDownloadManager(this);
 		initChapter();
 		initReaderBook();
 		view = LayoutInflater.from(this)
@@ -121,6 +148,8 @@ public class ReaderActivity extends BaseReaderActivity implements
 		booksetting_back.setOnClickListener(this);
 		booksetting_speech.setOnClickListener(this);
 		booksetting_bookmark.setOnClickListener(this);
+		booksetting_source.setOnClickListener(this);
+		booksetting_update.setOnClickListener(this);
 	}
 
 	/**
@@ -136,10 +165,29 @@ public class ReaderActivity extends BaseReaderActivity implements
 		curCanvas = new Canvas(curBitmap);
 		nextCanvas = new Canvas(nextBitmap);
 		bookpage = new BookPage(this, screenWith, screenHeight, chapter,
-				currentPage, pageCount);
-		bookpage.setBgBitmap(this, BookTheme.READBOOK_BACKGROUND);
+				currentPage, pageCount, bookType);
+		boolean isNightMode = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_NIGHT_MODE, false);
+		boolean isAutoNightMode = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
+		bookpage.setBgBitmap(this,
+				isNightMode ? BookTheme.BOOK_SETTING_NIGHT_DRAWABLE
+						: BookTheme.READBOOK_BACKGROUND);
+		if (isAutoNightMode) {
+			boolean isChangeToNightMode = false;
+			int hour = TimestampUtils.getCurrentHour();
+			if (hour >= 19 || hour <= 7) {
+				isChangeToNightMode = true;
+				bookpage.setBgBitmap(this,
+						BookTheme.BOOK_SETTING_NIGHT_DRAWABLE);
+			}
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_SETTING_AUTO_NIGHT_MODE_YES,
+					isChangeToNightMode);
+		}
 		bookpage.draw(this, curCanvas);
 		pageWidget = new PageWidget(this, screenWith, screenHeight);
+		pageWidget.initNightMode();
 
 	}
 
@@ -149,11 +197,11 @@ public class ReaderActivity extends BaseReaderActivity implements
 		if (v == pageWidget) {
 			if (e.getAction() == MotionEvent.ACTION_DOWN) {
 				if (isClickable(e)) {
-					startAnimation();
+					startAnimation(250);
 					return false;
 				} else {
 					if (isUp) {
-						startAnimation();
+						startAnimation(250);
 						isUp = false;
 					}
 
@@ -194,11 +242,16 @@ public class ReaderActivity extends BaseReaderActivity implements
 	private void initChapter() {
 		Intent intent = getIntent();
 		index = intent.getStringExtra("index");
+		lastUrl = intent.getStringExtra("lastUrl");
+		gid = intent.getStringExtra("gid");
 		int position = intent.getIntExtra("position", 0);
 		currentPage = intent.getIntExtra("currentPage", -1);
+		type = intent.getIntExtra("type", 1);
+		bookType = intent.getIntExtra("bookType", 1);
+		statue = intent.getStringExtra("statue");
 		pageCount = intent.getIntExtra("pageCount", -1);
 		isNeedSaveProgress = intent.getBooleanExtra("isNeedSave", false);
-		chapter = IOHelper.getChapter(index, position);
+		chapter = IOHelper.getChapter(index, position, bookType);
 	}
 
 	/**
@@ -233,7 +286,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 	 */
 	private void initAnimation() {
 		topHight = DeviceUtil.dip2px(this, 50);
-		bottomHight = DeviceUtil.dip2px(this, 260);
+		bottomHight = DeviceUtil.dip2px(this, 255);
 		LayoutParams parmas = (LayoutParams) bookseeting_bottombar
 				.getLayoutParams();
 		parmas.height = bottomHight;
@@ -242,10 +295,10 @@ public class ReaderActivity extends BaseReaderActivity implements
 		parmas2.height = topHight;
 		bookseeting_bottombar.setLayoutParams(parmas);
 		booksetting_titlebar.setLayoutParams(parmas2);
-		AnimationUtils.setViewTranslateDownY(bookseeting_bottombar, 0f,
+		AnimationUtils.setViewTranslateDownY(50, bookseeting_bottombar, 0f,
 				bottomHight);
-		AnimationUtils
-				.setViewTranslateDownY(booksetting_titlebar, 0, -topHight);
+		AnimationUtils.setViewTranslateDownY(50, booksetting_titlebar, 0,
+				-topHight);
 		initFragmentAdapter();
 	}
 
@@ -255,7 +308,8 @@ public class ReaderActivity extends BaseReaderActivity implements
 	private void initFragmentAdapter() {
 
 		BookSettingFragmentAdapter mAdapter = new BookSettingFragmentAdapter(
-				getSupportFragmentManager(), this,chapter.getBookName(), IOHelper.getChapterLength());
+				getSupportFragmentManager(), this, chapter.getBookName(),
+				IOHelper.getChapterLength(), type, bookType, statue,gid,lastUrl);
 
 		ViewPager mPager = (ViewPager) findViewById(R.id.pager);
 		mPager.setAdapter(mAdapter);
@@ -268,17 +322,17 @@ public class ReaderActivity extends BaseReaderActivity implements
 	/**
 	 * 执行出现顶部和底部的TitleBar动画
 	 */
-	private void startAnimation() {
+	private void startAnimation(int duration) {
 		if (!isUp) {
-			AnimationUtils.setViewTranslateUpY(booksetting_titlebar, -topHight,
-					0f);
-			AnimationUtils.setViewTranslateUpY(bookseeting_bottombar,
+			AnimationUtils.setViewTranslateUpY(duration, booksetting_titlebar,
+					-topHight, 0f);
+			AnimationUtils.setViewTranslateUpY(duration, bookseeting_bottombar,
 					bottomHight, 0f);
 		} else {
-			AnimationUtils.setViewTranslateDownY(bookseeting_bottombar, 0f,
-					bottomHight);
-			AnimationUtils.setViewTranslateDownY(booksetting_titlebar, 0f,
-					-topHight);
+			AnimationUtils.setViewTranslateDownY(duration,
+					bookseeting_bottombar, 0f, bottomHight);
+			AnimationUtils.setViewTranslateDownY(duration,
+					booksetting_titlebar, 0f, -topHight);
 		}
 		isUp = !isUp;
 	}
@@ -296,7 +350,6 @@ public class ReaderActivity extends BaseReaderActivity implements
 	@Override
 	public void onPreChapter() {
 		// TODO Auto-generated method stub
-
 		bookpage.initPreChapter();
 		bookpage.draw(this, isFilp ? nextCanvas : curCanvas);
 		pageWidget.invalidate();
@@ -323,6 +376,8 @@ public class ReaderActivity extends BaseReaderActivity implements
 	public void onTextBackgroundChange() {
 		// TODO Auto-generated method stub
 		bookpage.setBgBitmap(this, BookTheme.READBOOK_BACKGROUND);
+		bookpage.changeTextColor(Color.BLACK);
+		pageWidget.initNightMode();
 		bookpage.draw(this, isFilp ? nextCanvas : curCanvas);
 		pageWidget.invalidate();
 
@@ -340,8 +395,8 @@ public class ReaderActivity extends BaseReaderActivity implements
 	@Override
 	public void onTextTypeChildrenChange() {
 		// TODO Auto-generated method stub
-
 		bookpage.setTextTypeChildren(false);
+		pageWidget.initNightMode();
 		bookpage.draw(this, isFilp ? nextCanvas : curCanvas);
 		pageWidget.invalidate();
 
@@ -351,6 +406,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 	public void onTextLineSpaceChange() {
 		// TODO Auto-generated method stub
 		bookpage.setTextLineSpace(false);
+		pageWidget.initNightMode();
 		bookpage.draw(this, isFilp ? nextCanvas : curCanvas);
 		pageWidget.invalidate();
 	}
@@ -375,10 +431,34 @@ public class ReaderActivity extends BaseReaderActivity implements
 			finish();
 			break;
 		case R.id.booksetting_speech:
-			SpeechReader.getInstance().speechChapter(chapter.getContent());
+			isSpeech = !isSpeech;
+			booksetting_speech
+					.setImageResource(isSpeech ? R.drawable.iphone_yuyin_speech
+							: R.drawable.iphone_yuyin);
+			if (isSpeech)
+				SpeechReader.getInstance().speechChapter(
+						bookpage.getCurPage().toString());
+			else
+				SpeechReader.getInstance().clear();
 			break;
 		case R.id.booksetting_bookmark:
 			new SaveMarkAsyncTask().execute();
+			break;
+		case R.id.booksetting_source:
+			if (bookType == 1) {
+				Toast.show(this, "该书已下载,无需换源!");
+				return;
+			} else {
+				BaiduInfo book = BaiduBookDownload.getInstance(this)
+						.queryNeedUpdate(bookpage.chapter.getBookName());
+				BaiduBookDownload.getInstance(this).updateChapterName(book,
+						"连夜启程");
+				Toast.show(this, "插入最新章节成功!");
+			}
+			break;
+		case R.id.booksetting_update:
+			AnimationUtils.setViewRotating(this,booksetting_update);
+			updateBook();
 			break;
 
 		default:
@@ -417,6 +497,18 @@ public class ReaderActivity extends BaseReaderActivity implements
 		mark.setPageCount(bookpage.pagesVe.size());
 		mark.setType(2);
 		db.saveReaderMark(mark);
+	}
+
+	/**
+	 * 保存书签
+	 */
+	private void updateBookReaderProgress() {
+		BookMark mark = new BookMark();
+		mark.setBookName(bookpage.chapter.getBookName());
+		mark.setChapterName(bookpage.chapter.getChapterName());
+		mark.setPosition(bookpage.chapter.getPosition());
+		downloadManager.updateReaderProgress(mark,
+				IOHelper.getChapterLength() + 1);
 
 	}
 
@@ -430,19 +522,12 @@ public class ReaderActivity extends BaseReaderActivity implements
 		protected void onPreExecute() {
 			// TODO Auto-generated method stub
 			super.onPreExecute();
-			showRefreshDialog("添加书签成功");
 		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
 			// TODO Auto-generated method stub
 			saveBookReaderMark();
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			return null;
 		}
 
@@ -450,7 +535,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 		protected void onPostExecute(Void result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			dismissRefreshDialog();
+			Toast.show(getApplicationContext(), "添加书签成功!");
 		}
 
 	}
@@ -459,6 +544,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		saveBookReaderProgress();
+		updateBookReaderProgress();
 		super.onPause();
 	}
 
@@ -467,6 +553,109 @@ public class ReaderActivity extends BaseReaderActivity implements
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		SpeechReader.getInstance().clear();
+		boolean isNigthModeHand = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_NITGHT_HAND, false);
+		if (isNigthModeHand) {
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_SETTING_AUTO_NIGHT, true);
+		}
+	}
+
+	@Override
+	public void onCloseTitleBarAndBottomBar() {
+		// TODO Auto-generated method stub
+		startAnimation(50);
+	}
+
+	@Override
+	public void onNightMode() {
+		// TODO Auto-generated method stub
+		bookpage.setNightMode();
+		pageWidget.initNightMode();
+		bookpage.draw(this, isFilp ? nextCanvas : curCanvas);
+		pageWidget.invalidate();
+
+	}
+
+	@Override
+	public void onUmengShare() {
+		// TODO Auto-generated method stub
+		UmengShare.getInstance().setShareContent(this,
+				bookpage.chapter.getBookName(),
+				bookpage.chapter.getChapterUrl(),
+				bookpage.chapter.getBookName(),
+				bookpage.chapter.getChapterUrl());
+		UmengShare.getInstance().addCustomPlatforms(this);
+	}
+
+	/**
+	 * 更新书籍
+	 */
+	private void updateBook() {
+		if (bookType == 1) {
+			Toast.show(this, "该书已经完结!");
+			return;
+		} else {
+
+			int type = SharedPreferences.getInstance().getInt(
+					"book_update_type", 2);
+			if (type == 1) {
+				new AlertDialog(this)
+						.builder()
+						.setTitle("提醒")
+						.setMsg("您现在选择的是整本更新模式，我们会更新您的整本书，这将会把您本地的书籍全部重新下载,是否继续。")
+						.setNegativeButton("取消", new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+
+							}
+						}).setPositiveButton("确定", new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								// TODO Auto-generated method stub
+								BookUpdateTask task = new BookUpdateTask(ReaderActivity.this,
+										bookpage.chapter.getBookName(),1);
+								task.setOnNewChapterListener(ReaderActivity.this);
+								task.execute();
+							}
+						}).show();
+			} else if (type == 2) {
+				BookUpdateTask task = new BookUpdateTask(this,
+						bookpage.chapter.getBookName(),1);
+				task.setOnNewChapterListener(this);
+				task.execute();
+
+			}
+		}
+	}
+
+	@Override
+	public void onUpdateSuccess(LastChapter chapter) {
+		// TODO Auto-generated method stub
+		Toast.show(this, "最新章节更新成功！");
+		AnimationUtils.cancelAnim(booksetting_update);
+	}
+
+	@Override
+	public void onUpdateFailure() {
+		// TODO Auto-generated method stub
+		AnimationUtils.cancelAnim(booksetting_update);
+		Toast.show(this, " 暂无更新! ");
+	}
+
+	@Override
+	public void onUpdateProgress(String bookName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUpdateAllNewChapter() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

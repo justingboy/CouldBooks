@@ -11,6 +11,7 @@ public class BaiduBookChapter {
 	private String text;
 	private String href;
 	private String cid;
+	private int position;
 	
 	private String chapterName;
 	private String chapterUrl;
@@ -77,6 +78,14 @@ public class BaiduBookChapter {
 
 	public void setChapterUrl(String chapterUrl) {
 		this.chapterUrl = chapterUrl;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
 	}
 
 }

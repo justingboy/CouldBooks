@@ -212,6 +212,25 @@ public class BaseAdapterHelper {
 	}
 
 	/**
+	 * 设置TextView的左边的图片
+	 * @param viewId
+	 * @param resId
+	 * @return
+	 */
+	public BaseAdapterHelper setTextRightDrawable(int viewId, int resId) {
+		TextView view = retrieveView(viewId);
+		Drawable img =context.getResources().getDrawable(resId);
+		img.setBounds(0, 0, img.getMinimumWidth(), img.getMinimumHeight());
+		view.setCompoundDrawables(null, null, img, null);
+		return this;
+	}
+	public BaseAdapterHelper setTextNoDrawable(int viewId, int resId) {
+		TextView view = retrieveView(viewId);
+		view.setCompoundDrawables(null, null, null, null);
+		return this;
+	}
+
+	/**
 	 * Will set text color of a TextView.
 	 * 
 	 * @param viewId
@@ -353,6 +372,21 @@ public class BaseAdapterHelper {
 	public BaseAdapterHelper setVisible(int viewId, boolean visible) {
 		View view = retrieveView(viewId);
 		view.setVisibility(visible ? View.VISIBLE : View.GONE);
+		return this;
+	}
+	
+	/**
+	 * Set a view visibility to VISIBLE (true) or GONE (false).
+	 * 
+	 * @param viewId
+	 *            The view id.
+	 * @param visible
+	 *            True for VISIBLE, false for GONE.
+	 * @return The BaseAdapterHelper for chaining.
+	 */
+	public BaseAdapterHelper setInVisible(int viewId, boolean visible) {
+		View view = retrieveView(viewId);
+		view.setVisibility(visible ? View.VISIBLE : View.INVISIBLE);
 		return this;
 	}
 

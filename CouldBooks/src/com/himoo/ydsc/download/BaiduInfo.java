@@ -17,6 +17,9 @@ public class BaiduInfo extends EntityBase {
 	@Column(column = "bookAuthor")
 	private String bookAuthor;
 
+	@Column(column = "bookStatue")
+	private String bookStatue;
+
 	@Column(column = "bookReadProgress")
 	private long bookReadProgress;
 
@@ -44,6 +47,10 @@ public class BaiduInfo extends EntityBase {
 	@Column(column = "progress")
 	private long progress;
 
+	/** 最新阅读的位置 */
+	@Column(column = "lastReaderProgress")
+	private String lastReaderProgress;
+
 	@Column(column = "fileLength")
 	private long fileLength;
 
@@ -53,6 +60,9 @@ public class BaiduInfo extends EntityBase {
 	@Column(column = "autoRename")
 	private boolean autoRename;
 
+	// @Column(column = "state")
+	// private HttpHandler.State state;
+
 	/** 　1表示自己服务器下载，不需要更新，2表示百度, */
 	@Column(column = "bookSourceType")
 	private int bookSourceType;
@@ -60,15 +70,15 @@ public class BaiduInfo extends EntityBase {
 	/** 是不是连载的状态 */
 	@Column(column = "isSerialize")
 	private boolean isSerialize;
-	
+
 	/** 书的地址，主要解析最新章节那块数据 */
 	@Column(column = "lastUrl")
 	private String lastUrl;
-	
+
 	/** 最新章节的名字 */
 	@Column(column = "lastChapterName")
 	private String lastChapterName;
-	
+
 	public String getDownloadUrl() {
 		return downloadUrl;
 	}
@@ -209,8 +219,29 @@ public class BaiduInfo extends EntityBase {
 		return isSerialize;
 	}
 
+	/**
+	 * 设置此书是连载还是完结
+	 * 
+	 * @param isSerialize
+	 */
 	public void setSerialize(boolean isSerialize) {
 		this.isSerialize = isSerialize;
+	}
+
+	public String getBookStatue() {
+		return bookStatue;
+	}
+
+	public void setBookStatue(String bookStatue) {
+		this.bookStatue = bookStatue;
+	}
+
+	public String getLastReaderProgress() {
+		return lastReaderProgress;
+	}
+
+	public void setLastReaderProgress(String lastReaderProgress) {
+		this.lastReaderProgress = lastReaderProgress;
 	}
 
 }

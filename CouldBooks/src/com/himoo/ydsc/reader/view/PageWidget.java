@@ -1,6 +1,5 @@
 package com.himoo.ydsc.reader.view;
 
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,15 +11,19 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Region;
 import android.graphics.drawable.GradientDrawable;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Scroller;
 
+import com.himoo.ydsc.config.SpConstant;
+import com.himoo.ydsc.util.SharedPreferences;
+
+//import android.util.Log;
+
 /**
  * 该类只实现了翻书效果
  * 
- *
+ * 
  */
 public class PageWidget extends View {
 
@@ -75,6 +78,8 @@ public class PageWidget extends View {
 	Paint mPaint;
 
 	Scroller mScroller;
+	private boolean isNightMode;
+	private boolean isAutoNightMode;
 
 	public PageWidget(Context context, int w, int h) {
 		super(context);
@@ -99,6 +104,16 @@ public class PageWidget extends View {
 
 		mTouch.x = 0.01f; // 不让x,y为0,否则在点计算时会有问题
 		mTouch.y = 0.01f;
+	}
+
+	/**
+	 * 初始化夜间模式
+	 */
+	public void initNightMode() {
+		isNightMode = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_NIGHT_MODE, false);
+		isAutoNightMode = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_AUTO_NIGHT_MODE_YES, false);
 	}
 
 	/**
@@ -139,13 +154,13 @@ public class PageWidget extends View {
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			mTouch.x = event.getX();
 			mTouch.y = event.getY();
-//			 calcCornerXY(mTouch.x, mTouch.y);
-//			 this.postInvalidate();
+			// calcCornerXY(mTouch.x, mTouch.y);
+			// this.postInvalidate();
 		}
 
 		if (event.getAction() == MotionEvent.ACTION_UP) {
 			if (canDragOver()) {
-				Log.i("msg", "--canDragOver");
+				// Log.i("msg", "--canDragOver");
 				startAnimation(1200);
 			} else {
 				mTouch.x = mCornerX - 0.09f;
@@ -205,7 +220,7 @@ public class PageWidget extends View {
 		// 当mBezierStart1.x < 0或者mBezierStart1.x > 480时
 		// 如果继续翻页，会出现BUG故在此限制
 		if (mTouch.x > 0 && mTouch.x < mWidth) {
-			Log.d("msg", "mTouch.x ="+mTouch.x+"mWidth = "+mWidth);
+			// Log.d("msg", "mTouch.x ="+mTouch.x+"mWidth = "+mWidth);
 			if (mBezierStart1.x < 0 || mBezierStart1.x > mWidth) {
 				if (mBezierStart1.x < 0)
 					mBezierStart1.x = mWidth - mBezierStart1.x;
@@ -348,7 +363,11 @@ public class PageWidget extends View {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		canvas.drawColor(0xFFAAAAAA);
+		if (isNightMode || isAutoNightMode) {
+			canvas.drawColor(0xFF535352);
+		} else {
+			canvas.drawColor(0xFFAAAAAA);
+		}
 		calcPoints();
 		drawCurrentPageArea(canvas, mCurPageBitmap, mPath0);
 		drawNextPageAreaAndShadow(canvas, mNextPageBitmap);
@@ -571,7 +590,7 @@ public class PageWidget extends View {
 		if (mScroller.computeScrollOffset()) {
 			float x = mScroller.getCurrX();
 			float y = mScroller.getCurrY();
-			Log.i("mm", "x = " + x + "y = " + y);
+			// Log.i("mm", "x = " + x + "y = " + y);
 			mTouch.x = x;
 			mTouch.y = y;
 			postInvalidate();
@@ -595,7 +614,7 @@ public class PageWidget extends View {
 		} else {
 			dy = (int) (1 - mTouch.y); // 防止mTouch.y最终变为0
 		}
-		Log.i("msg", "dx = " + dx + "dy = " + dy);
+		// Log.i("msg", "dx = " + dx + "dy = " + dy);
 		mScroller.startScroll((int) mTouch.x, (int) mTouch.y, dx, dy,
 				delayMillis);
 	}

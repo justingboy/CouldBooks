@@ -11,14 +11,17 @@ import android.graphics.Paint;
 import android.graphics.Paint.Align;
 import android.graphics.Typeface;
 import android.text.format.Time;
+import android.util.Log;
 
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.reader.bean.Chapter;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.JccUtil;
 import com.himoo.ydsc.util.SharedPreferences;
+import com.himoo.ydsc.util.TimestampUtils;
 
-/**
+/** 
  * 这个类的目的是为在看书翻页时，需要进行的动作提供接口。
  * 包括翻向下一页，翻向上一页。在翻到每章最后一页时，如果后面还有章节就继续翻向下一章节，没有就向用户显示已读完。
  * 在翻向上一章节时，如果前面还有章节，就翻到上一章节，没有就向用户显示，这已经是第一章节。
@@ -26,11 +29,10 @@ import com.himoo.ydsc.util.SharedPreferences;
  * 在直觉上认为这个应该只设置成一个接口，因为只需向视图层提供动作接口，也就是本类应属于模型层。则其设置为一个借口可能也合适。
  * 但是如果设置成一个接口，那么接口的实现类，有多个都要保存的数据。那么为了代码重用，抽象类可能比接口更加合适。 上面是个人分析，可能不是很合适。
  * 
- * @author MJZ
- * 
  */
 public class BookPage {
-
+	/** 表示打开的1是 自己服务器上的书 2是百度的书还是 */
+	private int bookType = 2;
 	private int currentSeekBarPos = 0;
 	// configuration information
 	private int screenWidth; // 屏幕宽度
@@ -39,7 +41,7 @@ public class BookPage {
 	private int lineHgight; // 每行的高度
 	private int marginWidth = 50; // 左右与边缘的距离
 	private int marginHeight = 50; // 上下与边缘的距离
-	private int textColor; // 字体颜色
+	private int textColor = Color.BLACK;; // 字体颜色
 	private Bitmap bgBitmap; // 背景图片
 	private int bgColor; // 背景颜色
 
@@ -78,8 +80,9 @@ public class BookPage {
 	 *            章节对象
 	 */
 	public BookPage(Context context, int screenWidth, int screenHeight,
-			Chapter chapter, int currentPage, int pageCount) {
+			Chapter chapter, int currentPage, int pageCount, int bookType) {
 		mContext = context;
+		this.bookType = bookType;
 		this.screenHeight = screenHeight;
 		this.screenWidth = screenWidth;
 		this.chapter = chapter;
@@ -103,10 +106,20 @@ public class BookPage {
 	 * 初始最好按照定义变量的顺序来初始化，统一。在将来需要修改某个变量的时候，容易找到。 对代码维护应该也很有用吧。
 	 */
 	protected void init(Context context) {
-		// bgBitmap = null;;
+		// bgBitmap = null;
+		boolean isNightMode = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_NIGHT_MODE, false);
+		boolean isAutoNightMode = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
+		textColor = isNightMode ? BookTheme.BOOK_TEXT_WHITE : Color.BLACK;
+		if (!isNightMode && isAutoNightMode) {
+			int hour = TimestampUtils.getCurrentHour();
+			if (hour >= 19 || hour <= 7) {
+				textColor = BookTheme.BOOK_TEXT_WHITE;
+			}
+		}
 
 		bgColor = 0xffff9e85;
-		textColor = Color.BLACK;
 		if (chapter == null)
 			return;
 		content = textType == 1 ? JccUtil.changeToSimplified(chapter
@@ -155,33 +168,42 @@ public class BookPage {
 		return linesVe;
 	}
 
+	/**
+	 * 将每章节的内容分页
+	 */
 	protected void slicePage() {
-		pagesVe.clear();
-		int curPos = 0;
-		while (curPos < chapterLen) {
-			Vector<String> lines = new Vector<String>();
-			charBegin = curPos;
-			while (lines.size() < lineCount && curPos < chapterLen) {
-				int i = content.indexOf("\n", curPos);
-				String paragraphStr = content.substring(curPos, i);
-				// curCharPos += i;
-				if (curPos == i)
-					lines.add("");
+		try {
 
-				while (paragraphStr.length() > 0) {
-					int horSize = paint.breakText(paragraphStr, true,
-							visibleWidth, null);
-					lines.add(paragraphStr.substring(0, horSize));
-					paragraphStr = paragraphStr.substring(horSize);
-					curPos += horSize;
-					if (lines.size() > lineCount)
-						break;
+			pagesVe.clear();
+			int curPos = 0;
+			while (curPos < chapterLen) {
+				Vector<String> lines = new Vector<String>();
+				charBegin = curPos;
+				while (lines.size() < lineCount && curPos < chapterLen) {
+					int i = content.indexOf("\n", curPos);
+					String paragraphStr = content.substring(curPos, i);
+					// curCharPos += i;
+					if (curPos == i)
+						lines.add("");
+
+					while (paragraphStr.length() > 0) {
+						int horSize = paint.breakText(paragraphStr, true,
+								visibleWidth, null);
+						lines.add(paragraphStr.substring(0, horSize));
+						paragraphStr = paragraphStr.substring(horSize);
+						curPos += horSize;
+						if (lines.size() > lineCount)
+							break;
+					}
+					// 如果是把一整段读取完的话，需要给当前位置加1
+					if (paragraphStr.length() == 0)
+						curPos += "\n".length();
 				}
-				// 如果是把一整段读取完的话，需要给当前位置加1
-				if (paragraphStr.length() == 0)
-					curPos += "\n".length();
+				pagesVe.add(lines);
 			}
-			pagesVe.add(lines);
+		} catch (Exception e) {
+			// TODO: handle exception
+			Log.i("msg", e.getMessage());
 		}
 
 	}
@@ -253,7 +275,7 @@ public class BookPage {
 			return false;
 		String index = chapter.getIndex();
 		int position = chapter.getPosition() + 1;
-		Chapter tempChapter = IOHelper.getChapter(index, position);
+		Chapter tempChapter = IOHelper.getChapter(index, position, bookType);
 
 		if (tempChapter == null)
 			return false;
@@ -280,7 +302,8 @@ public class BookPage {
 			return false;
 		String index = chapter.getIndex();
 		int position = chapter.getPosition();
-		Chapter tempChapter = IOHelper.getChapter(index, position - 1);
+		Chapter tempChapter = IOHelper
+				.getChapter(index, position - 1, bookType);
 		if (tempChapter == null)
 			return false;
 		chapter = tempChapter;
@@ -331,9 +354,11 @@ public class BookPage {
 		time.setToNow();
 		String timeStr;
 		if (time.minute < 10)
-			timeStr = "" + time.hour + " : 0" + time.minute;
+			timeStr = "" + time.hour + ((typefaceIndex == 3) ? ":0" : " : 0")
+					+ time.minute;
 		else
-			timeStr = "" + time.hour + " : " + time.minute;
+			timeStr = "" + time.hour + ((typefaceIndex == 3) ? " :" : " : ")
+					+ time.minute;
 
 		int pSWidth = (int) paintBottom.measureText("第12/10页")
 				+ DeviceUtil.dip2px(context, 3);
@@ -343,7 +368,7 @@ public class BookPage {
 		c.drawText(chapter.getBookName(), screenWidth / 2 - titWidth / 2,
 				screenHeight - DeviceUtil.dip2px(context, 4), paintBottom);
 		c.drawText(chapter.getChapterName(), DeviceUtil.dip2px(context, 20),
-				DeviceUtil.dip2px(context, 20), paintBottom);
+				DeviceUtil.dip2px(context, 15), paintBottom);
 		c.drawText(percetStr, screenWidth - pSWidth,
 				screenHeight - DeviceUtil.dip2px(context, 4), paintBottom);
 	}
@@ -463,7 +488,7 @@ public class BookPage {
 	}
 
 	public void initSeekBarChapter(int position) {
-		chapter = IOHelper.getChapter("1", position);
+		chapter = IOHelper.getChapter("1", position, bookType);
 		if (currentSeekBarPos < position) {
 			nextChapter();
 		} else {
@@ -471,6 +496,30 @@ public class BookPage {
 		}
 		init(mContext);
 		currentSeekBarPos = position;
+	}
+
+	/**
+	 * 改变字体的颜色
+	 */
+	public void changeTextColor(int color) {
+		textColor = color;
+		paint.setColor(textColor);
+		paintBottom.setColor(textColor);
+	}
+
+	/**
+	 * 设置夜间模式
+	 */
+	public void setNightMode() {
+		if (SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_NIGHT_MODE, false)) {
+			setBgBitmap(mContext, BookTheme.BOOK_SETTING_NIGHT_DRAWABLE);
+			changeTextColor(BookTheme.BOOK_TEXT_WHITE);
+		} else {
+			setBgBitmap(mContext, BookTheme.READBOOK_BACKGROUND);
+			changeTextColor(Color.BLACK);
+		}
+
 	}
 
 }

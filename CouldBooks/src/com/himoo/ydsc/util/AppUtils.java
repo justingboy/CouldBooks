@@ -15,6 +15,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.Signature;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.view.animation.AnimationUtils;
 
 import com.himoo.ydsc.R;
 

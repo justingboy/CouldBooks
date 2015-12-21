@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.ios.radiogroup.SegmentedGroup xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:segmentedgroup="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/segment_update_network"
+    android:id="@+id/segment_bookshelf"
     android:layout_width="160dp"
     android:layout_height="match_parent"
     android:orientation="horizontal"
@@ -14,20 +14,22 @@
     <RadioButton
         android:id="@+id/book_sort_horizontal"
         style="@style/RadioButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="方块"
+        android:checked="true"
+        android:drawableLeft="@drawable/book_horzial_blue"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
         android:textSize="16sp" />
 
     <RadioButton
         android:id="@+id/book_sort_vertial"
         style="@style/RadioButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:checked="true"
-        android:text="竖排"
+        android:drawableLeft="@drawable/book_vertica_blue"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
         android:textSize="16sp" />
 
 </com.ios.radiogroup.SegmentedGroup>

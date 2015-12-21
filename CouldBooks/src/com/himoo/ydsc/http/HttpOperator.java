@@ -151,7 +151,7 @@ public class HttpOperator {
 						} else {
 							if (mCurrentIndex == 3) {
 								mCurrentIndex = 0;
-								Toast.showLong(context, "服務器出现错误！");
+								Toast.showLong(context, "服务器出现错误！");
 								return;
 							}
 							validateHostUrlWork(context);
@@ -165,7 +165,7 @@ public class HttpOperator {
 						mCurrentIndex++;
 						if (mCurrentIndex == 3) {
 							mCurrentIndex=0;
-							Toast.showLong(context, "服務器出现错误！");
+							Toast.showLong(context, "服务器出现错误！");
 							return;
 						}
 						validateHostUrlWork(context);

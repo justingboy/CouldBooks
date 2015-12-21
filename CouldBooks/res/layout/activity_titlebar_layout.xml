@@ -41,8 +41,8 @@
 
     <ImageView
         android:id="@+id/titlebar_refresh"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:layout_width="36dip"
+        android:layout_height="36dip"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_gravity="right"

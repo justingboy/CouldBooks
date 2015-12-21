@@ -8,21 +8,39 @@
 
     <include layout="@layout/titlebar_layout" />
 
-    <com.handmark.pulltorefresh.library.PullToRefreshListView
-        xmlns:ptr="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/pull_refresh_list"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:cacheColorHint="#00000000"
-        android:fadingEdge="none"
-        android:gravity="fill"
-        android:padding="2dp"
-        android:scrollbarStyle="outsideOverlay"
-        ptr:ptrAnimationStyle="flip"
-        ptr:ptrDrawable="@drawable/pullto_refresh_listview_arrow"
-        ptr:ptrHeaderTextAppearance="@style/PulltorefreshListview_textStyle"
-        ptr:ptrListViewExtrasEnabled="false"
-        ptr:ptrMode="both"
-        ptr:ptrScrollingWhileRefreshingEnabled="true" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/tv_search_empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:drawablePadding="15dp"
+            android:drawableTop="@drawable/icon_local_no_books"
+            android:gravity="center"
+            android:text="获取数据失败,请点击右上角的刷新按钮重试!"
+            android:textColor="@color/main_bottom_textcolor_default"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <com.handmark.pulltorefresh.library.PullToRefreshListView
+            xmlns:ptr="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/pull_refresh_list"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:cacheColorHint="#00000000"
+            android:fadingEdge="none"
+            android:gravity="fill"
+            android:padding="2dp"
+            android:scrollbarStyle="outsideOverlay"
+            ptr:ptrAnimationStyle="flip"
+            ptr:ptrDrawable="@drawable/pullto_refresh_listview_arrow"
+            ptr:ptrHeaderTextAppearance="@style/PulltorefreshListview_textStyle"
+            ptr:ptrListViewExtrasEnabled="false"
+            ptr:ptrMode="both"
+            ptr:ptrScrollingWhileRefreshingEnabled="true" />
+    </RelativeLayout>
 
 </LinearLayout>

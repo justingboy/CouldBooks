@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -17,7 +18,6 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.adapter.DouBanCommentAdapter;
 import com.himoo.ydsc.bean.DouBanBookComment;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
-import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.UIHelper;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -30,6 +30,10 @@ public class DoubanCommentActivity extends SwipeBackActivity {
 
 	@ViewInject(R.id.douban_book_list)
 	private PullToRefreshListView mRefrshListView;
+
+	@ViewInject(R.id.tv_book_empty)
+	private TextView tv_book_empty;
+
 	/** 标记当前点击的位置 */
 	private int mCurrentClickPosition = -1;
 
@@ -93,25 +97,41 @@ public class DoubanCommentActivity extends SwipeBackActivity {
 				// TODO Auto-generated method stub
 				try {
 					ArrayList<DouBanBookComment> bookList = parseDoubanJson(responseInfo.result);
-					DouBanCommentAdapter mAdapter = new DouBanCommentAdapter(
-							DoubanCommentActivity.this,
-							R.layout.adapter_douban_comment_item, bookList);
-					dismissRefreshDialog();
-					mRefrshListView.setAdapter(mAdapter);
+					if (bookList != null && !bookList.isEmpty()) {
+
+						DouBanCommentAdapter mAdapter = new DouBanCommentAdapter(
+								DoubanCommentActivity.this,
+								R.layout.adapter_douban_comment_item, bookList);
+						dismissRefreshDialog();
+						mRefrshListView.setAdapter(mAdapter);
+					} else {
+						dismissRefreshDialog();
+						setEmptyView();
+					}
 
 				} catch (JSONException e) {
 					dismissRefreshDialog();
-					Toast.showLong(DoubanCommentActivity.this,
-							"解析评书信息失败：" + e.getMessage());
+					setEmptyView();
 				}
 			}
 
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				dismissRefreshDialog();
-				Toast.showLong(DoubanCommentActivity.this, "获取评书信息失败：" + msg);
+				setEmptyView();
+				// Toast.showLong(DoubanCommentActivity.this, "获取评书信息失败：" +
+				// msg);
 			}
 		});
+	}
+
+	/**
+	 * 无数据的显示View
+	 */
+	private void setEmptyView() {
+		mRefrshListView.setVisibility(View.GONE);
+		tv_book_empty.setText("暂无评论列表,请移驾到别处吧!");
+		tv_book_empty.setVisibility(View.VISIBLE);
 	}
 
 	/**

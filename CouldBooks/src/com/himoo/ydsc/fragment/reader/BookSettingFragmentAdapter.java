@@ -15,9 +15,9 @@ public class BookSettingFragmentAdapter extends FragmentPagerAdapter implements
 	private List<Fragment> fragmentList = new ArrayList<Fragment>();
 	private int mCount = 3;
 
-	public BookSettingFragmentAdapter(FragmentManager fm, Context context,String bookName,int position) {
+	public BookSettingFragmentAdapter(FragmentManager fm, Context context,String bookName,int position,int type,int bookType,String statue,String gid,String lastUrl) {
 		super(fm);
-		fragmentList.add(BookSettingFragment1.newInstance(bookName,position));
+		fragmentList.add(BookSettingFragment1.newInstance(bookName,position,type,bookType,statue,gid,lastUrl));
 		fragmentList.add(BookSettingFragment2.newInstance());
 		fragmentList.add(BookSettingFragment3.newInstance(context));
 	}

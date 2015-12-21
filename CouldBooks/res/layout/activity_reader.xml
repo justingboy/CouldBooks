@@ -29,11 +29,13 @@
             android:src="@drawable/iphone_b_backbtn" />
 
         <ImageView
+            android:id="@+id/booksetting_source"
             style="@style/book_setting_image_title_style"
             android:contentDescription="@string/app_name"
             android:src="@drawable/iphone_yuan" />
 
         <ImageView
+            android:id="@+id/booksetting_update"
             style="@style/book_setting_image_title_style"
             android:contentDescription="@string/app_name"
             android:src="@drawable/iphone_update" />

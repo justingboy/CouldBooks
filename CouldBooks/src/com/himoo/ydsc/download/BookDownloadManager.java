@@ -1,6 +1,7 @@
 package com.himoo.ydsc.download;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +13,7 @@ import android.util.Log;
 import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BookDetails;
+import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.util.FileUtils;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.HttpUtils;
@@ -35,7 +37,7 @@ public class BookDownloadManager {
 	/** 下载书籍的集合 */
 	private ArrayList<BookDownloadInfo> downloadInfoList;
 	/** 下载使用的线程数 */
-	private int maxDownloadThread = 3;
+	private int maxDownloadThread = 1;
 	/** 上下文 */
 	private Context mContext;
 	/** 数据库 */
@@ -165,6 +167,49 @@ public class BookDownloadManager {
 	}
 
 	/**
+	 * 判断数据库中是否已经下载过
+	 * 
+	 * @param book
+	 * @return
+	 */
+	public BookDownloadInfo querryByBookName(String bookName) {
+		try {
+			List<BookDownloadInfo> list = db.findAll(Selector.from(
+					BookDownloadInfo.class).where("bookName", "=", bookName));
+			if (list != null && !list.isEmpty())
+
+				return list.get(0);
+			else
+				return null;
+
+		} catch (DbException e) {
+			return null;
+		}
+
+	}
+
+	/**
+	 * 根据书名判断该书是否下载过
+	 * 
+	 * @param bookName
+	 * @return
+	 */
+	public boolean isDownload(String bookName) {
+		try {
+			List<BookDownloadInfo> list = db.findAll(Selector.from(
+					BookDownloadInfo.class).where("bookName", "=", bookName));
+			if (list == null || list.isEmpty())
+				return false;
+			else
+				return true;
+
+		} catch (DbException e) {
+			return false;
+		}
+
+	}
+
+	/**
 	 * 按照关键字查找书籍
 	 * 
 	 * @param keyword
@@ -211,10 +256,11 @@ public class BookDownloadManager {
 	public void addNewBookDownload(BookDetails bookDetails,
 			String saveFileName, boolean autoResume, boolean autoRename,
 			final RequestCallBack<File> callback) throws DbException {
-		final BookDownloadInfo bookDownloadInfo = new BookDownloadInfo();
+		final BaiduInfo bookDownloadInfo = new BaiduInfo();
 		bookDownloadInfo.setDownloadUrl(bookDetails.getBook_Download());
 		bookDownloadInfo.setAutoRename(autoRename);
 		bookDownloadInfo.setAutoResume(autoResume);
+		bookDownloadInfo.setBookStatue("完结");
 		bookDownloadInfo.setSerialize(false);
 		bookDownloadInfo.setBookSourceType(1);
 		bookDownloadInfo.setBookName(bookDetails.getBook_Name());
@@ -222,17 +268,18 @@ public class BookDownloadManager {
 		bookDownloadInfo.setBookLastUpdateTime(System.currentTimeMillis() + "");
 		bookDownloadInfo.setBookCoverImageUrl(bookDetails.getBook_Image());
 		bookDownloadInfo.setBookIsRead(false);
-		bookDownloadInfo.setBookReadHository("您还没阅读这本书呢");
+		bookDownloadInfo.setBookReadHository("此书您还没有阅读!");
+		bookDownloadInfo.setLastReaderProgress("0%");
 		bookDownloadInfo.setBookReadProgress(0L);
 		bookDownloadInfo.setFileSavePath(bookSavePath + saveFileName);
-		HttpUtils http = new HttpUtils();
-		http.configRequestThreadPoolSize(maxDownloadThread);
-		HttpHandler<File> handler = http.download(bookDetails
-				.getBook_Download(), bookSavePath + saveFileName, autoResume,
-				autoRename, new ManagerCallBack(bookDownloadInfo, callback));
-		bookDownloadInfo.setHandler(handler);
-		bookDownloadInfo.setState(handler.getState());
-		downloadInfoList.add(bookDownloadInfo);
+		// HttpUtils http = new HttpUtils();
+		// http.configRequestThreadPoolSize(maxDownloadThread);
+		// HttpHandler<File> handler = http.download(bookDetails
+		// .getBook_Download(), bookSavePath + saveFileName, autoResume,
+		// autoRename, new ManagerCallBack(bookDownloadInfo, callback));
+		// bookDownloadInfo.setHandler(handler);
+		// bookDownloadInfo.setState(handler.getState());
+		// downloadInfoList.add(bookDownloadInfo);
 		db.saveBindingId(bookDownloadInfo);
 		BaseApplication.getInstance().putHashMap(
 				bookDetails.getBook_Download(), bookDownloadInfo);
@@ -243,10 +290,10 @@ public class BookDownloadManager {
 	 * 下载百度书籍
 	 * 
 	 * @param book
-	 * @throws DbException 
+	 * @throws DbException
 	 */
 	public void addBaiduBookDownload(BaiduBook book) throws DbException {
-	    BookDownloadInfo bookDownloadInfo = new BookDownloadInfo();
+		BookDownloadInfo bookDownloadInfo = new BookDownloadInfo();
 		bookDownloadInfo.setSerialize(book.getStatus().equals("完结"));
 		bookDownloadInfo.setBookSourceType(2);
 		bookDownloadInfo.setBookName(book.getTitle());
@@ -256,11 +303,38 @@ public class BookDownloadManager {
 		bookDownloadInfo.setBookIsRead(false);
 		bookDownloadInfo.setBookReadHository("您还没阅读这本书呢");
 		bookDownloadInfo.setBookReadProgress(100L);
+		bookDownloadInfo.setLastReaderProgress("0%");
 		bookDownloadInfo.setLastChapterName(book.getLastChapter().getText());
 		bookDownloadInfo.setLastChapterName(book.getListurl());
 		downloadInfoList.add(bookDownloadInfo);
 		db.saveBindingId(bookDownloadInfo);
-		
+
+	}
+
+	/**
+	 * 保存阅读进度
+	 * 
+	 * @param bookName
+	 */
+	public void updateReaderProgress(BookMark bookMark, int chapterNum) {
+		List<BaiduInfo> list;
+		try {
+			list = db.findAll(Selector.from(BaiduInfo.class).where("bookName",
+					"=", bookMark.getBookName()));
+			if (list != null && !list.isEmpty()) {
+				BaiduInfo bookinfo = list.get(0);
+				bookinfo.setBookReadHository(bookMark.getChapterName());
+				bookinfo.setBookIsRead(true);
+				DecimalFormat df = new DecimalFormat("#.#");
+				double progress = 100 * ((double) bookMark.getPosition() / chapterNum);
+				bookinfo.setLastReaderProgress(df.format(progress) + "%");
+				db.update(bookinfo);
+			}
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			Log.e("msg", e.getMessage());
+		}
+
 	}
 
 	/**
