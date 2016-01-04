@@ -8,6 +8,7 @@ import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.util.MyLogger;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.db.sqlite.Selector;
+import com.lidroid.xutils.db.sqlite.WhereBuilder;
 import com.lidroid.xutils.exception.DbException;
 
 public class BookMarkDb {
@@ -153,6 +154,35 @@ public class BookMarkDb {
 	public void deletBookMark(BookMark bookMark) {
 		try {
 			db.delete(bookMark);
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			MyLogger.kLog().e(e);
+		}
+	}
+
+	/**
+	 * 删除书签
+	 * 
+	 * @param bookMarko
+	 */
+	public void deletBookMark(String bookName) {
+		try {
+			db.delete(BookMark.class,
+					WhereBuilder.b("bookName", "=", bookName));
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			MyLogger.kLog().e(e);
+		}
+	}
+
+	/**
+	 * 删除集合中书签信息
+	 * 
+	 * @param list
+	 */
+	public void deletBookMarkList(List<BookMark> list) {
+		try {
+			db.delete(list);
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
 			MyLogger.kLog().e(e);

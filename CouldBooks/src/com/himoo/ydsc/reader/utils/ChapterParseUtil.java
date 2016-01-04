@@ -47,7 +47,7 @@ public class ChapterParseUtil {
 				return bookContent;
 			} else {
 
-				Toast.showLong(context, "本章暂无内容");
+//				Toast.showLong(context, "本章暂无内容");
 			}
 		} catch (JSONException e1) {
 

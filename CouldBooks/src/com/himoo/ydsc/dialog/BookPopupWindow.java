@@ -41,6 +41,8 @@ public class BookPopupWindow extends BasePopWindow implements OnClickListener,
 	private BaseFragment fragment;
 	public ArrayAdapter<String> adapter;
 	private String[] bookArrays;
+	/** 当前的点击的位置 */
+	public int currentPosition = -1;
 
 	public BookPopupWindow(BaseFragment frag, View view) {
 		this(frag, view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
@@ -95,6 +97,9 @@ public class BookPopupWindow extends BasePopWindow implements OnClickListener,
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
+		if(currentPosition!=-1)
+			return ;
+		currentPosition = position;
 		String keyWord = (String) parent.getItemAtPosition(position);
 		startToActivity(keyWord);
 	}
@@ -144,4 +149,5 @@ public class BookPopupWindow extends BasePopWindow implements OnClickListener,
 			}
 		}
 	}
+	
 }

@@ -34,7 +34,7 @@ public class LocalReaderUtil {
 	 * 
 	 * @param bookName
 	 * @param bookType
-	 *            1:自己服务器上的书  2:是百度书籍 
+	 *            1:自己服务器上的书 2:是百度书籍
 	 * @return
 	 */
 	public ArrayList<BaiduBookChapter> parseLocalBook(String bookName,
@@ -63,6 +63,8 @@ public class LocalReaderUtil {
 					list.add(chapter);
 
 				}
+				chapterFile.clear();
+				chapterFile = null;
 
 				Collections.sort(list, new Comparator<BaiduBookChapter>() {
 
@@ -90,9 +92,10 @@ public class LocalReaderUtil {
 					String[] str = chapter[i].split("\\|\\|\\|");
 					baiduBookChapter.setText(str[0].trim());
 					baiduBookChapter.setIndex(str[1].split("\\.")[0].trim());
-					baiduBookChapter.setPosition(i);		
+					baiduBookChapter.setPosition(i);
 					list.add(baiduBookChapter);
 				}
+				chapter = null;
 			}
 
 		}

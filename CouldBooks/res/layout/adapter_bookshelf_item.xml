@@ -10,16 +10,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="2dp" >
+        android:paddingBottom="2dp"
+        android:paddingLeft="@dimen/bookCover_Left"
+        android:paddingTop="6dp" >
 
-        <ImageView
-            android:id="@+id/shelf_book_image"
-            android:layout_width="90dp"
-            android:layout_height="128dp"
-            android:layout_gravity="center"
-            android:layout_marginLeft="5dp"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/no_cover" />
+        <com.himoo.ydsc.animation.BookView
+            android:id="@+id/bookView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/shelf_book_image"
+                android:layout_width="@dimen/bookCover_width"
+                android:layout_height="@dimen/bookCover_Height"
+                android:layout_gravity="center"
+                android:background="@color/theme_skin_blue"
+                android:contentDescription="@string/app_name"
+                android:scaleType="fitXY"
+                android:src="@drawable/no_cover" />
+        </com.himoo.ydsc.animation.BookView>
 
         <ProgressBar
             android:id="@+id/book_download_pb"
@@ -36,7 +45,7 @@
         <LinearLayout
             android:id="@+id/book_shelf_middle_layout"
             android:layout_width="0dp"
-            android:layout_height="128dp"
+            android:layout_height="@dimen/bookCover_Height"
             android:layout_marginLeft="10dp"
             android:layout_weight="1"
             android:orientation="vertical"
@@ -79,7 +88,7 @@
         <LinearLayout
             android:id="@+id/book_shelf_right_layout"
             android:layout_width="wrap_content"
-            android:layout_height="128dp"
+            android:layout_height="@dimen/bookCover_Height"
             android:orientation="vertical"
             android:paddingRight="15dp"
             android:visibility="gone" >

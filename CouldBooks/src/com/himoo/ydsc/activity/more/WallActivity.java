@@ -2,6 +2,9 @@ package com.himoo.ydsc.activity.more;
 
 import java.util.ArrayList;
 
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -15,6 +18,8 @@ import android.widget.RelativeLayout.LayoutParams;
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.aescrypt.AESCrypt;
 import com.himoo.ydsc.animation.AnimationUtils;
+import com.himoo.ydsc.animation.openbook.BookView;
+import com.himoo.ydsc.dialog.BookDownloadDialog;
 import com.himoo.ydsc.reader.utils.ZipExtractorTask;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
@@ -64,6 +69,7 @@ public class WallActivity extends SwipeBackActivity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_more_wall);
+		
 		dialog_layout_rating = (LinearLayout) this
 				.findViewById(R.id.dialog_layout_rating);
 		final Button dialog_btn_rate = (Button) this
@@ -97,36 +103,47 @@ public class WallActivity extends SwipeBackActivity {
 
 			@Override
 			public void onClick(View v) {
-				
-				AnimationUtils.setViewRotating(WallActivity.this,dialog_btn_rate);
-				
-//				String value = OnlineConfigAgent.getInstance().getConfigParams(
-//						WallActivity.this, "adstatue");
-//				if (value.equals("1")) {
-//					Toast.showLong(WallActivity.this, "在线参数为" + value);
-//				}
-//				int index = (int) (Math.random() * 10);
-//				FileUtils fileUtils = new FileUtils(WallActivity.this);
-//				String filePath = fileUtils.getStorageDirectory()
-//						+ "一问一世界-2334/index" + ".txt";
-//				// String inPath = fileUtils.getStorageDirectory() +
-//				// "一问一世界-2334.zip";
-//				// String outPath = fileUtils.getStorageDirectory() +
-//				// "一问一世界-2334";
-//				// doZipExtractorWork(inPath, outPath);
-//				String bookContent = AESCrypt.readBookFile(filePath);
-//				ArrayList<MyChapter> list = new ArrayList<MyChapter>();
-//				String chapter[] = bookContent.split("\n");
-//				for (int i = 0; i < chapter.length; i++) {
-//					MyChapter ch = new MyChapter();
-//					String[] str = chapter[i].split("\\|\\|\\|");
-//					ch.setChapterName(str[0]);
-//					ch.setPosition(Integer.valueOf(str[1].split("\\.")[0].trim()));
-//					list.add(ch);
-//				}
-//				Log.i("chapter = " + list.size());
-//
-//				Toast.showLong(WallActivity.this, bookContent);
+
+			
+
+				BookView bookView = (BookView) findViewById(R.id.book);
+				bookView.setImageResource(R.drawable.book_face_default);
+
+				// FileUtils fileUtils = new FileUtils(WallActivity.this);
+				// String filePath = fileUtils.getStorageDirectory()
+				// + "我的美女房东/1" + ".txt";
+				// String bookContent = AESCrypt.readBookFile(filePath);
+				// Toast.showLong(WallActivity.this, bookContent);
+
+				// showDialog();
+				// String value =
+				// OnlineConfigAgent.getInstance().getConfigParams(
+				// WallActivity.this, "adstatue");
+				// if (value.equals("1")) {
+				// Toast.showLong(WallActivity.this, "在线参数为" + value);
+				// }
+				// int index = (int) (Math.random() * 10);
+				// FileUtils fileUtils = new FileUtils(WallActivity.this);
+				// String filePath = fileUtils.getStorageDirectory()
+				// + "一问一世界-2334/index" + ".txt";
+				// // String inPath = fileUtils.getStorageDirectory() +
+				// // "一问一世界-2334.zip";
+				// // String outPath = fileUtils.getStorageDirectory() +
+				// // "一问一世界-2334";
+				// // doZipExtractorWork(inPath, outPath);
+				// String bookContent = AESCrypt.readBookFile(filePath);
+				// ArrayList<MyChapter> list = new ArrayList<MyChapter>();
+				// String chapter[] = bookContent.split("\n");
+				// for (int i = 0; i < chapter.length; i++) {
+				// MyChapter ch = new MyChapter();
+				// String[] str = chapter[i].split("\\|\\|\\|");
+				// ch.setChapterName(str[0]);
+				// ch.setPosition(Integer.valueOf(str[1].split("\\.")[0].trim()));
+				// list.add(ch);
+				// }
+				// Log.i("chapter = " + list.size());
+				//
+				// Toast.showLong(WallActivity.this, bookContent);
 
 			}
 
@@ -186,7 +203,7 @@ public class WallActivity extends SwipeBackActivity {
 	 * @param outPath
 	 */
 	public void doZipExtractorWork(String inPath, String outPath) {
-		ZipExtractorTask task = new ZipExtractorTask(inPath, outPath, this,
+		ZipExtractorTask task = new ZipExtractorTask("", inPath, outPath, this,
 				true);
 		task.execute();
 	}
@@ -213,4 +230,22 @@ public class WallActivity extends SwipeBackActivity {
 
 	}
 
+	private void showDialog() {
+		BookDownloadDialog mDialog = new BookDownloadDialog(this);
+
+		mDialog.setMessage("正在下载");
+		mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+		mDialog.setOnCancelListener(new OnCancelListener() {
+
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				// TODO Auto-generated method stub
+				// cancel(true);
+			}
+		});
+		mDialog.show();
+
+		mDialog.setMax(100 * 1024 * 1024);
+		mDialog.setProgress(65 * 1024 * 1024);
+	}
 }

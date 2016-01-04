@@ -15,6 +15,7 @@ import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BookDetails;
 import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.util.FileUtils;
+import com.himoo.ydsc.util.MyLogger;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.db.converter.ColumnConverter;
@@ -85,6 +86,27 @@ public class BookDownloadManager {
 	 */
 	public int getDownloadInfoListCount() {
 		return downloadInfoList.size();
+	}
+
+	/**
+	 * 查询已经阅读过的书
+	 * 
+	 * @return
+	 */
+	public int getReaderBookCount() {
+
+		try {
+			List<BookDownloadInfo> list = db.findAll(Selector.from(
+					BookDownloadInfo.class).where("bookIsRead", "=", true));
+			if (list != null)
+				return list.size();
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			MyLogger.kLog().e(e);
+			return getDownloadInfoListCount();
+		}
+
+		return getDownloadInfoListCount();
 	}
 
 	/**
@@ -259,7 +281,7 @@ public class BookDownloadManager {
 		final BaiduInfo bookDownloadInfo = new BaiduInfo();
 		bookDownloadInfo.setDownloadUrl(bookDetails.getBook_Download());
 		bookDownloadInfo.setAutoRename(autoRename);
-		bookDownloadInfo.setAutoResume(autoResume);
+		bookDownloadInfo.setAutoResume(false);
 		bookDownloadInfo.setBookStatue("完结");
 		bookDownloadInfo.setSerialize(false);
 		bookDownloadInfo.setBookSourceType(1);
@@ -268,6 +290,7 @@ public class BookDownloadManager {
 		bookDownloadInfo.setBookLastUpdateTime(System.currentTimeMillis() + "");
 		bookDownloadInfo.setBookCoverImageUrl(bookDetails.getBook_Image());
 		bookDownloadInfo.setBookIsRead(false);
+		bookDownloadInfo.setReaderTime(0L);
 		bookDownloadInfo.setBookReadHository("此书您还没有阅读!");
 		bookDownloadInfo.setLastReaderProgress("0%");
 		bookDownloadInfo.setBookReadProgress(0L);

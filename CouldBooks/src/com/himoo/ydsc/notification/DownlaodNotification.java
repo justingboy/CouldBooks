@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.net.TrafficStats;
 import android.widget.RemoteViews;
 
-
 /**
  * 下载小说的通知类 关于Notification
  * 
@@ -35,30 +34,33 @@ public class DownlaodNotification {
 	@SuppressWarnings("deprecation")
 	public void creatNotification(String bookName, String tickText) {
 		this.bookName = bookName;
-		notification = new Notification(
-				android.R.drawable.stat_sys_download_done, bookName + tickText,
-				System.currentTimeMillis());
-		remoteViews = new RemoteViews(mContext.getPackageName(),
-				R.layout.book_download_notification_view);
+		if (notification == null) {
+
+			notification = new Notification(
+					android.R.drawable.stat_sys_download_done, bookName
+							+ tickText, System.currentTimeMillis());
+			remoteViews = new RemoteViews(mContext.getPackageName(),
+					R.layout.book_download_notification_view);
+			notification.contentView = remoteViews;
+			Intent intent = new Intent();
+			PendingIntent pIntent = PendingIntent.getActivity(mContext, 0,
+					intent, 0);
+			notification.contentIntent = pIntent;
+			notification.flags = Notification.FLAG_AUTO_CANCEL;
+			notifiManger.notify(NOTIFI_ID, notification);
+		}
 		remoteViews.setTextViewText(R.id.download_notication_title, bookName
 				+ "   " + progress + "%");
-		//在sdk版本0之前的背景是白色的，使得白色的字体无法显示
-		if(android.os.Build.VERSION.SDK_INT<=9)
-		{
-			remoteViews.setTextColor(R.id.download_notication_title, mContext.getResources().getColor(R.color.alarm_playback_color));
-			remoteViews.setTextColor(R.id.tv_progress,  mContext.getResources().getColor(R.color.alarm_playback_color));
+		// 在sdk版本0之前的背景是白色的，使得白色的字体无法显示
+		if (android.os.Build.VERSION.SDK_INT <= 9) {
+			remoteViews.setTextColor(R.id.download_notication_title, mContext
+					.getResources().getColor(R.color.alarm_playback_color));
+			remoteViews.setTextColor(R.id.tv_progress, mContext.getResources()
+					.getColor(R.color.alarm_playback_color));
 		}
 		remoteViews.setProgressBar(R.id.progress, 100, progress, false);
-		notification.contentView = remoteViews;
-		Intent intent = new Intent();
-		PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, intent,
-				0);
-		notification.contentIntent = pIntent;
-		notification.flags = Notification.FLAG_AUTO_CANCEL;
-		notifiManger.notify(NOTIFI_ID, notification);
-//		if (tickText.equals("下载完成!"))
-//			return;
-//		new DownloadThread().start();
+
+		
 
 	}
 
@@ -116,7 +118,7 @@ public class DownlaodNotification {
 
 			// 下载完成
 			creatNotification(bookName, "下载完成!");
-			
+
 			try {
 				Thread.sleep(3000);
 			} catch (InterruptedException e) {
@@ -124,7 +126,6 @@ public class DownlaodNotification {
 				e.printStackTrace();
 			}
 			notifiManger.cancel(NOTIFI_ID);
-			
 
 		}
 	}

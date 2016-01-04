@@ -39,6 +39,8 @@ import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.himoo.ydsc.animation.BookView;
+import com.himoo.ydsc.animation.BookView.OpenBookAnimEndListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
@@ -197,6 +199,19 @@ public class BaseAdapterHelper {
 	}
 
 	/**
+	 * 特殊，只能用于设置BookView
+	 * @param viewId
+	 * @param listener
+	 * @return
+	 */
+	public BaseAdapterHelper setOnOpenBookListener(int viewId,
+			OpenBookAnimEndListener listener) {
+		BookView view = retrieveView(viewId);
+		view.setOnOpenBookAnimEndListener(listener);
+		return this;
+	}
+
+	/**
 	 * Will set text color of a TextView.
 	 * 
 	 * @param viewId
@@ -213,17 +228,19 @@ public class BaseAdapterHelper {
 
 	/**
 	 * 设置TextView的左边的图片
+	 * 
 	 * @param viewId
 	 * @param resId
 	 * @return
 	 */
 	public BaseAdapterHelper setTextRightDrawable(int viewId, int resId) {
 		TextView view = retrieveView(viewId);
-		Drawable img =context.getResources().getDrawable(resId);
+		Drawable img = context.getResources().getDrawable(resId);
 		img.setBounds(0, 0, img.getMinimumWidth(), img.getMinimumHeight());
 		view.setCompoundDrawables(null, null, img, null);
 		return this;
 	}
+
 	public BaseAdapterHelper setTextNoDrawable(int viewId, int resId) {
 		TextView view = retrieveView(viewId);
 		view.setCompoundDrawables(null, null, null, null);
@@ -374,7 +391,7 @@ public class BaseAdapterHelper {
 		view.setVisibility(visible ? View.VISIBLE : View.GONE);
 		return this;
 	}
-	
+
 	/**
 	 * Set a view visibility to VISIBLE (true) or GONE (false).
 	 * 

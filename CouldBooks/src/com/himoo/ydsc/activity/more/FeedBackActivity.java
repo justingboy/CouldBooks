@@ -101,7 +101,7 @@ public class FeedBackActivity extends SwipeBackActivity implements
 						feedback_question_type.getText().toString(),
 						createErrorMessge(),
 						mPhotoFile == null ? null : mPhotoFile
-								.getAbsolutePath());
+								.getAbsolutePath(),false);
 
 			}
 		});

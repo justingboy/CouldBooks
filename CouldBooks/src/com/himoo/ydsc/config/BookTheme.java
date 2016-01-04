@@ -41,6 +41,10 @@ public class BookTheme {
 	public static int THEME_COLOR_DEFAULT = Color.parseColor("#FF7E7D7B");
 	/** 主题颜色默认 */
 	public static int BUTTON_COLOR_PRESS = BookTheme.BOOK_GREEN_PRESS;
+	/** 设置背景色，白天和夜间*/
+	public static int BOOK_SETTING_BG = Color.parseColor("#FF5F5F5C");
+	/** 设置背景色，白天和夜间*/
+	public static int BOOK_SETTING_PRESS_BG = Color.parseColor("#FF7F7F7F");
 
 	/** Button 选择器的绿色背景色 */
 	public static final int BOOK_RED_PRESS = Color.parseColor("#FF1000");
@@ -67,7 +71,7 @@ public class BookTheme {
 			R.drawable.book_face_default };
 
 	/** 书籍默认封面 */
-	public static int BOOK_COVER = coverDrawable[0];
+	public static int BOOK_COVER = coverDrawable[1];
 
 	/** 夜间模式的背景图片 */
 	public static int BOOK_SETTING_NIGHT_DRAWABLE = R.drawable.book_setting_night;

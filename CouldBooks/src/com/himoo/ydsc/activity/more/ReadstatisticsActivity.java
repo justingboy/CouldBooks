@@ -4,21 +4,27 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.TrafficStats;
 import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.download.BookDownloadManager;
 import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.ViewSelector;
+import com.himoo.ydsc.util.SharedPreferences;
+import com.himoo.ydsc.util.TimestampUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
 /**
  * 阅读统计类
  * 
  */
-public class ReadstatisticsActivity extends SwipeBackActivity {
+public class ReadstatisticsActivity extends SwipeBackActivity implements
+		OnClickListener {
 
 	@ViewInject(R.id.read_time)
 	private TextView read_time;
@@ -43,7 +49,7 @@ public class ReadstatisticsActivity extends SwipeBackActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_more_staticis);
 		initData();
-	
+
 	}
 
 	@Override
@@ -57,14 +63,18 @@ public class ReadstatisticsActivity extends SwipeBackActivity {
 
 	private void initData() {
 		downloadManager = BookDownloadService.getDownloadManager(this);
-		read_time.setText("共阅读0小时10分钟40秒");
-		read_book_count.setText("共看过11本书");
+		long readerTime = SharedPreferences.getInstance().getLong(
+				SpConstant.BOOK_READER_TIME, 0l);
+		read_time
+				.setText("共阅读" + TimestampUtils.formatTimeDuration(readerTime));
+		read_book_count.setText("共看过" + downloadManager.getReaderBookCount()
+				+ "本书");
 		int bookCount = downloadManager.getDownloadInfoListCount();
-		read_download_count.setText("共下载过"+bookCount+"本书");
+		read_download_count.setText("共下载过" + bookCount + "本书");
 		// 2G/3G 流量，上传+下载的总和
 		read_flow.setText("上网流量 ：" + getMobleTraffic());
 		ViewSelector.setButtonSelector(this, read_clear_btn);
-
+		read_clear_btn.setOnClickListener(this);
 	}
 
 	/**
@@ -83,13 +93,14 @@ public class ReadstatisticsActivity extends SwipeBackActivity {
 			mobleTraffic += (TrafficStats.getUidTxBytes(uid) == TrafficStats.UNSUPPORTED) ? 0
 					: TrafficStats.getUidTxBytes(uid);
 			String traffic = mobleTraffic / (float) (1024 * 1024) + "M";
-			return traffic.substring(0, traffic.indexOf(".")+3)+"M";
+			return traffic.substring(0, traffic.indexOf(".") + 3) + "M";
 		}
 
 	}
 
 	/**
 	 * 获取UID
+	 * 
 	 * @return
 	 */
 	private int getAppUid() {
@@ -101,5 +112,12 @@ public class ReadstatisticsActivity extends SwipeBackActivity {
 			// TODO Auto-generated catch block
 			return -1;
 		}
+	}
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		SharedPreferences.getInstance().putLong(SpConstant.BOOK_READER_TIME, 0L);
+		read_time.setText("共阅读0分钟");
 	}
 }

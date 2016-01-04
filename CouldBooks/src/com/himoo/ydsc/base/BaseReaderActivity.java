@@ -21,7 +21,11 @@ public class BaseReaderActivity extends FragmentActivity {
 			case REFRESH_DIALOG_SHOW:
 				if (mDialog == null) {
 					mDialog = new RefreshDialog(BaseReaderActivity.this);
+					mDialog.setBackground();
+					mDialog.setTextColor();
+					mDialog.setIndeterminateDrawable();
 					mDialog.setCancelable(false);
+					
 				}
 				mDialog.setMessage(msg.obj.toString());
 				if (!mDialog.isShowing()) {

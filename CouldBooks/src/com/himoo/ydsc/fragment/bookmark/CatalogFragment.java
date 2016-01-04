@@ -24,6 +24,7 @@ import com.himoo.ydsc.reader.ReaderActivity;
 import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.reader.dao.BookMarkDb;
 import com.himoo.ydsc.reader.utils.IOHelper;
+import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
@@ -35,8 +36,12 @@ public class CatalogFragment extends BaseFragment {
 	private BookMark bookMark;
 	/** 标记当前点击Item的位置 */
 	private int mCurrentClickPosition = -1;
+	/** 通知广播的Action */
+	private static final String ACTION = "com.himoo.ydsc.catalog.receiver";
+	private boolean isDownloading;
 
-	public static CatalogFragment newInstance(String bookName, int type,int bookType) {
+	public static CatalogFragment newInstance(String bookName, int type,
+			int bookType) {
 		CatalogFragment fragment = new CatalogFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString("bookName", bookName);
@@ -76,12 +81,17 @@ public class CatalogFragment extends BaseFragment {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		if (mCurrentClickPosition != -1)
-			return;
-		mCurrentClickPosition = position;
-		BaiduBookChapter chapter = (BaiduBookChapter) parent
-				.getItemAtPosition(position);
-		startToReaderActivity(chapter, position);
+		if (!isDownloading) {
+			if (mCurrentClickPosition != -1)
+				return;
+			mCurrentClickPosition = position;
+			BaiduBookChapter chapter = (BaiduBookChapter) parent
+					.getItemAtPosition(position);
+			startToReaderActivity(chapter, position);
+		} else {
+			Toast.show(getActivity(), "下载中,请稍后打开");
+		}
+
 	}
 
 	public class BookCatalogdapter extends QuickAdapter<BaiduBookChapter> {
@@ -152,16 +162,22 @@ public class CatalogFragment extends BaseFragment {
 		super.onResume();
 		mCurrentClickPosition = -1;
 	}
-	
-	public class BookUpdateReceiver extends BroadcastReceiver{
+
+	public class BookUpdateReceiver extends BroadcastReceiver {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
-			initData();
+
+			if (intent.getAction().equals(ACTION)) {
+				isDownloading = intent.getBooleanExtra("isDownloading", false);
+				if (!isDownloading) {
+					initData();
+				}
+			}
+
 		}
-		
+
 	}
-	
 
 }

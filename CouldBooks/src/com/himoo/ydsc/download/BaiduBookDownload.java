@@ -8,6 +8,7 @@ import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.util.MyLogger;
 import com.lidroid.xutils.DbUtils;
+import com.lidroid.xutils.DbUtils.DbUpgradeListener;
 import com.lidroid.xutils.db.sqlite.Selector;
 import com.lidroid.xutils.exception.DbException;
 
@@ -22,6 +23,26 @@ public class BaiduBookDownload {
 				if (instance == null)
 					instance = new BaiduBookDownload();
 				db = DbUtils.create(context, "Book");
+				db.configAllowTransaction(true);
+			}
+		return instance;
+	}
+
+	/**
+	 * 数据库升级
+	 * 
+	 * @param context
+	 * @param DbVersion
+	 * @param dbUpgradeListener
+	 * @return BaiduBookDownload
+	 */
+	public static BaiduBookDownload getInstance(Context context, int DbVersion,
+			DbUpgradeListener dbUpgradeListener) {
+		if (instance == null)
+			synchronized (BaiduBookDownload.class) {
+				if (instance == null)
+					instance = new BaiduBookDownload();
+				db = DbUtils.create(context, "Book", 2, dbUpgradeListener);
 				db.configAllowTransaction(true);
 			}
 		return instance;
@@ -49,12 +70,14 @@ public class BaiduBookDownload {
 				bookDownloadInfo.setSerialize(!book.getStatus().equals("完结"));
 				bookDownloadInfo.setBookSourceType(2);
 				bookDownloadInfo.setBookName(book.getTitle());
+				bookDownloadInfo.setReaderTime(0L);
 				bookDownloadInfo.setBookStatue(book.getStatus());
 				bookDownloadInfo.setBookAuthor(book.getAuthor());
 				bookDownloadInfo.setBookLastUpdateTime(System
 						.currentTimeMillis() + "");
 				bookDownloadInfo.setBookCoverImageUrl(book.getCoverImage());
 				bookDownloadInfo.setBookIsRead(false);
+				bookDownloadInfo.setAutoResume(false);
 				bookDownloadInfo.setBookReadHository("此书您还没有阅读!");
 				bookDownloadInfo.setBookReadProgress(100L);
 				bookDownloadInfo.setLastReaderProgress("0%");
@@ -71,6 +94,47 @@ public class BaiduBookDownload {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+	}
+
+	/**
+	 * 更新下载状态
+	 */
+	public void updateDownlaodstatue(String bookName) {
+		try {
+			List<BaiduInfo> list = db.findAll(Selector.from(BaiduInfo.class)
+					.where("bookName", "=", bookName));
+			if (list != null && !list.isEmpty()) {
+				BaiduInfo book = list.get(0);
+				book.setAutoResume(true);// 下载完成
+				db.update(book);
+			}
+
+		} catch (DbException e) {
+			MyLogger.kLog().e(e);
+		}
+
+	}
+
+	/**
+	 * 查询下载的状态
+	 * @param bookName
+	 * @return
+	 */
+	public boolean queryBookDownloadStatue(String bookName) {
+		try {
+			List<BaiduInfo> list = db.findAll(Selector.from(BaiduInfo.class)
+					.where("bookName", "=", bookName));
+			if (list != null && !list.isEmpty()) {
+				BaiduInfo book = list.get(0);
+				return book.isAutoResume();
+			}
+
+		} catch (DbException e) {
+			MyLogger.kLog().e(e);
+			return false;
+		}
+		return false;
 
 	}
 

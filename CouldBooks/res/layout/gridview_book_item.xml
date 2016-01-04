@@ -5,12 +5,12 @@
     android:background="@android:color/white"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="2dp" >
+    android:padding="@dimen/bookCover_Padding" >
 
     <ImageView
         android:id="@+id/book_image"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="@dimen/bookCover_Height"
         android:contentDescription="@string/app_name" />
 
     <TextView

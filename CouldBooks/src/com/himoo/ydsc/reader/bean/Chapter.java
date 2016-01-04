@@ -19,6 +19,8 @@ public class Chapter {
 	private String chapterUrl;
 	/** 书的封面地址 */
 	private String coverImageUrl;
+	/** 章节的来源，详情界面还是书架 */
+	private int jumpType = 1;
 
 	public String getContent() {
 		return content;
@@ -74,6 +76,14 @@ public class Chapter {
 
 	public void setCoverImageUrl(String coverImageUrl) {
 		this.coverImageUrl = coverImageUrl;
+	}
+
+	public int getJumpType() {
+		return jumpType;
+	}
+
+	public void setJumpType(int jumpType) {
+		this.jumpType = jumpType;
 	}
 
 }

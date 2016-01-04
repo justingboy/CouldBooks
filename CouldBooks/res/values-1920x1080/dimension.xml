@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="bookCover_width">82dp</dimen>
+    <dimen name="bookCover_Height">112dp</dimen>
+    <dimen name="bookCover_Left">12dp</dimen>
+    <dimen name="bookCover_Spacing">15dp</dimen>
+    <dimen name="bookCover_Padding">5dp</dimen>
+    <dimen name="mogoAd_height">55dp</dimen>
+
+</resources>

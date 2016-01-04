@@ -29,5 +29,19 @@ public class ButtonSelector extends View {
         return bg;
     }
 	
+    /**
+     * 设置TextView点击的Selected
+     * @param mImageIds
+     * @return
+     */
+    public StateListDrawable setTextViewbg(Drawable[] mImageIds) {
+        StateListDrawable bg = new StateListDrawable();
+        Drawable pressed = mImageIds[0];
+        Drawable normal = mImageIds[1];
+        bg.addState(View.PRESSED_ENABLED_STATE_SET, pressed);
+        bg.addState(View.EMPTY_STATE_SET, normal);
+        return bg;
+    }
+    
 	
 }

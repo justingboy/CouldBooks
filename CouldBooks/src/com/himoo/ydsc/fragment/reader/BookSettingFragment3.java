@@ -10,13 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.GridView;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.quickadapter.BaseAdapterHelper;
 import com.himoo.ydsc.base.quickadapter.QuickAdapter;
-import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
@@ -42,10 +41,32 @@ public final class BookSettingFragment3 extends Fragment {
 			R.drawable.iphone_b_pagemode2, R.drawable.iphone_b_pageselected,
 			R.drawable.iphone_b_pagemode3p, R.drawable.iphone_b_pagemode4 };
 
-	public static BookSettingFragment3 newInstance(Context context) {
+	private OnFragment3Listener mListener;
+
+	private boolean isNightMode = false;
+
+	public static BookSettingFragment3 newInstance(Context context,
+			boolean isNightMode) {
 		BookSettingFragment3 fragment = new BookSettingFragment3();
+		Bundle bundle = new Bundle();
+		bundle.putBoolean("mode", isNightMode);
+		fragment.setArguments(bundle);
 		mContext = context;
 		return fragment;
+	}
+
+	@Override
+	public void onAttach(Context context) {
+		// TODO Auto-generated method stub
+		super.onAttach(context);
+		mContext = context;
+		try {
+			mListener = (OnFragment3Listener) context;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(context.toString()
+					+ " must implement OnFragment3Listener");
+		}
+
 	}
 
 	@Override
@@ -63,9 +84,12 @@ public final class BookSettingFragment3 extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 		ViewUtils.inject(this);
 		initReadBookGridView();
+		isNightMode = getArguments().getBoolean("mode");
 	}
 
 	private void initReadBookGridView() {
+		this.mCurrentTitle = SharedPreferences.getInstance().getString(
+				SpConstant.BOOK_TURNPAGE_TITLE_TYPE, title[1]);
 		ArrayList<ReaderBookAnimation> readerAniList = new ArrayList<ReaderBookAnimation>();
 		for (int i = 0; i < title.length; i++) {
 			ReaderBookAnimation ani = new ReaderBookAnimation(title[i],
@@ -80,9 +104,13 @@ public final class BookSettingFragment3 extends Fragment {
 			protected void convert(BaseAdapterHelper helper,
 					ReaderBookAnimation item) {
 				// TODO Auto-generated method stub
-				
+
 				helper.setBackgroundRes(R.id.theme_cover_image, item.drawableId);
 				helper.setText(R.id.theme_cover_text, item.title);
+				if (isNightMode)
+					helper.setTextColorRes(R.id.theme_cover_text,
+							R.color.book_setting_text_color);
+
 				if (item.title.equals(mCurrentTitle))
 					helper.setVisible(R.id.theme_coverChoice_image, true);
 				else
@@ -99,18 +127,23 @@ public final class BookSettingFragment3 extends Fragment {
 					int position, long id) {
 				mCurrentTitle = title[position];
 				SharedPreferences.getInstance().putString(
-						SpConstant.BOOK_COVER_TYPE, mCurrentTitle);
-				SharedPreferences.getInstance().putInt(
-						SpConstant.BOOK_COVER_INDEX, position);
-				BookTheme.setBookCover(position);
+						SpConstant.BOOK_TURNPAGE_TITLE_TYPE, mCurrentTitle);
+				if (position != 0)
+					SharedPreferences.getInstance().putInt(
+							SpConstant.BOOK_TURNPAGE_TYPE, position);
 				coverAdapter.notifyDataSetChanged();
+				if (mListener != null)
+					if (position == 0)
+						mListener.onTurnPageLeftMode();
+					else
+						mListener.onTurnPageChange();
 
 			}
 		});
 
 	}
 
-	static class ReaderBookAnimation {
+	public static class ReaderBookAnimation {
 		public String title;
 		public int drawableId;
 
@@ -118,5 +151,11 @@ public final class BookSettingFragment3 extends Fragment {
 			this.title = title;
 			this.drawableId = drawableId;
 		}
+	}
+
+	public interface OnFragment3Listener {
+		public void onTurnPageChange();
+
+		public void onTurnPageLeftMode();
 	}
 }

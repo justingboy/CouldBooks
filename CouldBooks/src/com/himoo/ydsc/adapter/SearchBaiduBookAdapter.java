@@ -47,7 +47,8 @@ public class SearchBaiduBookAdapter extends QuickAdapter<BaiduBook> {
 		helper.setText(R.id.search_book_name, item.getTitle());
 		helper.setTextColor(R.id.search_book_name, BookTheme.THEME_COLOR);
 		helper.setText(R.id.search_book_author, item.getAuthor());
-		helper.setText(R.id.search_book_summary, item.getSummary().trim());
+		helper.setText(R.id.search_book_summary, item.getSummary().trim().replaceAll("\\s{1,}", "")
+				);
 		if (item.getStatus().equals("完结")) {
 			helper.setImageResource(R.id.book_statue,
 					R.drawable.story_state_finished);

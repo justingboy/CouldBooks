@@ -1,6 +1,5 @@
 package com.himoo.ydsc.util;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -44,7 +43,7 @@ public class SendEmailUtils {
 	 * @param context
 	 */
 	public void sendEmail(Context context, String title, String content,
-			String imagePath) {
+			String fliePath, boolean isFile) {
 
 		Intent intent = new Intent();
 		intent.setData(Uri.parse("mailto:"));
@@ -56,11 +55,16 @@ public class SendEmailUtils {
 		// intent.putExtra(Intent.EXTRA_BCC, bccs); // 密送这
 		intent.putExtra(Intent.EXTRA_SUBJECT, title);
 		intent.putExtra(Intent.EXTRA_TEXT, content);// "file:///mnt/sdcard/test.jpg")
-		if (imagePath != null && !imagePath.equals("")) {
+		if (fliePath != null && !fliePath.equals("")) {
 			intent.putExtra(Intent.EXTRA_STREAM,
-					Uri.parse("file://" + imagePath));
-			intent.setType("image/*");
+					Uri.parse("file://" + fliePath));
+			if (isFile) {
+				intent.setType("text/*");
+			} else {
+				intent.setType("image/*");
+			}
 		}
+
 		intent.setType("message/rfc882");
 		Intent.createChooser(intent, "Choose Email Client");
 		context.startActivity(intent);

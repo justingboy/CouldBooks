@@ -96,7 +96,7 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 						}
 					}
 				}
-			}else{
+			} else {
 				return null;
 			}
 		} else if (mUpdateType == 2) {
@@ -111,10 +111,11 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 				e.printStackTrace();
 			}
 			if (list == null || list.isEmpty()) {
-				onProgressUpdate("0本/" + bookCount + "本");
+				onProgressUpdate("  0本/ " + bookCount + "本          ");
 			}
 			if (list != null && !list.isEmpty()) {
-				onProgressUpdate(list.size() + "本/" + bookCount + "本");
+				onProgressUpdate("      " + list.size() + "本/" + bookCount
+						+ "本       ");
 				for (int i = 0; i < list.size(); i++) {
 					BaiduInfo book = list.get(i);
 					String lastChapter = book.getLastChapterName();
@@ -133,6 +134,12 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 								}
 								BaiduBookDownload.getInstance(mContext)
 										.updateChapterName(book, newChapter);
+								try {
+									Thread.sleep(1000);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								onProgressUpdate(book.getBookName());
 
 							}
@@ -249,17 +256,44 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 				+ File.separator + bookName + File.separator);
 		if (!dirFile.exists())
 			dirFile.mkdirs();
-		for (int i = 0; i < allChapterLength; i++) {
+		ArrayList<BaiduBookChapter> localList = LocalReaderUtil.getInstance()
+				.parseLocalBook(bookName, 2);
+		ArrayList<String> chapterNameList = new ArrayList<String>();
+		int localSize = localList.size();
+		int localStartLen = 0;
+		if(localSize>12){
+			localStartLen = localSize - 11;
+		}
+		for (int i = localStartLen; i < localSize; i++) {
+			chapterNameList.add(localList.get(i).getText().trim());
+		}
+		int statLen = 0;
+		if (localList != null&&localList.size()>12) {
+			statLen = localList.size() - 10;
+		}
+		int pos = localList.size();
+		for (int i = statLen; i < allChapterLength; i++) {
 			BaiduBookChapter chapter = list.get(i);
+			//判断这大于10章的可有重名的，有则不下载 ,没有则下载
+			if (chapterNameList.contains(chapter.getText().trim()
+					.replaceAll("/", "|"))) {
+				continue;
+			}
 			String url = getChapterUrl(chapter);
 			String chapterName = chapter.getText().trim().replaceAll("/", "|")
 					+ "-|" + chapter.getIndex() + "-|" + i + ".txt";
 			File chapterFile = new File(dirFile.getAbsolutePath(), chapterName);
 			// 如何该章节已经下载则不需要下载,跳过,下载下一个章节
-			if (!chapterFile.exists() || chapterFile.length() == 0)
-				com.himoo.ydsc.download.FileUtils.writeTosSd(url, chapterFile);
-
+			if (!chapterFile.exists()) {
+				String fileName = chapter.getText().trim().replaceAll("/", "|")
+						+ "-|" + chapter.getIndex() + "-|" + pos + ".txt";
+				File file = new File(dirFile.getAbsolutePath(), fileName);
+				com.himoo.ydsc.download.FileUtils.writeTosSd(url, file);
+				pos++;
+			}
 		}
+		chapterNameList.clear();
+		chapterNameList = null;
 	}
 
 	/**

@@ -26,6 +26,10 @@ import com.himoo.ydsc.util.SharedPreferences;
  * 
  */
 public class PageWidget extends View {
+	
+	
+	//记录上一次滑动的点
+	private int aniTouchX, aniTouchY,aniDx ,aniDy;
 
 	private int mWidth;// 宽度
 	private int mHeight;// 高度
@@ -81,6 +85,19 @@ public class PageWidget extends View {
 	private boolean isNightMode;
 	private boolean isAutoNightMode;
 
+	static enum Mode {
+		TURN_LEFT(0), TURN_CURL(1), TURN_NO(2), TURN_MOVE(3), TURN_UPANDDOWN(4);
+
+		int Auto;
+
+		Mode(int auto) {
+			Auto = auto;
+		}
+	}
+
+	/** 默认动画的类型 */
+	private Mode mMode = Mode.TURN_CURL;
+
 	public PageWidget(Context context, int w, int h) {
 		super(context);
 		// TODO Auto-generated constructor stub
@@ -104,6 +121,7 @@ public class PageWidget extends View {
 
 		mTouch.x = 0.01f; // 不让x,y为0,否则在点计算时会有问题
 		mTouch.y = 0.01f;
+		initMode();
 	}
 
 	/**
@@ -163,6 +181,7 @@ public class PageWidget extends View {
 				// Log.i("msg", "--canDragOver");
 				startAnimation(1200);
 			} else {
+				// Log.i("msg", "--canDragOver --mTouch.x");
 				mTouch.x = mCornerX - 0.09f;
 				mTouch.y = mCornerY - 0.09f;
 			}
@@ -339,6 +358,17 @@ public class PageWidget extends View {
 		canvas.restore();
 	}
 
+	private void drawNextPageNoAnim(Canvas canvas, Bitmap bitmap) {
+		canvas.drawBitmap(bitmap, 0, 0, null);
+		canvas.restore();
+	}
+
+	private void drawCurrentPageNoAnim(Canvas canvas, Bitmap bitmap) {
+		canvas.save();
+		canvas.drawBitmap(bitmap, 0, 0, null);
+		canvas.restore();
+	}
+
 	/**
 	 * 设置书页的当前Bitmap和下一个Bitmap
 	 * 
@@ -361,18 +391,89 @@ public class PageWidget extends View {
 		mHeight = h;
 	}
 
+	/**
+	 * 设置翻书动画
+	 */
+	public void setTurnPageType() {
+		initMode();
+	}
+
 	@Override
 	protected void onDraw(Canvas canvas) {
-		if (isNightMode || isAutoNightMode) {
-			canvas.drawColor(0xFF535352);
+		if (SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_AUTO_COLOR, false)) {
+			canvas.drawColor(5 + SharedPreferences.getInstance().getInt(
+					SpConstant.BOOK_AUTO_COLOR_BG, 0xFFAAAAAA));
 		} else {
-			canvas.drawColor(0xFFAAAAAA);
+			if (isNightMode || isAutoNightMode) {
+				canvas.drawColor(0xFF535352);
+			} else {
+				canvas.drawColor(0xFFAAAAAA);
+			}
 		}
+
 		calcPoints();
-		drawCurrentPageArea(canvas, mCurPageBitmap, mPath0);
-		drawNextPageAreaAndShadow(canvas, mNextPageBitmap);
-		drawCurrentPageShadow(canvas);
-		drawCurrentBackArea(canvas, mCurPageBitmap);
+		perforTurnPageAnim(canvas);
+
+	}
+
+	/**
+	 * 执行翻书动画
+	 */
+	public void perforTurnPageAnim(Canvas canvas) {
+		switch (mMode) {
+		case TURN_LEFT:
+			break;
+		case TURN_CURL:
+			drawCurrentPageArea(canvas, mCurPageBitmap, mPath0);
+			drawNextPageAreaAndShadow(canvas, mNextPageBitmap);
+			// drawCurrentPageShadow(canvas);
+			drawCurrentBackArea(canvas, mCurPageBitmap);
+			break;
+		case TURN_NO:
+			drawCurrentPageNoAnim(canvas, mCurPageBitmap);
+			drawNextPageNoAnim(canvas, mNextPageBitmap);
+			break;
+		case TURN_MOVE:
+
+			break;
+		case TURN_UPANDDOWN:
+
+			break;
+
+		default:
+			break;
+		}
+
+	}
+
+	/**
+	 * 初始化翻书模式
+	 */
+	public void initMode() {
+		int type = SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_TURNPAGE_TYPE, 1);
+		switch (type) {
+		case 0:
+			mMode = Mode.TURN_LEFT;
+			break;
+		case 1:
+			mMode = Mode.TURN_CURL;
+			break;
+		case 2:
+			mMode = Mode.TURN_NO;
+			break;
+		case 3:
+			mMode = Mode.TURN_UPANDDOWN;
+			break;
+		case 4:
+			mMode = Mode.TURN_LEFT;
+			break;
+
+		default:
+			break;
+		}
+
 	}
 
 	/**
@@ -422,11 +523,11 @@ public class PageWidget extends View {
 	}
 
 	/**
-	 * 绘制翻起页的阴影
+	 * 绘制每页右边的阴影
 	 * 
 	 * @param canvas
 	 */
-	public void drawCurrentPageShadow(Canvas canvas) {
+	private void drawCurrentPageShadow(Canvas canvas) {
 		double degree;
 		if (mIsRTandLB) {
 			degree = Math.PI
@@ -614,9 +715,23 @@ public class PageWidget extends View {
 		} else {
 			dy = (int) (1 - mTouch.y); // 防止mTouch.y最终变为0
 		}
-		// Log.i("msg", "dx = " + dx + "dy = " + dy);
+		aniTouchX = (int) mTouch.x;
+		aniTouchY = (int) mTouch.y;
+		aniDx = dx;
+		aniDy = dy;
 		mScroller.startScroll((int) mTouch.x, (int) mTouch.y, dx, dy,
 				delayMillis);
+	}
+
+	/**
+	 * 执行默认翻书动画
+	 */
+	public void startAnimation() {
+		if (mScroller != null) {
+			// int dx = -1278, dy = 331;
+			// int touchX = 558, touchY = 948;
+			mScroller.startScroll(aniTouchX, aniTouchY, aniDx, aniDy, 1200);
+		}
 	}
 
 	/**
@@ -634,7 +749,7 @@ public class PageWidget extends View {
 	 * @return
 	 */
 	public boolean canDragOver() {
-		if (mTouchToCornerDis > mWidth / 10)
+		if (mTouchToCornerDis > mWidth / 30)
 			return true;
 		return false;
 	}
@@ -646,6 +761,22 @@ public class PageWidget extends View {
 		if (mCornerX > 0)
 			return false;
 		return true;
+	}
+
+	public void setAutoNightFalse() {
+		isAutoNightMode = false;
+		isNightMode = false;
+	}
+
+	public void destroy() {
+		if (mCurPageBitmap != null) {
+			mCurPageBitmap.recycle();
+			mCurPageBitmap = null;
+		}
+		if (mNextPageBitmap != null) {
+			mNextPageBitmap.recycle();
+			mNextPageBitmap = null;
+		}
 	}
 
 }

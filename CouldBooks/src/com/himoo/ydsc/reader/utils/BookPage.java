@@ -21,7 +21,7 @@ import com.himoo.ydsc.util.JccUtil;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
 
-/** 
+/**
  * 这个类的目的是为在看书翻页时，需要进行的动作提供接口。
  * 包括翻向下一页，翻向上一页。在翻到每章最后一页时，如果后面还有章节就继续翻向下一章节，没有就向用户显示已读完。
  * 在翻向上一章节时，如果前面还有章节，就翻到上一章节，没有就向用户显示，这已经是第一章节。
@@ -85,6 +85,7 @@ public class BookPage {
 		this.bookType = bookType;
 		this.screenHeight = screenHeight;
 		this.screenWidth = screenWidth;
+		// IOHelper.setOnChapterListener(this);
 		this.chapter = chapter;
 		initSetting();
 		setTextTypeChildren(true);
@@ -92,6 +93,32 @@ public class BookPage {
 		init(context);
 		if (currentPage != -1 && pageCount != -1)
 			pageNum = (currentPage * (pagesVe.size())) / pageCount;
+	}
+
+	public void initChapter(Chapter chapter, int currentPage, int pageCount,
+			int bookType) {
+		this.bookType = bookType;
+		this.chapter = chapter;
+		initSetting();
+		setTextTypeChildren(true);
+		setTextLineSpace(true);
+		init(mContext);
+		if (currentPage != -1 && pageCount != -1)
+			pageNum = (currentPage * (pagesVe.size())) / pageCount;
+
+	}
+
+	/**
+	 * 联网加载章节
+	 * 
+	 * @param context
+	 * @param screenWidth
+	 * @param screenHeight
+	 */
+	public BookPage(Context context, int screenWidth, int screenHeight) {
+		mContext = context;
+		this.screenHeight = screenHeight;
+		this.screenWidth = screenWidth;
 	}
 
 	/**
@@ -142,14 +169,24 @@ public class BookPage {
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setTextAlign(Align.LEFT);
 		paint.setTextSize(fontSize);
-		paint.setColor(textColor);
+
 		if (typeface != null)
 			paint.setTypeface(typeface);
 
 		paintBottom = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paintBottom.setTextAlign(Align.LEFT);
 		paintBottom.setTextSize(fontSize / 2);
-		paintBottom.setColor(textColor);
+		if (SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_AUTO_COLOR, false)) {
+			int color = SharedPreferences.getInstance().getInt(
+					SpConstant.BOOK_AUTO_COLOR_TEXT, Color.BLACK);
+			paint.setColor(color);
+			paintBottom.setColor(color);
+		} else {
+			paint.setColor(textColor);
+			paintBottom.setColor(textColor);
+		}
+
 		if (typeface != null)
 			paintBottom.setTypeface(typeface);
 
@@ -275,7 +312,9 @@ public class BookPage {
 			return false;
 		String index = chapter.getIndex();
 		int position = chapter.getPosition() + 1;
-		Chapter tempChapter = IOHelper.getChapter(index, position, bookType);
+		int jumpType = chapter.getJumpType();
+		Chapter tempChapter = IOHelper.getChapter(jumpType, index, position,
+				bookType);
 
 		if (tempChapter == null)
 			return false;
@@ -295,6 +334,48 @@ public class BookPage {
 	}
 
 	/**
+	 * 跳到下一章，若返回值为false，则当前章节已经为最后一章
+	 */
+	public void currentChapter(Chapter mchapter) {
+		chapter = mchapter;
+		String index = chapter.getIndex();
+		int position = chapter.getPosition();
+		int jumpType = chapter.getJumpType();
+		Chapter tempChapter = IOHelper.getChapter(jumpType, index, position,
+				bookType);
+		chapter = tempChapter;
+		content = textType == 1 ? JccUtil.changeToSimplified(chapter
+				.getContent()) : JccUtil.changeToTraditional(chapter
+				.getContent());
+		if (typefaceIndex == 3)
+			content = content.replaceAll("        ", "    ");
+		chapterLen = content.length();
+		// curCharPos = 0;
+		charBegin = 0;
+		charEnd = 0;
+		slicePage();
+		pageNum = -1;
+	}
+
+	/**
+	 * 跳到下一章，若返回值为false，则当前章节已经为最后一章
+	 */
+	public void currentAsyncChapter(Chapter mchapter) {
+		chapter = mchapter;
+		content = textType == 1 ? JccUtil.changeToSimplified(chapter
+				.getContent()) : JccUtil.changeToTraditional(chapter
+				.getContent());
+		if (typefaceIndex == 3)
+			content = content.replaceAll("        ", "    ");
+		chapterLen = content.length();
+		// curCharPos = 0;
+		charBegin = 0;
+		charEnd = 0;
+		slicePage();
+		pageNum = -1;
+	}
+
+	/**
 	 * 跳到上一章,若返回值为false，则当前章节已经为第一章
 	 */
 	public boolean preChapter() {
@@ -302,8 +383,9 @@ public class BookPage {
 			return false;
 		String index = chapter.getIndex();
 		int position = chapter.getPosition();
-		Chapter tempChapter = IOHelper
-				.getChapter(index, position - 1, bookType);
+		int jumpType = chapter.getJumpType();
+		Chapter tempChapter = IOHelper.getChapter(jumpType, index,
+				position - 1, bookType);
 		if (tempChapter == null)
 			return false;
 		chapter = tempChapter;
@@ -334,14 +416,37 @@ public class BookPage {
 		return false;
 	}
 
+	public void draw(Canvas c) {
+
+		if (SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_AUTO_COLOR, false)) {
+			c.drawColor(SharedPreferences.getInstance().getInt(
+					SpConstant.BOOK_AUTO_COLOR_BG, Color.CYAN));
+		} else {
+			c.drawBitmap(bgBitmap, 0, 0, null);
+		}
+	}
+
+	/**
+	 * 绘制每页的你内容
+	 * 
+	 * @param context
+	 * @param c
+	 */
 	public void draw(Context context, Canvas c) {
 		if (linesVe.size() == 0)
 			nextPage();
 		if (linesVe.size() > 0) {
-			if (bgBitmap == null)
-				c.drawColor(bgColor);
-			else
+			if (SharedPreferences.getInstance().getBoolean(
+					SpConstant.BOOK_AUTO_COLOR, false)) {
+				c.drawColor(SharedPreferences.getInstance().getInt(
+						SpConstant.BOOK_AUTO_COLOR_BG, Color.CYAN));
+			} else {
+				// if (bgBitmap == null)
+				// c.drawColor(bgColor);
+				// else
 				c.drawBitmap(bgBitmap, 0, 0, null);
+			}
 
 			int y = marginHeight;
 			for (String line : linesVe) {
@@ -380,9 +485,9 @@ public class BookPage {
 	 * @param resId
 	 */
 	public void setBgBitmap(Context context, int resId) {
-		bgBitmap = Bitmap.createScaledBitmap(
-				BitmapFactory.decodeResource(context.getResources(), resId),
-				screenWidth, screenHeight, true);
+		bgBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(context
+				.getResources().openRawResource(resId)), screenWidth,
+				screenHeight, true);
 	}
 
 	/**
@@ -412,7 +517,7 @@ public class BookPage {
 				SpConstant.BOOK_SETTING_TEXT_LINE, 1);
 		fontSize = SharedPreferences.getInstance().getInt(
 				SpConstant.BOOK_SETTING_TEXT_SIZE,
-				DeviceUtil.dip2px(mContext, 20));
+				DeviceUtil.dip2px(mContext, 21));
 		switch (index) {
 		case 1:
 			lineHgight = fontSize + DeviceUtil.dip2px(mContext, 4);
@@ -488,7 +593,7 @@ public class BookPage {
 	}
 
 	public void initSeekBarChapter(int position) {
-		chapter = IOHelper.getChapter("1", position, bookType);
+		chapter = IOHelper.getChapter(2, "1", position, bookType);
 		if (currentSeekBarPos < position) {
 			nextChapter();
 		} else {
@@ -496,15 +601,6 @@ public class BookPage {
 		}
 		init(mContext);
 		currentSeekBarPos = position;
-	}
-
-	/**
-	 * 改变字体的颜色
-	 */
-	public void changeTextColor(int color) {
-		textColor = color;
-		paint.setColor(textColor);
-		paintBottom.setColor(textColor);
 	}
 
 	/**
@@ -522,4 +618,84 @@ public class BookPage {
 
 	}
 
+	/**
+	 * 设置颜色背景 Color
+	 * 
+	 * @param color
+	 */
+	public void setBgColor(int color) {
+		this.bgColor = color;
+		if (bgBitmap != null && !bgBitmap.isRecycled())
+			bgBitmap.recycle();
+		bgBitmap = null;
+	}
+
+	/**
+	 * 改变字体的颜色
+	 */
+	public void changeTextColor(int color) {
+		// if (!SharedPreferences.getInstance().getBoolean(
+		// SpConstant.BOOK_AUTO_COLOR, false)) {
+		textColor = color;
+		paint.setColor(textColor);
+		paintBottom.setColor(textColor);
+		// }
+	}
+
+	public void destory() {
+		if (bgBitmap != null) {
+			bgBitmap.recycle();
+			bgBitmap = null;
+		}
+
+		if (pagesVe != null) {
+			pagesVe.clear();
+			pagesVe = null;
+		}
+		if (linesVe != null) {
+			linesVe.clear();
+			linesVe = null;
+		}
+
+	}
+
+	/**
+	 * 设置当前页
+	 */
+	public void setCurrentPageNum() {
+		this.pageNum = pagesVe.size() - 1;
+	}
+
+	// @Override
+	// public void onGetChapterPre() {
+	// // TODO Auto-generated method stub
+	//
+	// }
+	//
+	// @Override
+	// public boolean onGetChapterSuccess(Chapter mChapter) {
+	// // TODO Auto-generated method stub
+	// Chapter tempChapter = mChapter;
+	// if (tempChapter == null)
+	// return false;
+	// chapter = tempChapter;
+	// content = textType == 1 ? JccUtil.changeToSimplified(chapter
+	// .getContent()) : JccUtil.changeToTraditional(chapter
+	// .getContent());
+	// if (typefaceIndex == 3)
+	// content = content.replaceAll("        ", "    ");
+	// chapterLen = content.length();
+	// // curCharPos = 0;
+	// charBegin = 0;
+	// charEnd = 0;
+	// slicePage();
+	// pageNum = -1;
+	// return true;
+	// }
+	//
+	// @Override
+	// public void onGetChapterFailure() {
+	// // TODO Auto-generated method stub
+	//
+	// }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:adsmogo="http://www.adsmogo.com"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -33,11 +34,26 @@
         android:id="@+id/search_keywordFlow"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="30dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
         android:layout_marginTop="5dp"
         android:layout_weight="1" >
     </com.himoo.ydsc.ui.view.KeywordsFlow>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/mogoAd_height"
+        android:layout_gravity="bottom"
+        android:orientation="vertical" >
+
+        <com.adsmogo.adview.AdsMogoLayout
+            android:id="@+id/adsMogoView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            adsmogo:appid="c31290cab9c649b79b9f2751b25e535a" >
+        </com.adsmogo.adview.AdsMogoLayout>
+    </LinearLayout>
 
 </LinearLayout>

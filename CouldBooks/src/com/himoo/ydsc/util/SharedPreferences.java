@@ -6,16 +6,16 @@ import android.content.Context;
 import android.content.SharedPreferences.Editor;
 
 /**
- * 封装类
- *SharedPreferences
- *
+ * 封装类 SharedPreferences
+ * 
  */
 public class SharedPreferences {
-	//保存的键值对文件的名字
+	// 保存的键值对文件的名字
 	private static final String SP_NAME = "ydsc";
-	//单例类
+	// 单例类
 	private static SharedPreferences mInstance = null;
-	//private权限不可外部类被创建
+
+	// private权限不可外部类被创建
 	private SharedPreferences() {
 	}
 
@@ -128,6 +128,30 @@ public class SharedPreferences {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void putFloat(String key, float val) {
+		try {
+			android.content.SharedPreferences sp = getSp();
+			if (sp != null) {
+				Editor e = sp.edit();
+				e.putFloat(key, val);
+				e.commit();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public float getFloat(String key, float def) {
+		try {
+			android.content.SharedPreferences sp = getSp();
+			if (sp != null)
+				def = sp.getFloat(key, def);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return def;
 	}
 
 	public void remove(String key) {

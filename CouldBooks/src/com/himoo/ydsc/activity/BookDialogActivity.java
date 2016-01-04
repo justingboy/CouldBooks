@@ -1,5 +1,7 @@
 package com.himoo.ydsc.activity;
 
+import java.io.File;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -41,6 +43,7 @@ import com.himoo.ydsc.share.UmengShare;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.FileUtils;
+import com.himoo.ydsc.util.SP;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.DbException;
@@ -214,10 +217,16 @@ public class BookDialogActivity extends FragmentActivity implements
 		setTextRateDrawable(this, book_score, rate);
 		String result = String.valueOf(rate).substring(0, 3);
 		book_score.setText("评分:" + result);
-		if (bookDetails.getBook_Summary().startsWith("　　")) {
-			book_summary.setText(bookDetails.getBook_Summary().trim());
-		} else
-			book_summary.setText("　　" + bookDetails.getBook_Summary().trim());
+		String summary = bookDetails.getBook_Summary();
+		if (summary != null) {
+			if (bookDetails.getBook_Summary().startsWith("　　")) {
+				book_summary.setText(bookDetails.getBook_Summary().trim());
+			} else
+				book_summary.setText("　　"
+						+ bookDetails.getBook_Summary().trim());
+		} else {
+			book_summary.setText("暂无简介:");
+		}
 	}
 
 	/**
@@ -227,14 +236,16 @@ public class BookDialogActivity extends FragmentActivity implements
 	 * @param bookSummary
 	 */
 	private void setSummaryHeight(View view, String bookSummary) {
-		int length = bookSummary.length();
-		int ViewHeight = 180;
-		if (length < 100) {
-			ViewHeight = 120;
-		} else if (bookDetails.getBook_Summary().length() < 180) {
-			ViewHeight = 150;
+		if (bookSummary != null && !bookSummary.isEmpty()) {
+			int length = bookSummary.length();
+			int ViewHeight = 180;
+			if (length < 100) {
+				ViewHeight = 120;
+			} else if (bookDetails.getBook_Summary().length() < 180) {
+				ViewHeight = 150;
+			}
+			view.getLayoutParams().height = DeviceUtil.dip2px(this, ViewHeight);
 		}
-		view.getLayoutParams().height = DeviceUtil.dip2px(this, ViewHeight);
 
 	}
 
@@ -317,11 +328,12 @@ public class BookDialogActivity extends FragmentActivity implements
 				mSampleView.setVisibility(View.VISIBLE);
 				mSampleView.startAnimation(true);
 			}
-
 			try {
 				downloadManager.addNewBookDownload(bookDetails,
 						bookDetails.getBook_Name() + ".zip", true, true, null);
-				doDownLoadWork(bookDetails.getBook_Download(), bookDetails.getBook_Name());
+				doDownLoadWork(bookDetails.getBook_Download(),
+						bookDetails.getBook_Name());
+				SP.getInstance().putBoolean(bookDetails.getBook_Name(), false);
 				bookDownlaodCountUpload(bookDetails.getBook_ID());
 			} catch (DbException e) {
 				// TODO Auto-generated catch block
@@ -456,13 +468,18 @@ public class BookDialogActivity extends FragmentActivity implements
 
 	/**
 	 * 下载书籍
+	 * 
 	 * @param downloadUrl
 	 * @param bookName
-	 */ 
-	private void doDownLoadWork(String downloadUrl,String bookName) {
-		
-		String filePath = fileUtils.getStorageDirectory()+ bookName + ".zip";
-		DownLoaderTask task = new DownLoaderTask(downloadUrl,bookName,
+	 */
+	private void doDownLoadWork(String downloadUrl, String bookName) {
+
+		File file = new File(fileUtils.getStorageDirectory());
+		if (file != null && !file.exists())
+			file.mkdirs();
+		String filePath = fileUtils.getStorageDirectory() + bookName + ".zip";
+
+		DownLoaderTask task = new DownLoaderTask(downloadUrl, bookName,
 				filePath, this);
 		task.execute();
 	}

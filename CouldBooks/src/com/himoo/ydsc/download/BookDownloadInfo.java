@@ -30,6 +30,10 @@ public class BookDownloadInfo extends EntityBase {
 	@Column(column = "bookIsRead")
 	private boolean bookIsRead;
 
+	/** 阅读时间（总长） */
+	@Column(column = "readerTime")
+	private long readerTime;
+
 	@Column(column = "bookLastChapter")
 	private String bookLastChapter;
 
@@ -260,6 +264,14 @@ public class BookDownloadInfo extends EntityBase {
 
 	public void setLastReaderProgress(String lastReaderProgress) {
 		this.lastReaderProgress = lastReaderProgress;
+	}
+
+	public long getReaderTime() {
+		return readerTime;
+	}
+
+	public void setReaderTime(long readerTime) {
+		this.readerTime = readerTime;
 	}
 
 	@Override

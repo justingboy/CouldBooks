@@ -207,6 +207,11 @@ public class NetWorkUtils {
 		return diviceNo;
 	}
 
+	/**
+	 * 判断网络是否连接
+	 * @param context
+	 * @return
+	 */
 	public static boolean isNetConnected(Context context) {
 		boolean flag = false;
 		if (!isNetworkConnected(context)) {
@@ -262,7 +267,7 @@ public class NetWorkUtils {
 	 * 显示tost信息
 	 * 
 	 * @param msg
-	 *            显示的信�?
+	 *            显示的信
 	 */
 	public static void showToast(Context context, String msg) {
 		Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();

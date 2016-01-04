@@ -114,11 +114,13 @@ public class BookTitleBar extends LinearLayout {
 
 	/**
 	 * 设置宽度和高度
+	 * 
 	 * @param width
 	 * @param height
 	 */
 	public void setRightWidthAndHeight(int width, int height) {
-		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) titlebar_refresh.getLayoutParams();
+		RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) titlebar_refresh
+				.getLayoutParams();
 		params.height = DeviceUtil.dip2px(mActivity, height);
 		params.width = DeviceUtil.dip2px(mActivity, width);
 		titlebar_refresh.setLayoutParams(params);
@@ -148,6 +150,14 @@ public class BookTitleBar extends LinearLayout {
 	public void setRightLogoGone() {
 		titlebar_refresh.setEnabled(false);
 		titlebar_refresh.setVisibility(View.GONE);
+	}
+
+	/**
+	 * 设置左边View为 GONE 状态
+	 */
+	public void setLeftLogoGone() {
+		leftTitle.setEnabled(false);
+		leftTitle.setVisibility(View.GONE);
 	}
 
 	/**

@@ -5,9 +5,7 @@ import java.util.Hashtable;
 import android.util.Log;
 
 /**
- * 日志打印工具类
- * MyLogger log = MyLogger.kLog(); 
- * log.d(str);
+ * 日志打印工具类 MyLogger log = MyLogger.kLog(); log.d(str);
  */
 public class MyLogger {
 	private final static boolean logFlag = true;
@@ -51,22 +49,10 @@ public class MyLogger {
 		return klog;
 	}
 
-//	/**
-//	 * Purpose:Mark user two
-//	 * 
-//	 * @return
-//	 */
-//	public static MyLogger jLog() {
-//		if (jlog == null) {
-//			jlog = new MyLogger(JAMES);
-//		}
-//		return jlog;
-//	}
-
 	/**
-	 * Get The Current Function Name
+	 * 获得具体的类名，方法名，哪一行打印的log
 	 * 
-	 * @return
+	 * @return String
 	 */
 	private String getFunctionName() {
 		StackTraceElement[] sts = Thread.currentThread().getStackTrace();
@@ -74,6 +60,7 @@ public class MyLogger {
 			return null;
 		}
 		for (StackTraceElement st : sts) {
+			// 如果是本地方法，跳过
 			if (st.isNativeMethod()) {
 				continue;
 			}
@@ -83,9 +70,14 @@ public class MyLogger {
 			if (st.getClassName().equals(this.getClass().getName())) {
 				continue;
 			}
-			return mClassName + "[ " + Thread.currentThread().getName() + ": "
-					+ st.getFileName() + ":" + st.getLineNumber() + " "
-					+ st.getMethodName() + " ]";
+			StringBuffer sb = new StringBuffer();
+			sb.append(mClassName).append("[ ")
+					.append(Thread.currentThread().getName()).append(": ")
+					.append(st.getFileName()).append(": ")
+					.append(st.getLineNumber()).append(": ")
+					.append(st.getMethodName()).append(" ]");
+
+			return sb.toString();
 		}
 		return null;
 	}

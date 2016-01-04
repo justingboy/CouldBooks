@@ -35,6 +35,9 @@ public class ThemeActivity extends SwipeBackActivity implements
 	@ViewInject(R.id.theme_switch_button)
 	private SwitchButton switchButton;
 
+	@ViewInject(R.id.theme_switch_button_load)
+	private SwitchButton switchButton_load;
+
 	/** 　皮肤 */
 	private int[] skinDrawable = { R.drawable.theme_shape_red,
 			R.drawable.theme_shape_blue, R.drawable.theme_shape_green,
@@ -42,14 +45,14 @@ public class ThemeActivity extends SwipeBackActivity implements
 	/** 　封面 */
 	private int[] coverDrawable = { R.drawable.book_face_default,
 			R.drawable.no_cover, R.drawable.default_sign_free_book_cover,
-			R.drawable.fm_big};
+			R.drawable.fm_big };
 	private String[] title = { "封面一", "封面二", "封面三", "封面四" };
 
 	/** 当前选择皮肤的颜色 */
 	private int mCurrentSkinColor = R.drawable.theme_shape_green;
 
 	/** 当前选择皮的小说默认封面 */
-	private String mCurrentTitle = title[0];
+	private String mCurrentTitle = title[1];
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,11 +63,12 @@ public class ThemeActivity extends SwipeBackActivity implements
 		mCurrentSkinColor = SharedPreferences.getInstance().getInt(
 				SpConstant.BOOK_SKIN_TYPE, R.drawable.theme_shape_green);
 		mCurrentTitle = SharedPreferences.getInstance().getString(
-				SpConstant.BOOK_COVER_TYPE, title[0]);
+				SpConstant.BOOK_COVER_TYPE, title[1]);
 
 		initSkinGridView();
 		initCoverGridView();
 		switchButton.setOnCheckedChangeListener(this);
+		switchButton_load.setOnCheckedChangeListener(this);
 
 	}
 
@@ -77,9 +81,16 @@ public class ThemeActivity extends SwipeBackActivity implements
 		switchButton.setConfiguration(
 				Configuration.getDefault(DeviceUtil.getDisplayDensity(this)),
 				BookTheme.THEME_COLOR);
+		switchButton_load.setConfiguration(
+				Configuration.getDefault(DeviceUtil.getDisplayDensity(this)),
+				BookTheme.THEME_COLOR);
 		boolean isAutoNightMode = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
 		switchButton.setChecked(isAutoNightMode);
+
+		boolean isAutoLoading = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_AUTO_LOAD, false);
+		switchButton_load.setChecked(isAutoLoading);
 
 	}
 
@@ -173,12 +184,25 @@ public class ThemeActivity extends SwipeBackActivity implements
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		// TODO Auto-generated method stub
-		SharedPreferences.getInstance().putBoolean(
-				SpConstant.BOOK_SETTING_AUTO_NIGHT, isChecked);
-		SharedPreferences.getInstance().putBoolean(
-				SpConstant.BOOK_SETTING_AUTO_NIGHT_MODE_YES, isChecked);
-		SharedPreferences.getInstance().putBoolean(
-				SpConstant.BOOK_SETTING_NITGHT_HAND , isChecked);
+		switch (buttonView.getId()) {
+		case R.id.theme_switch_button:
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_SETTING_AUTO_NIGHT, isChecked);
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_SETTING_AUTO_NIGHT_MODE_YES, isChecked);
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_SETTING_NITGHT_HAND, isChecked);
+
+			break;
+		case R.id.theme_switch_button_load:
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_SETTING_AUTO_LOAD, isChecked);
+
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	/**
@@ -188,6 +212,9 @@ public class ThemeActivity extends SwipeBackActivity implements
 		tintManager.setStatusBarTintColor(BookTheme.THEME_COLOR);
 		mTitleBar.setBackgroundColor(BookTheme.THEME_COLOR);
 		switchButton.setConfiguration(
+				Configuration.getDefault(DeviceUtil.getDisplayDensity(this)),
+				BookTheme.THEME_COLOR);
+		switchButton_load.setConfiguration(
 				Configuration.getDefault(DeviceUtil.getDisplayDensity(this)),
 				BookTheme.THEME_COLOR);
 

@@ -26,6 +26,10 @@ public class BaiduInfo extends EntityBase {
 	@Column(column = "bookIsRead")
 	private boolean bookIsRead;
 
+	/** 阅读时间（总长） */
+	@Column(column = "readerTime")
+	private long readerTime;
+
 	@Column(column = "bookLastChapter")
 	private String bookLastChapter;
 
@@ -54,6 +58,7 @@ public class BaiduInfo extends EntityBase {
 	@Column(column = "fileLength")
 	private long fileLength;
 
+	/**　暂时用此字段表示，下载的状态,true表示下载完成,或者表示下载一半时断网，false 表示正在下载 */
 	@Column(column = "autoResume")
 	private boolean autoResume;
 
@@ -242,6 +247,14 @@ public class BaiduInfo extends EntityBase {
 
 	public void setLastReaderProgress(String lastReaderProgress) {
 		this.lastReaderProgress = lastReaderProgress;
+	}
+
+	public long getReaderTime() {
+		return readerTime;
+	}
+
+	public void setReaderTime(long readerTime) {
+		this.readerTime = readerTime;
 	}
 
 }

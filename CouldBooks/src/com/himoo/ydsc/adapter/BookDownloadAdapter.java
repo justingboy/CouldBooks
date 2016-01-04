@@ -5,10 +5,10 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 
 import com.himoo.ydsc.R;
-import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.base.quickadapter.BaseAdapterHelper;
 import com.himoo.ydsc.base.quickadapter.QuickAdapter;
 import com.himoo.ydsc.config.BookTheme;
@@ -36,13 +36,22 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 	public boolean isChoice = false;
 	public static Context mContext;
 
+
 	public BookDownloadAdapter(Context context, int layoutResId,
 			List<BookDownloadInfo> data) {
 		super(context, layoutResId, data);
 		// TODO Auto-generated constructor stub
-		option = BaseApplication.getInstance().displayImageOptionsBuider(
-				BookTheme.BOOK_COVER);
+		option = displayImageOptionsBuider(BookTheme.BOOK_COVER);
 		mContext = context;
+	}
+
+	public DisplayImageOptions displayImageOptionsBuider(int resId) {
+		DisplayImageOptions options = new DisplayImageOptions.Builder()
+				.showImageOnLoading(resId).showImageForEmptyUri(resId)
+				.showImageOnFail(resId).cacheInMemory(true).cacheOnDisk(true)
+				.considerExifParams(true).bitmapConfig(Bitmap.Config.ARGB_8888)
+				.build();
+		return options;
 	}
 
 	@Override
@@ -52,6 +61,7 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 				SpConstant.BOOK_SHELF_DIRECTION, true);
 		String imageUrl = RegularUtil.converUrl(item.getBookCoverImageUrl());
 		helper.setImageUrl(R.id.shelf_book_image, imageUrl, option);
+		// helper.setOnOpenBookListener(R.id.bookView, mListener);
 		helper.setVisible(R.id.book_new_label, item.getBookIsRead() ? false
 				: true);
 		if (isHorizontal) {
@@ -75,11 +85,13 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 				helper.setImageResource(R.id.book_shelf_delected_box,
 						R.drawable.help_uncheck);
 			helper.setInVisible(R.id.book_shelf_delected_box, isSelectedState);
+			helper.setVisible(R.id.shelf_delected_box, false);
 			helper.setVisible(R.id.book_shelf_middle_layout, true);
 			helper.setVisible(R.id.book_shelf_right_layout, true);
 			helper.setVisible(R.id.shelf_book_name, false);
 			helper.setText(R.id.shelf_book_name_Vertical, item.getBookName());
-			helper.setTextColor(R.id.shelf_book_name_Vertical, BookTheme.THEME_COLOR);
+			helper.setTextColor(R.id.shelf_book_name_Vertical,
+					BookTheme.THEME_COLOR);
 			helper.setText(R.id.shelf_book_Author, item.getBookAuthor());
 			helper.setText(
 					R.id.shelf_book_update_time,
@@ -97,27 +109,6 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 					item.getLastReaderProgress());
 
 		}
-
-		// int progress = 0;
-		// if (item.getFileLength() > 0) {
-		// progress = (int) (item.getProgress() * 100 / item.getFileLength());
-		// }
-		// helper.setProgress(R.id.book_download_pb, progress);
-		// HttpHandler<File> handler = item.getHandler();
-		// if (handler != null) {
-		// Log.d("handler");
-		// @SuppressWarnings("rawtypes")
-		// RequestCallBack callBack = handler.getRequestCallBack();
-		// if (callBack instanceof BookDownloadManager.ManagerCallBack) {
-		// BookDownloadManager.ManagerCallBack managerCallBack =
-		// (BookDownloadManager.ManagerCallBack) callBack;
-		// if (managerCallBack.getBaseCallBack() == null) {
-		// managerCallBack
-		// .setBaseCallBack(new DownloadRequestCallBack(item));
-		// }
-		// }
-		// callBack.setUserTag(new WeakReference<BaseAdapterHelper>(helper));
-		// }
 
 	}
 
@@ -169,7 +160,7 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 					+ item.getBookName() + ".zip";
 			String outPath = fileUtils.getStorageDirectory()
 					+ item.getBookName();
-			doZipExtractorWork(inPath, outPath);
+			doZipExtractorWork(item.getBookName(), inPath, outPath);
 			Toast.showLong(mContext, "《" + item.getBookName() + "》下载完成");
 		}
 
@@ -182,7 +173,7 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 					+ item.getBookName() + ".zip";
 			String outPath = fileUtils.getStorageDirectory()
 					+ item.getBookName();
-			doZipExtractorWork(inPath, outPath);
+			doZipExtractorWork(item.getBookName(), inPath, outPath);
 		}
 
 		@Override
@@ -197,9 +188,10 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 	 * @param inPath
 	 * @param outPath
 	 */
-	public static void doZipExtractorWork(String inPath, String outPath) {
-		ZipExtractorTask task = new ZipExtractorTask(inPath, outPath, mContext,
-				true);
+	public static void doZipExtractorWork(String bookName, String inPath,
+			String outPath) {
+		ZipExtractorTask task = new ZipExtractorTask(bookName, inPath, outPath,
+				mContext, true);
 		task.execute();
 	}
 

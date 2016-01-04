@@ -1,5 +1,6 @@
 package com.himoo.ydsc.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,13 +10,15 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.adsmogo.offers.MogoOffer;
+import com.adsmogo.offers.MogoOfferListCallback;
+import com.adsmogo.offers.MogoOfferPointCallBack;
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.activity.more.FeedBackActivity;
 import com.himoo.ydsc.activity.more.PasswordLockActivity;
 import com.himoo.ydsc.activity.more.ReadstatisticsActivity;
 import com.himoo.ydsc.activity.more.ThemeActivity;
 import com.himoo.ydsc.activity.more.UpdateSettingActivity;
-import com.himoo.ydsc.activity.more.WallActivity;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
@@ -28,8 +31,10 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 import com.umeng.onlineconfig.OnlineConfigAgent;
 
 public class MoreFragment extends BaseFragment implements
-		RadioGroup.OnCheckedChangeListener {
-
+		RadioGroup.OnCheckedChangeListener,MogoOfferPointCallBack, MogoOfferListCallback {
+	/** 芒果ID */
+	public static String mogoID = "c31290cab9c649b79b9f2751b25e535a";
+	
 	/** 主题皮肤设置 */
 	@ViewInject(R.id.more_topic)
 	private TextView more_topic;
@@ -85,6 +90,18 @@ public class MoreFragment extends BaseFragment implements
 	private BookTitleBar titleBar;
 
 	@Override
+	public void onAttach(Context context) {
+		// TODO Auto-generated method stub
+		super.onAttach(context);
+		MogoOffer.init(context, mogoID);
+		MogoOffer.addPointCallBack(this);
+		MogoOffer.setOfferListTitle("获取积分");
+		MogoOffer.setOfferEntranceMsg("商城");
+		MogoOffer.setMogoOfferScoreVisible(false);
+		MogoOffer.setMogoOfferListCallback(this);
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			SharedPreferences sp, Bundle savedInstanceState,
 			PageManager pageManager) {
@@ -130,7 +147,8 @@ public class MoreFragment extends BaseFragment implements
 			startToActivity(UpdateSettingActivity.class);
 			break;
 		case R.id.more_unlock:
-			startToActivity(WallActivity.class);
+			MogoOffer.showOffer(getActivity());
+//			startToActivity(WallActivity.class);
 			break;
 		case R.id.more_statistics:
 			startToActivity(ReadstatisticsActivity.class);
@@ -205,6 +223,25 @@ public class MoreFragment extends BaseFragment implements
 
 		}
 
+	}
+
+	@Override
+	public void showOfferListDialog(Context arg0, String arg1, String[] arg2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updatePoint(long arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		MogoOffer.clear(getActivity());
+		super.onDestroy();
 	}
 
 }

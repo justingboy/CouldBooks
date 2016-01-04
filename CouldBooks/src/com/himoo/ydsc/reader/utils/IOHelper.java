@@ -8,15 +8,19 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.himoo.ydsc.aescrypt.AESCrypt;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.reader.bean.BookOperation;
 import com.himoo.ydsc.reader.bean.Chapter;
 import com.himoo.ydsc.util.FileUtils;
+import com.himoo.ydsc.util.SharedPreferences;
+import com.umeng.socialize.utils.Log;
 
 /**
  * 设计此类的目的是便于统一管理，从资源文件中读取数据。 app中的所有数据来源都可以通过这个类来提供，这样在将来重用代码的时候，也方便修改。
@@ -31,6 +35,7 @@ public class IOHelper {
 	private static String[] chapterPaths;
 	private static Resources res;
 	private static Context mContext;
+	private static OnGetChapterListener mListener;
 
 	/**
 	 * 初始化Book类的唯一对象。 这个函数一般只会调用一次。
@@ -98,6 +103,8 @@ public class IOHelper {
 	/**
 	 * 得到章节内容。
 	 * 
+	 * @param jumpType
+	 *            跳转的类型，1表示从百度详情界面跳转过来，2表示从书架界面跳转过来
 	 * @param index
 	 * @param position
 	 *            要读取的章节的顺序。
@@ -105,10 +112,14 @@ public class IOHelper {
 	 *            1表示自己服务器上的书,2表示百度的书
 	 * @return
 	 */
-	public static Chapter getChapter(String index, int position, int bookType) {
+	public static Chapter getChapter(int jumpType, String index, int position,
+			int bookType) {
+		if(book.getChapterList()==null)
+			return null;
 		int length = book.getChapterList().size();
 		if (position - length == 0 || position == -1)
 			return null;
+		position = position >= length ? length - 1 : position;
 		Chapter chapter = new Chapter();
 		chapter.setPosition(position);
 		chapter.setIndex(book.getChapterList().get(position).getIndex());
@@ -119,17 +130,58 @@ public class IOHelper {
 		if (bookType == 2) {
 			String chapterUrl = ChapterParseUtil.getChapterUrl(bookChapter);
 			chapter.setChapterUrl(chapterUrl);
+			if (jumpType == 1) {
+				chapter.setJumpType(1);
+				new GetChapterAsyncTask(mContext, chapterUrl, index, chapter)
+						.execute();
 
-			File dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-					+ File.separator + book.getBookname() + File.separator);
+			} else {
+				chapter.setJumpType(2);
+				File dirFile = new File(FileUtils.mSdRootPath
+						+ "/CouldBook/baidu" + File.separator
+						+ book.getBookname() + File.separator);
 
-			File file = new File(dirFile, chapterName.replaceAll("/", "|")
-					+ "-|" + book.getChapterList().get(position).getIndex()
-					+ "-|" + position + ".txt");
-			if (file.exists()) {
-				final String content = com.himoo.ydsc.download.FileUtils
-						.readFormSd(file);
-				if (content == null || TextUtils.isEmpty(content)) {
+				File file = new File(dirFile, chapterName.replaceAll("/", "|")
+						+ "-|" + book.getChapterList().get(position).getIndex()
+						+ "-|" + position + ".txt");
+				if (file.exists()) {
+					final String content = com.himoo.ydsc.download.FileUtils
+							.readFormSd(file);
+					if (content == null || TextUtils.isEmpty(content)) {
+						InputStream is;
+						try {
+							is = mContext.getAssets().open("error.txt");
+							int size = is.available();
+							byte[] buffer = new byte[size];
+							is.read(buffer);
+							is.close();
+							String chapterContent = new String(buffer, "gbk");
+							chapter.setContent(chapterContent);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							return null;
+						}
+					} else {
+						chapter.setContent(content);
+					}
+				} else {
+					if (SharedPreferences.getInstance().getBoolean(
+							SpConstant.BOOK_SETTING_AUTO_LOAD, false)) {
+						chapter.setContent(getChapterContent(index, chapterUrl));
+						return chapter;
+					}
+				}
+			}
+			return chapter;
+		} else if (bookType == 1) {
+			File dirFile = new File(FileUtils.mSdRootPath
+					+ "/CouldBook/download" + File.separator
+					+ book.getBookname() + File.separator
+					+ bookChapter.getIndex() + ".txt");
+			if (dirFile != null && dirFile.exists()) {
+				String bookContent = AESCrypt.readBookFile(dirFile
+						.getAbsolutePath());
+				if (bookContent == null || TextUtils.isEmpty(bookContent)) {
 					InputStream is;
 					try {
 						is = mContext.getAssets().open("error.txt");
@@ -141,47 +193,13 @@ public class IOHelper {
 						chapter.setContent(chapterContent);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
-						return null;
+						Log.e("加载error.txt文件出错: " + e.getMessage());
 					}
 				} else {
-					chapter.setContent(content);
+					chapter.setContent(bookContent.replaceAll("　　    ",
+							"        "));
 				}
 
-			} else {
-				String chapterContent = BookDetailsTask.getInstance()
-						.getChapterFormService(mContext, chapterUrl);
-				if (chapterContent != null && !chapterContent.equals(""))
-					chapter.setContent(chapterContent);
-				else {
-					if (Integer.valueOf(index) > 0) {
-						InputStream is;
-						try {
-							is = mContext.getAssets().open("error.txt");
-							int size = is.available();
-							byte[] buffer = new byte[size];
-							is.read(buffer);
-							is.close();
-							String content = new String(buffer, "gbk");
-							chapter.setContent(content);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							return null;
-						}
-					} else
-						return null;
-				}
-
-			}
-			return chapter;
-		} else if (bookType == 1) {
-			File dirFile = new File(FileUtils.mSdRootPath
-					+ "/CouldBook/download" + File.separator
-					+ book.getBookname() + File.separator
-					+ bookChapter.getIndex() + ".txt");
-			if (dirFile != null && dirFile.exists()) {
-				String bookContent = AESCrypt.readBookFile(dirFile
-						.getAbsolutePath());
-				chapter.setContent(bookContent.replaceAll("　　    ", "        "));
 			}
 			return chapter;
 
@@ -215,6 +233,95 @@ public class IOHelper {
 	 */
 	public static BaiduBook getBaiduBook() {
 		return book.getBaiduBook();
+	}
+
+	/**
+	 * 开启线程获取小说章节, 防止在网络的不好的情况下出现应用程序无响应的现象
+	 * 
+	 */
+	public static class GetChapterAsyncTask extends
+			AsyncTask<Void, Void, String> {
+
+		public Context mContext;
+		public String mChapterUrl;
+		public String mIndex;
+		public Chapter mChapter;
+
+		public GetChapterAsyncTask(Context context, String chapterUrl,
+				String index, Chapter chapter) {
+			this.mContext = context;
+			this.mChapterUrl = chapterUrl;
+			this.mIndex = index;
+			this.mChapter = chapter;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			// TODO Auto-generated method stub
+			super.onPreExecute();
+			if (mListener != null)
+				mListener.onGetChapterPre();
+
+		}
+
+		@Override
+		protected String doInBackground(Void... params) {
+			// TODO Auto-generated method stub
+
+			return getChapterContent(mIndex, mChapterUrl);
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			// TODO Auto-generated method stub
+			super.onPostExecute(result);
+			mChapter.setContent(result);
+			if (mListener != null)
+				mListener.onGetChapterSuccess(mChapter);
+		}
+	}
+
+	/**
+	 * 联网获取章节内容
+	 * 
+	 * @param index
+	 * @param chapterUrl
+	 * @return
+	 */
+	private static String getChapterContent(String index, String chapterUrl) {
+		String chapterContent = BookDetailsTask.getInstance()
+				.getChapterFormService(mContext, chapterUrl);
+		if (chapterContent != null && !chapterContent.equals(""))
+			return chapterContent;
+		else {
+			if (Integer.valueOf(index) > 0) {
+				try {
+					InputStream is = mContext.getAssets().open("error.txt");
+					int size = is.available();
+					byte[] buffer = new byte[size];
+					is.read(buffer);
+					is.close();
+					String content = new String(buffer, "gbk");
+					return content;
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					return null;
+				}
+			} else
+				return null;
+		}
+	}
+
+	public interface OnGetChapterListener {
+		public void onGetChapterPre();
+
+		public boolean onGetChapterSuccess(Chapter chapter);
+
+		public void onGetChapterFailure();
+	}
+
+	public static void setOnChapterListener(OnGetChapterListener listener) {
+		mListener = listener;
 	}
 
 }

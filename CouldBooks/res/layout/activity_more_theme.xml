@@ -88,14 +88,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:horizontalSpacing="15dp"
-                android:verticalSpacing="15dp"
                 android:numColumns="3"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:paddingTop="10dp" >
+                android:paddingTop="10dp"
+                android:verticalSpacing="15dp" >
             </com.himoo.ydsc.ui.view.ExpandGridView>
 
-            <View style="@style/line_style" />
+            <View
+                style="@style/line_style"
+                android:layout_marginLeft="10dp" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp" >
+
+                <TextView
+                    android:id="@+id/theme_text_topic_load"
+                    style="@style/theme_text_style"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/theme_auto_loading" />
+
+                <com.ios.switchbutton.SwitchButton
+                    android:id="@+id/theme_switch_button_load"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="40dp"
+                    app:offColor="#C4C3C0"
+                    app:onColor="@color/status_bar_bg" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/theme_text_topic_load"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="40dp"
+                    android:layout_marginTop="5dp"                    android:text="@string/theme_touch_loading"
+                    android:textSize="14sp" />
+            </RelativeLayout>
         </LinearLayout>
     </ScrollView>
 

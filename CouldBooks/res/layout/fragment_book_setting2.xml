@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="5dp" >
 
@@ -120,7 +120,7 @@
             android:id="@+id/booksetting_iv_bg5"
             style="@style/book_setting_image_style"
             android:contentDescription="@string/app_name"
-            android:src="@drawable/rukou_xuanzhong" />
+            android:src="@drawable/rukou_moren" />
     </LinearLayout>
 
     <View

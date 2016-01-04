@@ -1,0 +1,51 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="272dp"
+    android:layout_height="wrap_content"
+    android:padding="10dp" >
+
+    <TextView
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:id="@+id/progress_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="5dp"
+        android:drawableLeft="@drawable/buttombar_download"
+        android:drawablePadding="8dp"
+        android:textColor="#ffffff"
+        android:textSize="20sp" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_below="@id/progress_message"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
+        android:progressDrawable="@drawable/shelf_progress_style" />
+
+    <TextView
+        android:id="@+id/progress_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progress"
+        android:layout_marginBottom="15dp"
+        android:layout_marginTop="5dp"
+        android:textColor="#ffffff"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/progress_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/progress_percent"
+        android:layout_below="@+id/progress"
+        android:layout_marginBottom="15dp"
+        android:textColor="#ffffff"
+        android:textSize="16sp" />
+
+</RelativeLayout>

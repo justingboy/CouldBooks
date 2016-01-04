@@ -287,7 +287,7 @@ public class HomeActivity extends BaseActivity {
 		setRadioButtonTextColorSelector();
 
 	}
-
+/*
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -297,6 +297,6 @@ public class HomeActivity extends BaseActivity {
 			// TODO: handle exception
 			Log.e(e);
 		}
-	}
+	}*/
 
 }

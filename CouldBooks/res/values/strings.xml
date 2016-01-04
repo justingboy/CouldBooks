@@ -37,8 +37,10 @@
     <!-- 主题界面文字配置 -->
     <string name="theme_color_choice">主题颜色选择</string>
     <string name="theme_auto_night">自动夜晚模式</string>
+    <string name="theme_auto_loading">联动缓存章节</string>
     <string name="theme_default_cover">默认封面</string>
     <string name="theme_touch_time">触发时间段19:00 - 7:00</string>
+    <string name="theme_touch_loading">在线看书，网络环境良好的时，开启则不显示加载提示框，滑动流畅。网络不好时可以关闭，显示加载提示框，防止应用程序无响应出现！</string>
 
     <!-- 主题界面文字配置 -->
     <string name="baidu_book_download">下载</string>
@@ -64,14 +66,13 @@
     <string name="feedback_theme_other">其他</string>
 
     <!-- 阅读统计界面文字配置 -->
-    <string name="read_staticis_text">清除阅读统计记录</string>
+    <string name="read_staticis_text">清除阅读时间统计记录</string>
 
     <!-- 密码保护计界面文字配置 -->
     <string name="password_open_text">开启密码</string>
     <string name="password_close_text">修改密码</string>
     <string name="password_protected_instruction">设置密码,充分保护隐私,但是如何您忘记密码,
                只通过系统设置里清除缓存来实现解锁，届时您的所有下载的书籍及阅读书签、设置将被删除。</string>
-               
     <string name="password_input_text">输入你的密码</string>
     <string name="network_error_text">网络不佳,请检查网络后,下拉刷新试试</string>
 

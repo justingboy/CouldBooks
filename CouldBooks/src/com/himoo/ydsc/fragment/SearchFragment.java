@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.adsmogo.adview.AdsMogoLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.himoo.ydsc.R;
@@ -76,7 +77,7 @@ public class SearchFragment extends BaseFragment implements
 	private KeywordsFlow keywordsFlow;
 
 	/** 　默认的关键字 */
-	public static String[] keywords = { "花千骨", "盗墓笔记", "华胥引", "重生", "大主宰",
+	public static String[] keywords = { "花千骨", "盗墓笔记", "华胥引", "芈月传", "大主宰",
 			"校花的贴身高手", "唐七公子", "凡人修仙传", "魔天记", "换一换" };
 
 	/** 请求关键字的的页数 */
@@ -114,8 +115,10 @@ public class SearchFragment extends BaseFragment implements
 
 	/** 是否有保存key的操作 */
 	private boolean isSaveKey = false;
-	
+
 	private BookTitleBar titleBar;
+
+	private AdsMogoLayout adsMogoLayout;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -124,15 +127,13 @@ public class SearchFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		View view = inflater
 				.inflate(R.layout.fragment_search, container, false);
-		titleBar = (BookTitleBar) view
-				.findViewById(R.id.book_titleBar);
+		titleBar = (BookTitleBar) view.findViewById(R.id.book_titleBar);
+		adsMogoLayout = (AdsMogoLayout) view.findViewById(R.id.adsMogoView);
 		titleBar.setShowSingleTile();
 		titleBar.setBackgroundColor(BookTheme.THEME_COLOR);
 		titleBar.setTitle(getResources().getString(R.string.main_search));
-
 		popupView = View.inflate(getActivity(), R.layout.popup_book_records,
 				null);
-
 		return view;
 	}
 
@@ -314,10 +315,15 @@ public class SearchFragment extends BaseFragment implements
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
-		super.onDestroy();
+
 		if (popupWindow != null && popupWindow.isShowing()) {
 			popupWindow.dismiss();
 		}
+		AdsMogoLayout.clear();
+		if (adsMogoLayout != null) {
+			adsMogoLayout.clearThread();
+		}
+		super.onDestroy();
 	}
 
 	/**
@@ -373,7 +379,6 @@ public class SearchFragment extends BaseFragment implements
 		}
 
 	};
-
 
 	/**
 	 * 参数设置
@@ -455,19 +460,19 @@ public class SearchFragment extends BaseFragment implements
 		getActivity().overridePendingTransition(R.anim.activity_zoom_in, 0);
 
 	}
-	
+
 	@Override
 	public void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		if (BookTheme.isThemeChange)
-		{
+		if (BookTheme.isThemeChange) {
 			titleBar.setBackgroundColor(BookTheme.THEME_COLOR);
 			bookSearch.setTextColor(BookTheme.THEME_COLOR);
 			initKeyWordFlow();
 		}
-		
-		
-		
+		if (popupWindow != null)
+			popupWindow.currentPosition = -1;
+
 	}
+
 }

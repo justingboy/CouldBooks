@@ -304,6 +304,7 @@ public class BookDetailsTask {
 						HttpURLConnection conn = (HttpURLConnection) url
 								.openConnection();
 						conn.setConnectTimeout(5000);
+						conn.setReadTimeout(5000);
 						conn.setRequestMethod("GET");
 						conn.setRequestProperty("Content-Type",
 								"application/x-www-form-urlencoded");
@@ -341,6 +342,7 @@ public class BookDetailsTask {
 			URL url = new URL(urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setConnectTimeout(5000);
+			conn.setReadTimeout(5000);
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Content-Type",
 					"application/x-www-form-urlencoded");

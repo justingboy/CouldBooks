@@ -13,6 +13,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
@@ -103,6 +104,17 @@ public class ViewSelector {
 	}
 
 	/**
+	 * 设置颜色背景图片
+	 * 
+	 * @param color
+	 * @return
+	 */
+	public static Drawable getColorDrawable(int color) {
+
+		return getColorDrawable(0, color);
+	}
+
+	/**
 	 * 设置圆角颜色背景图片
 	 * 
 	 * @param color
@@ -151,19 +163,57 @@ public class ViewSelector {
 		button.setBackgroundDrawable(new ButtonSelector(context)
 				.setbg(mButtonStateRed_down));
 	}
+
 	/**
 	 * 设置Button点击selector，描边
 	 * 
 	 * @param button
 	 */
 	@SuppressWarnings("deprecation")
-	public static void setButtonStrokeSelector(Context context, TextView button,int color) {
+	public static void setButtonStrokeSelector(Context context,
+			TextView button, int color) {
 		Drawable[] mButtonStateRed_down = {
 				getStrokColorDrawable(context, 5, color),
 				getStrokColorDrawable(context, 5, color),
 				getStrokColorDrawable(context, 5, color) };
 		button.setBackgroundDrawable(new ButtonSelector(context)
-		.setbg(mButtonStateRed_down));
+				.setbg(mButtonStateRed_down));
+	}
+
+//	/**
+//	 * 设置Button点击selector，描边
+//	 * 
+//	 * @param button
+//	 */
+//	@SuppressWarnings("deprecation")
+//	public static void setTextViewSelector(Context context, TextView text,
+//			int color) {
+//		Drawable[] mButtonStateRed_down = {
+//				getStrokColorDrawable(context, 0, color),
+//				getStrokColorDrawable(context, 0, color),
+//				getStrokColorDrawable(context, 0, color) };
+//		text.setBackgroundDrawable(new ButtonSelector(context)
+//				.setbg(mButtonStateRed_down));
+//	}
+
+	public static void setImageSelector(Context context, ImageView img,
+			int pressColor,int color) {
+		Drawable[] mButtonStateRed_down = {
+				getColorDrawable(pressColor),
+				getColorDrawable(color)};
+		img.setBackgroundDrawable(new ButtonSelector(context)
+				.setTextViewbg(mButtonStateRed_down));
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void setTextViewSelected(Context context, TextView textView,
+			int pressClolor,int color) {
+		Drawable[] mButtonStateRed_down = {
+				getColorDrawable(pressClolor),
+				getColorDrawable(color) };
+		textView.setBackgroundDrawable(new ButtonSelector(context)
+				.setTextViewbg(mButtonStateRed_down));
+
 	}
 
 	/**

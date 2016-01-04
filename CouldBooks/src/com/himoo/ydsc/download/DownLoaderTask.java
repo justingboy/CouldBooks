@@ -19,13 +19,14 @@ import android.content.DialogInterface.OnCancelListener;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.himoo.ydsc.dialog.BookDownloadDialog;
 import com.himoo.ydsc.reader.utils.ZipExtractorTask;
 
 public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 	private final String TAG = "DownLoaderTask";
 	private URL mUrl;
 	private File mFile;
-	private ProgressDialog mDialog;
+	private BookDownloadDialog mDialog;
 	private int mProgress = 0;
 	private ProgressReportingOutputStream mOutputStream;
 	private Activity mContext;
@@ -37,7 +38,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 		this.mContext = context;
 		this.bookName = bookName;
 		if (context != null) {
-			mDialog = new ProgressDialog(context);
+			mDialog = new BookDownloadDialog(context);
 		} else {
 			mDialog = null;
 		}
@@ -57,7 +58,6 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 		// TODO Auto-generated method stub
 		// super.onPreExecute();
 		if (mDialog != null) {
-			mDialog.setTitle("正在下载");
 			mDialog.setMessage(mFile.getName());
 			mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 			mDialog.setOnCancelListener(new OnCancelListener() {
@@ -65,7 +65,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 				@Override
 				public void onCancel(DialogInterface dialog) {
 					// TODO Auto-generated method stub
-					cancel(true);
+					cancel(false);
 				}
 			});
 			mDialog.show();
@@ -90,7 +90,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 				mDialog.setIndeterminate(true);
 			} else {
 				mDialog.setMax(contentLength);
-				
+
 			}
 		} else {
 			mDialog.setProgress(values[0].intValue());
@@ -107,7 +107,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 		if (isCancelled())
 			return;
 		doZipExtractorWork(mContext, mFile.getAbsolutePath(), mFile.getParent()
-				+ "/"+bookName);
+				+ "/" + bookName);
 	}
 
 	private long download() {
@@ -193,8 +193,8 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 	 */
 	public void doZipExtractorWork(Activity activity, String inPath,
 			String outPath) {
-		ZipExtractorTask task = new ZipExtractorTask(inPath, outPath, activity,
-				true);
+		ZipExtractorTask task = new ZipExtractorTask(bookName, inPath, outPath,
+				activity, true);
 		task.execute();
 	}
 

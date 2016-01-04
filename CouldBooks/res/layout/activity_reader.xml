@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:adsmogo="http://www.adsmogo.com"
     android:id="@+id/layout_more_rel"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
@@ -51,6 +52,22 @@
             style="@style/book_setting_image_title_style"
             android:contentDescription="@string/app_name"
             android:src="@drawable/iphone_b_bookmark" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_mogo"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/mogoAd_height"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical" >
+
+        <com.adsmogo.adview.AdsMogoLayout
+            android:id="@+id/adsMogoView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            adsmogo:appid="c31290cab9c649b79b9f2751b25e535a" >
+        </com.adsmogo.adview.AdsMogoLayout>
     </LinearLayout>
 
     <LinearLayout

@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -13,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -28,6 +30,7 @@ import com.himoo.ydsc.reader.utils.SystemBrightManager;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.SharedPreferences;
+import com.ios.dialog.AlertDialog;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
@@ -36,7 +39,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * 
  */
 public final class BookSettingFragment2 extends Fragment implements
-		OnClickListener {
+		OnClickListener, OnLongClickListener {
 
 	private static final String ACTION = "com.himoo.ydsc.booksettingfragment1.receiver";
 	private boolean isFollowSystem = false;
@@ -90,9 +93,11 @@ public final class BookSettingFragment2 extends Fragment implements
 
 	private ChangeNightReceiver receiver;
 
-	public static BookSettingFragment2 newInstance() {
+	public static BookSettingFragment2 newInstance(boolean isNightMode) {
 		BookSettingFragment2 fragment = new BookSettingFragment2();
-
+		Bundle bundle = new Bundle();
+		bundle.putBoolean("mode", isNightMode);
+		fragment.setArguments(bundle);
 		return fragment;
 	}
 
@@ -105,7 +110,7 @@ public final class BookSettingFragment2 extends Fragment implements
 			mListener = (OnFragment2Listener) context;
 		} catch (ClassCastException e) {
 			throw new ClassCastException(context.toString()
-					+ " must implement OnFragment1Listener");
+					+ " must implement OnFragment2Listener");
 		}
 
 	}
@@ -134,7 +139,7 @@ public final class BookSettingFragment2 extends Fragment implements
 		isNigthModeHand = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
 		if (!SharedPreferences.getInstance().getBoolean(
-				SpConstant.BOOK_SETTING_LIGHT_SYSTEM, false)) {
+				SpConstant.BOOK_SETTING_LIGHT_SYSTEM, true)) {
 			ViewSelector.setButtonStrokeSelector(getActivity(), tv_SystemLight,
 					BookTheme.BOOK_GRAY);
 			setScreenLight();
@@ -146,12 +151,15 @@ public final class BookSettingFragment2 extends Fragment implements
 		}
 		registeBroadcast();
 
+		setBooksettingNight();
+
 	}
 
 	public void setListener() {
 		textsiz_reduce.setOnClickListener(this);
 		textsiz_increase.setOnClickListener(this);
 		tv_SystemLight.setOnClickListener(this);
+		booksetting_iv_bg5.setOnLongClickListener(this);
 		booksetting_iv_bg1.setOnClickListener(onTextBgChangeListener);
 		booksetting_iv_bg2.setOnClickListener(onTextBgChangeListener);
 		booksetting_iv_bg3.setOnClickListener(onTextBgChangeListener);
@@ -194,9 +202,11 @@ public final class BookSettingFragment2 extends Fragment implements
 	public interface OnFragment2Listener {
 		public void onTextSizChange(int textSize);
 
-		public void onTextBackgroundChange();
+		public void onTextBackgroundChange(int color);
 
 		public void onTextLineSpaceChange();
+
+		public void onTextColorBgChange();
 	}
 
 	@Override
@@ -276,31 +286,50 @@ public final class BookSettingFragment2 extends Fragment implements
 		booksetting_iv_bg2.setImageResource(R.drawable.reading_bg_kraft);
 		booksetting_iv_bg3.setImageResource(R.drawable.reading_bg_default);
 		booksetting_iv_bg4.setImageResource(R.drawable.reading_bg_5);
-		// booksetting_iv_bg5.setImageResource(R.drawable.reading_bg_4);
+		booksetting_iv_bg5.setImageResource(R.drawable.rukou_moren);
+		SharedPreferences.getInstance().putBoolean(SpConstant.BOOK_AUTO_COLOR,
+				false);
 		switch (view.getId()) {
 		case R.id.booksetting_iv_bg1:
 			booksetting_iv_bg1
 					.setImageResource(R.drawable.reading_bg_eye_select);
 			BookTheme.setReaderBookTextBg(1);
+			mListener.onTextBackgroundChange(-1);
 			break;
 		case R.id.booksetting_iv_bg2:
 			BookTheme.setReaderBookTextBg(2);
 			booksetting_iv_bg2
 					.setImageResource(R.drawable.reading_bg_kraft_select);
-
+			mListener.onTextBackgroundChange(-1);
 			break;
 		case R.id.booksetting_iv_bg3:
 			BookTheme.setReaderBookTextBg(3);
 			booksetting_iv_bg3
 					.setImageResource(R.drawable.reading_bg_default_select);
+			mListener.onTextBackgroundChange(-1);
 			break;
 		case R.id.booksetting_iv_bg4:
 			BookTheme.setReaderBookTextBg(4);
 			booksetting_iv_bg4.setImageResource(R.drawable.reading_bg_5_select);
+			mListener.onTextBackgroundChange(-1);
 			break;
 		case R.id.booksetting_iv_bg5:
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_AUTO_COLOR, true);
 			BookTheme.setReaderBookTextBg(5);
-			// booksetting_iv_bg5.setImageResource(R.drawable.reading_bg_4_select);
+			booksetting_iv_bg5.setImageResource(R.drawable.rukou_xuanzhong);
+			if (SharedPreferences.getInstance().getBoolean(
+					SpConstant.BOOK_AUTO_COLOR_FIRST, true)) {
+				showDialog();
+				SharedPreferences.getInstance().putBoolean(
+						SpConstant.BOOK_AUTO_COLOR_FIRST, false);
+			} else {
+				SharedPreferences.getInstance().putBoolean(
+						SpConstant.BOOK_AUTO_COLOR, true);
+
+			}
+			mListener.onTextBackgroundChange(SharedPreferences.getInstance()
+					.getInt(SpConstant.BOOK_AUTO_COLOR_TEXT, Color.BLACK));
 			break;
 
 		default:
@@ -308,7 +337,6 @@ public final class BookSettingFragment2 extends Fragment implements
 		}
 
 		changeNightMode();
-		mListener.onTextBackgroundChange();
 		sendBrocastReceiver();
 
 	}
@@ -323,6 +351,7 @@ public final class BookSettingFragment2 extends Fragment implements
 		case 1:
 			booksetting_iv_bg1
 					.setImageResource(R.drawable.reading_bg_eye_select);
+
 			break;
 		case 2:
 			booksetting_iv_bg2
@@ -336,7 +365,8 @@ public final class BookSettingFragment2 extends Fragment implements
 			booksetting_iv_bg4.setImageResource(R.drawable.reading_bg_5_select);
 			break;
 		case 5:
-			// booksetting_iv_bg5.setImageResource(R.drawable.reading_bg_4_select);
+			booksetting_iv_bg5.setImageResource(R.drawable.rukou_xuanzhong);
+
 			break;
 
 		default:
@@ -479,7 +509,6 @@ public final class BookSettingFragment2 extends Fragment implements
 		}
 	};
 
-
 	/**
 	 * 设置亮度
 	 */
@@ -529,5 +558,52 @@ public final class BookSettingFragment2 extends Fragment implements
 		super.onDestroy();
 		if (receiver != null)
 			getActivity().unregisterReceiver(receiver);
+	}
+
+	@Override
+	public boolean onLongClick(View v) {
+		// TODO Auto-generated method stub
+		SharedPreferences.getInstance().putBoolean(SpConstant.BOOK_AUTO_COLOR,
+				true);
+		booksetting_iv_bg5.setImageResource(R.drawable.rukou_xuanzhong);
+		if (mListener != null)
+			mListener.onTextColorBgChange();
+		return true;
+	}
+
+	/**
+	 * 自定义颜色提示
+	 */
+	private void showDialog() {
+		new AlertDialog(getActivity()).builder().setTitle("提醒")
+				.setMsg("长按自定义按钮,弹出自定义颜色面板,可以自由设置阅读背景和字体的颜色,赶快去试试吧！")
+				.setNegativeButton("取消", new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+
+					}
+				}).setPositiveButton("确定", new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+
+					}
+				}).show();
+	}
+
+	/**
+	 * 设置夜间模式
+	 */
+	private void setBooksettingNight() {
+		if (getArguments().getBoolean("mode")) {
+			ViewSelector.setImageSelector(getActivity(), textsiz_reduce,
+					BookTheme.BOOK_SETTING_PRESS_BG, BookTheme.BOOK_SETTING_BG);
+			ViewSelector.setImageSelector(getActivity(), textsiz_increase,
+					BookTheme.BOOK_SETTING_PRESS_BG, BookTheme.BOOK_SETTING_BG);
+		}
+
 	}
 }

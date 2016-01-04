@@ -9,5 +9,11 @@
     <dimen name="titlebar_height">55dp</dimen>
     <dimen name="pulltorefresh_heard_textSize">16sp</dimen>
     <dimen name="margn_top_height">40sp</dimen>
-
+    
+    <dimen name="bookCover_width">90dp</dimen>
+    <dimen name="bookCover_Height">124dp</dimen>
+    <dimen name="bookCover_Left">6dp</dimen>
+    <dimen name="bookCover_Spacing">12dp</dimen>
+    <dimen name="bookCover_Padding">5dp</dimen>
+    <dimen name="mogoAd_height">52dp</dimen>
 </resources>

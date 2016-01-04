@@ -17,9 +17,11 @@ import android.widget.TextView;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.activity.BookMarkActivity;
+import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.reader.dao.BookMarkDb;
+import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -31,7 +33,6 @@ import com.lidroid.xutils.view.annotation.ViewInject;
 public class BookSettingFragment1 extends Fragment implements OnClickListener,
 		OnSeekBarChangeListener {
 
-	private String nnn;
 	private OnFragment1Listener mListener;
 
 	@ViewInject(R.id.booksetting_traditional)
@@ -78,7 +79,8 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	private boolean isNigthModeHand;
 
 	public static BookSettingFragment1 newInstance(String bookName,
-			int chapterSize,int type,int bookType,String statue,String gid,String lastUrl) {
+			int chapterSize, int type, int bookType, String statue, String gid,
+			String lastUrl,boolean isNightMode) {
 		BookSettingFragment1 fragment = new BookSettingFragment1();
 		Bundle bundle = new Bundle();
 		bundle.putInt("chapterSize", chapterSize);
@@ -88,6 +90,7 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 		bundle.putInt("type", type);
 		bundle.putInt("bookType", bookType);
 		bundle.putString("statue", statue);
+		bundle.putBoolean("mode", isNightMode);
 		fragment.setArguments(bundle);
 		return fragment;
 	}
@@ -138,6 +141,8 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 		isNigthModeHand = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
 		setListener();
+		setBooksettingNight();
+
 	}
 
 	public void setListener() {
@@ -224,6 +229,7 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 			mListener.onCloseTitleBarAndBottomBar();
 			break;
 		case R.id.booksetting_night:
+
 			isNightMode = SharedPreferences.getInstance().getBoolean(
 					SpConstant.BOOK_SETTING_NIGHT_MODE, false);
 			boolean isAutoNightMode = SharedPreferences.getInstance()
@@ -234,6 +240,8 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 			} else {
 				isNightMode = !isNightMode;
 			}
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_AUTO_COLOR, false);
 			setNightModeImg(isNightMode);
 			SharedPreferences.getInstance().putBoolean(
 					SpConstant.BOOK_SETTING_NIGHT_MODE, isNightMode);
@@ -417,6 +425,25 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
 			booksetting_night.setImageResource(R.drawable.iphone_daytime);
+		}
+
+	}
+
+	/**
+	 * 设置夜间模式
+	 */
+	private void setBooksettingNight() {
+		if (getArguments().getBoolean("mode")) {
+			ViewSelector.setTextViewSelected(getActivity(), tv_next_chapter,
+					BookTheme.BOOK_SETTING_PRESS_BG, BookTheme.BOOK_SETTING_BG);
+			ViewSelector.setTextViewSelected(getActivity(), tv_pre_chapter,
+					BookTheme.BOOK_SETTING_PRESS_BG, BookTheme.BOOK_SETTING_BG);
+			ViewSelector.setTextViewSelected(getActivity(),
+					booksetting_traditional, BookTheme.BOOK_SETTING_PRESS_BG,
+					BookTheme.BOOK_SETTING_BG);
+			ViewSelector.setTextViewSelected(getActivity(),
+					booksetting_simplified, BookTheme.BOOK_SETTING_PRESS_BG,
+					BookTheme.BOOK_SETTING_BG);
 		}
 
 	}

@@ -27,6 +27,14 @@ public class DeviceUtil {
 	}
 
 	/**
+	 * 根据手机的分辨率从 px(像素) 的单位 转成为 sp,字体的转换
+	 */
+	public static int sp2px(Context context, float pxValue) {
+		final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+		return (int) (pxValue * fontScale + 0.5f);
+	}
+
+	/**
 	 * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
 	 */
 	public static int dip2px(Context context, float dpValue) {
@@ -45,6 +53,7 @@ public class DeviceUtil {
 		context.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		return dm;
 	}
+
 	/**
 	 * 获取DisplayMetrics，包括屏幕高宽，密度等
 	 * 

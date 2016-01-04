@@ -46,10 +46,8 @@ public class BookMarkFragment extends BaseFragment {
 	private BookMarkAdapter adapter;
 
 	private BookMarkDb db;
-	
-	private String nnn;
 
-	public static BookMarkFragment newInstance(String bookName,int bookType) {
+	public static BookMarkFragment newInstance(String bookName, int bookType) {
 		BookMarkFragment fragment = new BookMarkFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString("bookName", bookName);
@@ -151,16 +149,14 @@ public class BookMarkFragment extends BaseFragment {
 		listView.setMenuCreator(creator);
 		listView.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 			@Override
-			public void onMenuItemClick(int position, SwipeMenu menu,
-					int index) {
+			public void onMenuItemClick(int position, SwipeMenu menu, int index) {
 				BookMark bookMark = bookMarklist.get(position);
 				adapter.remove(bookMark);
 				adapter.notifyDataSetChanged();
-				db.deletBookMark(bookMark);	
+				db.deletBookMark(bookMark);
 			}
 		});
 
-	
 	}
 
 	@Override
