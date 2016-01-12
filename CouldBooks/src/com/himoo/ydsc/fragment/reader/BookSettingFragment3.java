@@ -35,7 +35,7 @@ public final class BookSettingFragment3 extends Fragment {
 	/** 翻书动画 */
 	private String mCurrentTitle = title[1];
 
-	private final static String[] title = { "左手", "仿真", "无动画", "上下", "连动" };
+	private final static String[] title = { "左手", "仿真", "无动画", "连动", "上下" };
 
 	private final static int[] drawable = { R.drawable.iphone_b_pagemode1,
 			R.drawable.iphone_b_pagemode2, R.drawable.iphone_b_pageselected,

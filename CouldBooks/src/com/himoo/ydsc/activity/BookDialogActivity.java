@@ -480,7 +480,7 @@ public class BookDialogActivity extends FragmentActivity implements
 		String filePath = fileUtils.getStorageDirectory() + bookName + ".zip";
 
 		DownLoaderTask task = new DownLoaderTask(downloadUrl, bookName,
-				filePath, this);
+				filePath, this,null,false);
 		task.execute();
 	}
 }

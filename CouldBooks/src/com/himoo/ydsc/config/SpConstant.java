@@ -103,4 +103,7 @@ public interface SpConstant {
 	
 	/** 保存自定义字阅读背景的颜色 */
 	public static final String BOOK_AUTO_COLOR_BG = "book_auto_color_bg";
+	
+	/** 阅读速度 */
+	public static final String BOOK_READER_SPEED= "book_reader_speed";
 }

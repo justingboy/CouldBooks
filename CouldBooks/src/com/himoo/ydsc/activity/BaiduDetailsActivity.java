@@ -30,6 +30,7 @@ import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
+import com.himoo.ydsc.db.ChapterDb;
 import com.himoo.ydsc.download.BaiduBookDownload;
 import com.himoo.ydsc.fragment.BookShelfFragment;
 import com.himoo.ydsc.fragment.BookShelfFragment.BookDownloadReceiver;
@@ -49,6 +50,7 @@ import com.himoo.ydsc.update.BookUpdateTask.OnNewChapterUpdateListener;
 import com.himoo.ydsc.update.LastChapter;
 import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.MyLogger;
+import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.RegularUtil;
 import com.himoo.ydsc.util.SP;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -281,7 +283,12 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	public void onParseFailure(Exception ex, String msg) {
 		// TODO Auto-generated method stub
 		dismissRefreshDialog();
-		Toast.show(this, "获取数据失败,请检查网络后重试！");
+		if (!NetWorkUtils.isNetConnected(this)) {
+			Toast.showBg(this, " 未连接网络 ");
+		} else {
+			Toast.showBg(this, "获取数据失败");
+		}
+
 	}
 
 	@Override
@@ -315,13 +322,13 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		} else if (v == bookDownload) {
 			if (isDownload) {
 				if (bookDownload.getText().equals("完结")) {
-					Toast.show(this, "该书已下载,快去看吧!");
+					Toast.showBg(this, "该书已下载,快去看吧!");
 					return;
 				} else {
 					BookUpdateTask task = new BookUpdateTask(this,
 							book.getTitle(), 1);
 					task.setOnNewChapterListener(this);
-					task.execute();
+					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				}
 
 			} else {
@@ -334,7 +341,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 					// TODO Auto-generated catch block
 					Log.e("插入数据库失败" + e.getMessage());
 				}
-				new SaveAsyncTask(bookList).execute();
+				new SaveAsyncTask(bookList)
+						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				registeBroadcast();
 			}
 			// 豆瓣评书
@@ -370,7 +378,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	 * 
 	 * 
 	 */
-	class SaveAsyncTask extends AsyncTask<Void, String, String> {
+	private class SaveAsyncTask extends AsyncTask<Void, String, String> {
 		private File dirFile;
 		private ArrayList<BaiduBookChapter> list = null;
 
@@ -395,74 +403,86 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		@Override
 		protected String doInBackground(Void... params) {
 			// TODO Auto-generated method stub
-			int len = 0;
-			int progress = 0;
-			int allChapterLength = list.size();
-			float partProgress = (float) allChapterLength / 100;
-			String bookName = book.getTitle();
-			if (downNotification != null) {
-				downNotification.creatNotification(bookName, "开始下载");
-				downNotification.setProgressAndNetSpeed(progress,
-						downNotification.getNetSpeed());
-			}
-			for (int i = 0; i < allChapterLength; i++) {
-				BaiduBookChapter chapter = list.get(i);
-				String url = getChapterUrl(chapter);
-				String chapterName = chapter.getText().trim()
-						.replaceAll("/", "|")
-						+ "-|" + chapter.getIndex() + "-|" + i + ".txt";
-				File chapterFile = new File(dirFile.getAbsolutePath(),
-						chapterName);
-				// 如何该章节已经下载则不需要下载,跳过,下载下一个章节
-				if (!chapterFile.exists()) {
-					try {
-						chapterFile.createNewFile();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						MyLogger.kLog().e("下载章节，创建文件出错:" + e);
-					}
-					com.himoo.ydsc.download.FileUtils.writeTosSd(url,
-							chapterFile);
+			try {
+
+				ChapterDb.getInstance().createDb(BaiduDetailsActivity.this,
+						book.getTitle());
+				ChapterDb.getInstance().saveBookChapter(list);
+				int len = 0;
+				int progress = 0;
+				int allChapterLength = list.size();
+				float partProgress = (float) allChapterLength / 100;
+				String bookName = book.getTitle();
+				if (downNotification != null) {
+					downNotification.creatNotification(bookName, "开始下载");
+					downNotification.setProgressAndNetSpeed(progress,
+							downNotification.getNetSpeed());
 				}
-
-				len++;
-				if (partProgress <= 1) {
-					progress = getPartprogress(partProgress);
-					progress *= len;
-					if (downNotification != null) {
-						downNotification.creatNotification(bookName, "开始下载");
-						downNotification.setProgressAndNetSpeed(progress,
-								downNotification.getNetSpeed());
+				for (int i = 0; i < allChapterLength; i++) {
+					BaiduBookChapter chapter = list.get(i);
+					String url = getChapterUrl(chapter);
+					String chapterName = chapter.getText().trim()
+							.replaceAll("/", "|")
+							+ "-|" + chapter.getIndex() + "-|" + i + ".txt";
+					File chapterFile = new File(dirFile.getAbsolutePath(),
+							chapterName);
+					// 如何该章节已经下载则不需要下载,跳过,下载下一个章节
+					if (!chapterFile.exists()) {
+						try {
+							chapterFile.createNewFile();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							MyLogger.kLog().e("下载章节，创建文件出错:" + e);
+						}
+						com.himoo.ydsc.download.FileUtils.writeTosSd(url,
+								chapterFile);
 					}
 
-				} else {
-					if (len % (int) partProgress == 0) {
-						progress++;
-						if (progress <= 99) {
-							if (progress % 2 == 0) {
-								if (downNotification != null) {
-									downNotification.creatNotification(
-											bookName, "开始下载");
-									downNotification.setProgressAndNetSpeed(
-											progress,
-											downNotification.getNetSpeed());
-								}
-							}
+					len++;
+					if (partProgress <= 1) {
+						progress = getPartprogress(partProgress);
+						progress *= len;
+						if (downNotification != null) {
+							downNotification
+									.creatNotification(bookName, "开始下载");
+							downNotification.setProgressAndNetSpeed(progress,
+									downNotification.getNetSpeed());
+						}
 
+					} else {
+						if (len % (int) partProgress == 0) {
+							progress++;
+							if (progress <= 99) {
+								if (progress % 2 == 0) {
+									if (downNotification != null) {
+										downNotification.creatNotification(
+												bookName, "开始下载");
+										downNotification
+												.setProgressAndNetSpeed(
+														progress,
+														downNotification
+																.getNetSpeed());
+									}
+								}
+
+							}
 						}
 					}
-				}
 
-				if (allChapterLength - len == 0) {
-					if (downNotification != null) {
-						downNotification.creatNotification(bookName, "下载完成");
-						downNotification.setProgressAndNetSpeed(100,
-								downNotification.getNetSpeed());
+					if (allChapterLength - len == 0) {
+						if (downNotification != null) {
+							downNotification
+									.creatNotification(bookName, "下载完成");
+							downNotification.setProgressAndNetSpeed(100,
+									downNotification.getNetSpeed());
+						}
 					}
+
 				}
-
+			} catch (Exception e) {
+				MyLogger.kLog().e(e);
+				SP.getInstance().putBoolean(book.getTitle(), true);
 			}
-
 			return null;
 		}
 
@@ -470,8 +490,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		protected void onPostExecute(String result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-//			BaiduBookDownload.getInstance(BaiduDetailsActivity.this)
-//					.updateDownlaodstatue(book.getTitle());
+			// BaiduBookDownload.getInstance(BaiduDetailsActivity.this)
+			// .updateDownlaodstatue(book.getTitle());
 			SP.getInstance().putBoolean(book.getTitle(), true);
 			Toast.showLong(BaiduDetailsActivity.this, "《" + book.getTitle()
 					+ "》下载完成");
@@ -531,17 +551,19 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		if (mCurrentClickPosition != -1)
 			return;
 		mCurrentClickPosition = position;
-
 		int size = bookList.size();
 		BaiduBookChapter chapter = bookList.get(position - 2);
 		Intent intent = new Intent(this, ReaderActivity.class);
 		intent.putExtra("bookName", book.getTitle());
+		String lastUrl = HttpConstant.BAIDU_BOOK_DETAILS_URL
+				+ "appui=alaxs&gid=" + book.getGid() + "&dir=1&ajax=1";
+		intent.putExtra("lastUrl", lastUrl);
 		intent.putExtra("gid", book.getGid());
 		intent.putExtra("chapterName", chapter.getText().trim());
 		intent.putExtra("chapterUrl", getChapterUrl(chapter));
 		intent.putExtra("index", chapter.getIndex());
-		intent.putExtra("type",1);
-		intent.putExtra("isAutoLoad",isAutoLoad);
+		intent.putExtra("type", 1);
+		intent.putExtra("isAutoLoad", isAutoLoad);
 		intent.putExtra("bookType", 2);
 		intent.putExtra("statue", book.getStatus());
 		intent.putExtra("position", isReverse ? size - position + 1

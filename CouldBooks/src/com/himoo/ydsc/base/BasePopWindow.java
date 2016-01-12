@@ -14,6 +14,7 @@ import com.himoo.ydsc.util.MyLogger;
 public abstract class BasePopWindow extends PopupWindow {
 	protected View view;
 	protected BaseFragment frag;
+	protected Context context;
 	public MyLogger Log;
 
 	public BasePopWindow(View view, int width, int height, boolean focusable) {
@@ -30,6 +31,16 @@ public abstract class BasePopWindow extends PopupWindow {
 		super(view, width, height, focusable);
 		Log = MyLogger.kLog();
 		this.frag = frag;
+		this.view = view;
+		findViews();
+		setListener();
+		initData();
+	}
+	public BasePopWindow(Context context, View view, int width, int height,
+			boolean focusable) {
+		super(view, width, height, focusable);
+		Log = MyLogger.kLog();
+		this.context = context;
 		this.view = view;
 		findViews();
 		setListener();

@@ -26,7 +26,7 @@
             android:src="@drawable/book_details_close" />
 
         <com.viewpagerindicator.TabPageIndicator
-            android:id="@+id/pager_indicator"
+           android:id="@+id/book_pager_indicator"
             android:layout_width="200dp"
             android:layout_height="35dp"
             android:layout_centerInParent="true"

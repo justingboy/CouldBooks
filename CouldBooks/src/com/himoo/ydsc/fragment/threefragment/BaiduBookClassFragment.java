@@ -32,6 +32,7 @@ import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.UIHelper;
+import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
 import com.lidroid.xutils.HttpUtils;
@@ -74,14 +75,12 @@ public class BaiduBookClassFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.fragment_sub_book_display,
 				container, false);
-		Log.d("onCreateView");
 		return view;
 	}
 
 	@Override
 	public void initData() {
 		// TODO Auto-generated method stub
-		Log.d("initData");
 		showRefreshDialog("正在加载中");
 		getCouldBookInfoByGet();
 		initPTRGrideView();
@@ -256,7 +255,11 @@ public class BaiduBookClassFragment extends BaseFragment implements
 	public void onPullToRefreshFailure(Exception error, String msg) {
 		// TODO Auto-generated method stub
 		if (getActivity() != null) {
-			Toast.showLong(getActivity(), "加载数据错误 ：" + msg);
+			if (!NetWorkUtils.isNetConnected(getActivity())) {
+				Toast.showLong(getActivity(), "网络未连接");
+			} else {
+				Toast.showLong(getActivity(), "刷新数据失败");
+			}
 			notifyDataAndRefreshComplete();
 		}
 

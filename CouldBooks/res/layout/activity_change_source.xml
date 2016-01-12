@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F4F3"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical" >
+
+    <include layout="@layout/titlebar_layout" />
+
+    <View
+        style="@style/line_style"
+        android:layout_marginTop="35dp" />
+
+    <TextView
+        android:id="@+id/tv_current_booksource"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:drawableRight="@drawable/icon_chebox_press"
+        android:paddingBottom="15dp"
+        android:paddingLeft="18dp"
+        android:paddingRight="10dp"
+        android:paddingTop="15dp"
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <View
+        style="@style/line_style"
+        android:layout_marginTop="0dp" />
+
+    <TextView
+        android:id="@+id/tv_other_booksource"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="15dp"
+        android:paddingLeft="18dp"
+        android:paddingRight="10dp"
+        android:paddingTop="15dp"
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/booksource_line"
+        style="@style/line_style"
+        android:layout_marginTop="0dp"
+        android:visibility="gone" />
+
+    <com.handmark.pulltorefresh.library.PullToRefreshListView
+        xmlns:ptr="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/book_source_list"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:cacheColorHint="#00000000"
+        android:fadingEdge="none"
+        android:gravity="fill"
+        android:scrollbarStyle="outsideOverlay"
+        ptr:ptrAnimationStyle="flip"
+        ptr:ptrDrawable="@drawable/pullto_refresh_listview_arrow"
+        ptr:ptrHeaderTextAppearance="@style/PulltorefreshListview_textStyle"
+        ptr:ptrListViewExtrasEnabled="false"
+        ptr:ptrScrollingWhileRefreshingEnabled="true" />
+
+</LinearLayout>

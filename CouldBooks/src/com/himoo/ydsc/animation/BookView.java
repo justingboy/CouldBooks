@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -74,6 +75,7 @@ public class BookView extends RelativeLayout implements AnimatorListener {
 	private float mOpenBookEndBgY = 0;
 	private Context mContext;
 	private OpenBookAnimEndListener mListener;
+	private Drawable bg;
 
 	public void setOnOpenBookAnimEndListener(OpenBookAnimEndListener listener) {
 		this.mListener = listener;
@@ -131,6 +133,7 @@ public class BookView extends RelativeLayout implements AnimatorListener {
 	@SuppressLint("NewApi")
 	public synchronized void startOpenBookAnimation(OpenBookAnimEndListener l,
 			ViewParent parent, Drawable readerBg) {
+		bg = readerBg;
 		mOpenBookAnimEndListener = l;
 		// try {
 		// mGridParent = parent != null ? (PullToRefreshGridView) parent : null;
@@ -288,6 +291,10 @@ public class BookView extends RelativeLayout implements AnimatorListener {
 			if (mAnimationCount.decrementAndGet() <= 0) {
 				removeWindowView();
 			}
+		}
+		if (bg != null) {
+			bg.setCallback(null);
+			bg = null;
 		}
 	}
 

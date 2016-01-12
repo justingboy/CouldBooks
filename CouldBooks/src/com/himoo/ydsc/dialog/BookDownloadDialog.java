@@ -2,6 +2,7 @@ package com.himoo.ydsc.dialog;
 
 import java.text.NumberFormat;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -12,8 +13,10 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.view.Gravity;
+import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
@@ -36,11 +39,17 @@ public class BookDownloadDialog extends AlertDialog {
 	private NumberFormat mProgressPercentFormat;
 	private Context mContext;
 	private int resId = -1;
+	private boolean isFullWidth = false;
 
 	public BookDownloadDialog(Context context) {
 		super(context, R.style.book_download_dialog);
 		this.mContext = context;
-		// TODO Auto-generated constructor stub
+		initFormats();
+	}
+	public BookDownloadDialog(Context context, boolean isFullWidth) {
+		super(context, R.style.book_download_dialog_afresh);
+		this.mContext = context;
+		this.isFullWidth = isFullWidth;
 		initFormats();
 	}
 
@@ -51,18 +60,37 @@ public class BookDownloadDialog extends AlertDialog {
 		initFormats();
 		this.resId = resId;
 	}
+	public BookDownloadDialog(Context context, int resId,boolean isFullWidth) {
+		super(context, R.style.book_download_dialog_afresh);
+		this.mContext = context;
+		this.isFullWidth = isFullWidth;
+		initFormats();
+		this.resId = resId;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-
-		WindowManager.LayoutParams wmlp = getWindow().getAttributes();
-		wmlp.gravity = Gravity.CENTER;
-		wmlp.x = 0; // x position
-		wmlp.y = DeviceUtil.dip2px(getContext(), 80); // y position
-		getWindow().setAttributes(wmlp);
+		WindowManager.LayoutParams wmlp = this.getWindow().getAttributes();
+		if (isFullWidth) {
+			// 设置铺满宽度
+			wmlp.width = (int) (DeviceUtil.getWidth((Activity) mContext));
+			this.getWindow().setAttributes(wmlp);
+			getWindow().setGravity(Gravity.BOTTOM);
+		} else {
+			wmlp.gravity = Gravity.CENTER;
+			wmlp.x = 0; // x position
+			wmlp.y = DeviceUtil.dip2px(getContext(), 80); // y position
+			getWindow().setAttributes(wmlp);
+		}
 		setContentView(R.layout.download_progress_dialog);
+		if (isFullWidth) {
+			RelativeLayout dialog_downbook = (RelativeLayout) findViewById(R.id.dialog_downbook);
+			LayoutParams params = dialog_downbook.getLayoutParams();
+			params.width = LayoutParams.MATCH_PARENT;
+			dialog_downbook.setLayoutParams(params);
+		}
 		mProgress = (ProgressBar) findViewById(R.id.progress);
 		mProgressNumber = (TextView) findViewById(R.id.progress_number);
 		mProgressPercent = (TextView) findViewById(R.id.progress_percent);

@@ -80,11 +80,16 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 
 	private String value;
 
+	private boolean isUnlock;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_password_setting);
+		isUnlock = getIntent().getBooleanExtra("unlock", false);
+		if (isUnlock)
+			setSwipeBackEnable(false);
 		drawable_Oval = getResources().getDrawable(
 				R.drawable.shape_password_oval);
 		drawable_Line = getResources().getDrawable(
@@ -94,7 +99,8 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 	@Override
 	protected void initTitleBar() {
 		// TODO Auto-generated method stub
-		LinearLayout password_layout = (LinearLayout) this.findViewById(R.id.password_layout);
+		LinearLayout password_layout = (LinearLayout) this
+				.findViewById(R.id.password_layout);
 		password_layout.setBackgroundColor(BookTheme.THEME_COLOR);
 		mTitleBar.setLeftTitle("更多");
 		mTitleBar.setRightLogoGone();
@@ -165,22 +171,20 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 				String password = SharedPreferences.getInstance().getString(
 						"password", null);
 				if (value != null && value.equals("SplashActivity")) {
-					if(password.equals(getPasswordFormList(mList)))
-					{
+					if (password.equals(getPasswordFormList(mList))) {
 						new Handler().postDelayed(new Runnable() {
-							
+
 							@Override
 							public void run() {
 								// TODO Auto-generated method stub
-								
+
 								UIHelper.startToActivity(
 										PasswordSettingActivity.this,
 										HomeActivity.class);
 								finish();
 							}
 						}, 100);
-					}else
-					{
+					} else {
 						inputCount--;
 						if (inputCount == 0) {
 							com.himoo.ydsc.ui.utils.Toast.showLong(this,
@@ -189,8 +193,8 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 						}
 						password_error_toast.setBackgroundColor(Color.RED);
 						password_error_toast.setVisibility(View.VISIBLE);
-						password_error_toast.setText("密码错啦,还可输入"
-								+ inputCount + "次");
+						password_error_toast.setText("密码错啦,还可输入" + inputCount
+								+ "次");
 						mList.clear();
 						updateUi();
 					}
@@ -245,7 +249,7 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 								delayedColse();
 							} else {
 								password_error_toast
-										.setBackgroundColor(Color.TRANSPARENT);
+										.setBackgroundColor(Color.RED);
 								password_error_toast
 										.setVisibility(View.VISIBLE);
 								password_error_toast.setText("密码不匹配,再试一次。");

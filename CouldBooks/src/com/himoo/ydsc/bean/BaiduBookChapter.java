@@ -1,19 +1,43 @@
 package com.himoo.ydsc.bean;
 
+import com.himoo.ydsc.db.bean.EntityBase;
+import com.lidroid.xutils.db.annotation.Column;
+import com.lidroid.xutils.db.annotation.Table;
+import com.lidroid.xutils.db.annotation.Transient;
+
 /**
  * 百度小说章节 
  *
  */
-public class BaiduBookChapter {
+//建议加上注解， 混淆后表名不受影响
+@Table(name = "book_chapter")
+public class BaiduBookChapter extends EntityBase{
+	
+	@Transient
 	private String create_time;
+	
+	@Transient
 	private String index;
+	
+	@Transient
 	private String rank;
+	
+	@Column(column = "text")
 	private String text;
+	
+	@Column(column = "href")
 	private String href;
+	
+	@Column(column = "cid")
 	private String cid;
+	
+	@Transient
 	private int position;
 	
+	@Transient
 	private String chapterName;
+	
+	@Transient
 	private String chapterUrl;
 
 	public void setCreate_time(String create_time) {

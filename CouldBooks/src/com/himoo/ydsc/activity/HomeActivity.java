@@ -29,6 +29,7 @@ import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.umeng.onlineconfig.OnlineConfigAgent;
 
 public class HomeActivity extends BaseActivity {
@@ -256,8 +257,11 @@ public class HomeActivity extends BaseActivity {
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
-		super.onDestroy();
+		ImageLoader.getInstance().clearMemoryCache();
+//		ImageLoader.getInstance().clearDiskCache();  
 		stopDownloadService();
+		System.gc();
+		super.onDestroy();
 	}
 
 	/**

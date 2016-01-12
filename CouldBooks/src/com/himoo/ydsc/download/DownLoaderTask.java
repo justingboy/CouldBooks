@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.himoo.ydsc.dialog.BookDownloadDialog;
+import com.himoo.ydsc.http.OnAfreshDownloadListener;
 import com.himoo.ydsc.reader.utils.ZipExtractorTask;
 
 public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
@@ -31,14 +32,22 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 	private ProgressReportingOutputStream mOutputStream;
 	private Activity mContext;
 	private String bookName;
+	private OnAfreshDownloadListener listener;
+	private boolean isFullWidth;
 
 	public DownLoaderTask(String url, String bookName, String out,
-			Activity context) {
+			Activity context, OnAfreshDownloadListener listener,
+			boolean isFullWidth) {
 		super();
 		this.mContext = context;
+		this.listener = listener;
+		this.isFullWidth =isFullWidth;
 		this.bookName = bookName;
 		if (context != null) {
-			mDialog = new BookDownloadDialog(context);
+			if (isFullWidth)
+				mDialog = new BookDownloadDialog(context, isFullWidth);
+			else
+				mDialog = new BookDownloadDialog(context);
 		} else {
 			mDialog = null;
 		}
@@ -194,7 +203,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 	public void doZipExtractorWork(Activity activity, String inPath,
 			String outPath) {
 		ZipExtractorTask task = new ZipExtractorTask(bookName, inPath, outPath,
-				activity, true);
+				activity, true, listener,isFullWidth);
 		task.execute();
 	}
 

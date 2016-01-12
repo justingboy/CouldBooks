@@ -35,6 +35,8 @@ public class JccUtil {
 	 * @return
 	 */
 	public static String changeToSimplified (String changeText) {
+		if(changeText==null)
+			return changeText;
 		try {
 			JChineseConvertor jChineseConvertor = JChineseConvertor
 					.getInstance();

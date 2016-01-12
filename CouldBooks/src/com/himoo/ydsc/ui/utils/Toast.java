@@ -1,9 +1,11 @@
 ﻿package com.himoo.ydsc.ui.utils;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
@@ -22,7 +24,9 @@ public class Toast {
 
 	public static boolean isShow = true;
 	private static android.widget.Toast toast;
+	private static android.widget.Toast toastBg;
 	private static TextView tv;
+	private static TextView tvBg;
 
 	/**
 	 * 短时间显示Toast
@@ -106,7 +110,8 @@ public class Toast {
 		if (toast == null) {
 			toast = new android.widget.Toast(context);
 			LayoutInflater inflater = LayoutInflater.from(context);
-			View layout = inflater.inflate(R.layout.toast_custom_view, null,false);
+			View layout = inflater.inflate(R.layout.toast_custom_view, null,
+					false);
 			tv = (TextView) layout.findViewById(R.id.tv_toast_msg);
 			toast.setGravity(Gravity.CENTER, 0, -DeviceUtil.dip2px(context, 25));
 			toast.setDuration(android.widget.Toast.LENGTH_SHORT);
@@ -117,6 +122,35 @@ public class Toast {
 			tv.setTextColor(BookTheme.THEME_COLOR);
 		}
 		toast.show();
+	}
+
+	/**
+	 * 带有图片的Toast
+	 * 
+	 * @param context
+	 * @param message
+	 */
+	@SuppressWarnings("deprecation")
+	public static void showBg(Context context, String message) {
+		if (toastBg == null) {
+			toastBg = new android.widget.Toast(context);
+			LayoutInflater inflater = LayoutInflater.from(context);
+			View layout = inflater.inflate(R.layout.toast_custom_view, null,
+					false);
+			LinearLayout layout_toast = (LinearLayout) layout
+					.findViewById(R.id.layout_toast);
+			layout_toast.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_toast));
+			tvBg = (TextView) layout.findViewById(R.id.tv_toast_msg);
+			toastBg.setGravity(Gravity.CENTER, 0,
+					-DeviceUtil.dip2px(context, 25));
+			toastBg.setDuration(android.widget.Toast.LENGTH_SHORT);
+			toastBg.setView(layout);
+		}
+		if (tvBg != null) {
+			tvBg.setText(message);
+			tvBg.setTextColor(Color.WHITE);
+		}
+		toastBg.show();
 	}
 
 }

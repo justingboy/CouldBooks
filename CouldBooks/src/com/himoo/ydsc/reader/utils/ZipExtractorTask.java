@@ -23,6 +23,7 @@ import android.util.Log;
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.dialog.BookDownloadDialog;
 import com.himoo.ydsc.download.BaiduBookDownload;
+import com.himoo.ydsc.http.OnAfreshDownloadListener;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.SP;
 
@@ -35,11 +36,14 @@ public class ZipExtractorTask extends AsyncTask<Void, Integer, Long> {
 	private final Context mContext;
 	private boolean mReplaceAll;
 	private String bookName;
+	private OnAfreshDownloadListener listener;
 
-	public ZipExtractorTask(String bookName,String in, String out, Context context,
-			boolean replaceAll) {
+	public ZipExtractorTask(String bookName, String in, String out,
+			Context context, boolean replaceAll,
+			OnAfreshDownloadListener listener, boolean isFullWidth) {
 		super();
 		this.bookName = bookName;
+		this.listener = listener;
 		mInput = new File(in);
 		mOutput = new File(out);
 		if (!mOutput.exists()) {
@@ -50,7 +54,12 @@ public class ZipExtractorTask extends AsyncTask<Void, Integer, Long> {
 			}
 		}
 		if (context != null) {
-			mDialog = new BookDownloadDialog(context,R.drawable.actionbar_import);
+			if (isFullWidth) {
+				mDialog = new BookDownloadDialog(context, R.drawable.actionbar_import,true);
+			} else {
+				mDialog = new BookDownloadDialog(context,R.drawable.actionbar_import);
+						
+			}
 		} else {
 			mDialog = null;
 		}
@@ -62,21 +71,6 @@ public class ZipExtractorTask extends AsyncTask<Void, Integer, Long> {
 	protected Long doInBackground(Void... params) {
 		// TODO Auto-generated method stub
 		return unzip();
-	}
-
-	@Override
-	protected void onPostExecute(Long result) {
-		// TODO Auto-generated method stub
-		// super.onPostExecute(result);
-		if (mDialog != null && mDialog.isShowing()) {
-			mDialog.dismiss();
-		}
-//		BaiduBookDownload.getInstance(mContext).updateDownlaodstatue(bookName);
-		SP.getInstance().putBoolean(bookName, true);
-		Toast.show(mContext, "下载解压成功,赶快去看看吧!");
-		
-		if (isCancelled())
-			return;
 	}
 
 	@Override
@@ -110,6 +104,28 @@ public class ZipExtractorTask extends AsyncTask<Void, Integer, Long> {
 			mDialog.setMax(max);
 		} else
 			mDialog.setProgress(values[0].intValue());
+	}
+
+	@Override
+	protected void onPostExecute(Long result) {
+		// TODO Auto-generated method stub
+		// super.onPostExecute(result);
+		if (mDialog != null && mDialog.isShowing()) {
+			mDialog.dismiss();
+		}
+		// BaiduBookDownload.getInstance(mContext).updateDownlaodstatue(bookName);
+		SP.getInstance().putBoolean(bookName, true);
+		if (listener != null) {
+
+			listener.onPostDownloadSuccess(bookName);
+			Toast.show(mContext, "《" + bookName + "》" + "下载完成");
+		} else {
+
+			Toast.show(mContext, "下载解压成功,赶快去看看吧!");
+		}
+
+		if (isCancelled())
+			return;
 	}
 
 	@SuppressWarnings("unchecked")

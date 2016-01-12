@@ -162,7 +162,7 @@ public class BookPage {
 		marginHeight = DeviceUtil.dip2px(context, 20);
 		fontSize = SharedPreferences.getInstance().getInt(
 				SpConstant.BOOK_SETTING_TEXT_SIZE,
-				DeviceUtil.dip2px(context, 20));
+				DeviceUtil.dip2px(context, 22));
 		// lineHgight = fontSize + DeviceUtil.dip2px(context, 4);
 		linesVe = new Vector<String>();
 
@@ -201,8 +201,21 @@ public class BookPage {
 		slicePage();
 	}
 
-	public Vector<String> getCurPage() {
-		return linesVe;
+	/**
+	 * 获取当前页及后后面页数的内容
+	 * @return
+	 */
+	public String getCurPage() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = pageNum; i < pagesVe.size(); i++) {
+			sb.append(pagesVe.get(i).toString());
+
+		}
+		return sb.toString();
+	}
+
+	public Vector<String> getNextPage() {
+		return pagesVe.get(++pageNum);
 	}
 
 	/**
@@ -338,12 +351,12 @@ public class BookPage {
 	 */
 	public void currentChapter(Chapter mchapter) {
 		chapter = mchapter;
-		String index = chapter.getIndex();
-		int position = chapter.getPosition();
-		int jumpType = chapter.getJumpType();
-		Chapter tempChapter = IOHelper.getChapter(jumpType, index, position,
-				bookType);
-		chapter = tempChapter;
+//		String index = chapter.getIndex();
+//		int position = chapter.getPosition();
+//		int jumpType = chapter.getJumpType();
+////		Chapter tempChapter = IOHelper.getChapter(jumpType, index, position,
+////				bookType);
+//		chapter = tempChapter;
 		content = textType == 1 ? JccUtil.changeToSimplified(chapter
 				.getContent()) : JccUtil.changeToTraditional(chapter
 				.getContent());
@@ -517,10 +530,10 @@ public class BookPage {
 				SpConstant.BOOK_SETTING_TEXT_LINE, 1);
 		fontSize = SharedPreferences.getInstance().getInt(
 				SpConstant.BOOK_SETTING_TEXT_SIZE,
-				DeviceUtil.dip2px(mContext, 21));
+				DeviceUtil.dip2px(mContext, 22));
 		switch (index) {
 		case 1:
-			lineHgight = fontSize + DeviceUtil.dip2px(mContext, 4);
+			lineHgight = fontSize + DeviceUtil.dip2px(mContext, 6);
 			break;
 		case 2:
 			lineHgight = fontSize + DeviceUtil.dip2px(mContext, 10);
@@ -545,7 +558,7 @@ public class BookPage {
 	 */
 	public void setTextTypeChildren(boolean isFirstInit) {
 		typefaceIndex = SharedPreferences.getInstance().getInt(
-				SpConstant.BOOK_SETTING_TEXT_CHILDREN_TYPE, 1);
+				SpConstant.BOOK_SETTING_TEXT_CHILDREN_TYPE, 3);
 		switch (typefaceIndex) {
 		case 1:
 			typeface = null;
@@ -643,7 +656,7 @@ public class BookPage {
 	}
 
 	public void destory() {
-		if (bgBitmap != null) {
+		if (this.bgBitmap != null) {
 			bgBitmap.recycle();
 			bgBitmap = null;
 		}

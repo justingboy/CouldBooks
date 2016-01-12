@@ -32,6 +32,7 @@ import com.himoo.ydsc.base.BaseActivity;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.db.ChapterDb;
 import com.himoo.ydsc.download.BaiduBookDownload;
 import com.himoo.ydsc.fragment.BookShelfFragment;
 import com.himoo.ydsc.fragment.BookShelfFragment.BookDownloadReceiver;
@@ -85,7 +86,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	private List<Fragment> fragmentList;
 
 	/** TabPageIndicator */
-	@ViewInject(R.id.pager_indicator)
+	@ViewInject(R.id.book_pager_indicator)
 	private TabPageIndicator tabPageIndicator;
 
 	/** NoScrollViewPager */
@@ -182,7 +183,8 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 						// TODO Auto-generated method stub
 						if (position == 0) {
 							if (!SP.getInstance().getBoolean("isDown", false)) {
-								AnimationUtils.setViewRotating(BookMarkActivity.this, book_refresh);
+								AnimationUtils.setViewRotating(
+										BookMarkActivity.this, book_refresh);
 							}
 							book_refresh.setTag("刷新");
 							setRightLogo();
@@ -281,7 +283,8 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 											sendToBookShelfBroadcastSucess(true);
 											new DeleteFileTask(
 													BookMarkActivity.this,
-													bookName).execute();
+													bookName)
+													.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 										} else {
 											Toast.show(BookMarkActivity.this,
 													"未连接网络!");
@@ -333,7 +336,8 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 					Log.e("插入数据库失败" + e.getMessage());
 				}
 				List<BaiduBookChapter> list = IOHelper.getBookChapter();
-				new SaveAsyncTask(list, lastUrl).execute();
+				new SaveAsyncTask(list, lastUrl, false)
+						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				sendToBookShelfBroadcast();
 			}
 
@@ -443,6 +447,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	 */
 	private void sendToBookShelfBroadcastSucess(boolean isDown) {
 		SP.getInstance().putBoolean("isDown", !isDown);
+		SP.getInstance().putBoolean(bookName, !isDown);
 	}
 
 	@Override
@@ -464,9 +469,12 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 		private File dirFile;
 		private List<BaiduBookChapter> list = null;
 		private String lastUrl;
+		private boolean isAfreashDownload;
 
-		public SaveAsyncTask(List<BaiduBookChapter> list, String lastUrl) {
+		public SaveAsyncTask(List<BaiduBookChapter> list, String lastUrl,
+				boolean isAfreashDownload) {
 			this.lastUrl = lastUrl;
+			this.isAfreashDownload = isAfreashDownload;
 			if (list != null) {
 				String index = list.get(0).getIndex();
 				if (Integer.valueOf(index) > 1) {
@@ -502,82 +510,104 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 					}
 				}
 			}
+
+			// 保存章节的换源信息
+			ChapterDb.getInstance().createDb(BookMarkActivity.this, bookName);
+			ChapterDb.getInstance().saveBookChapter(list);
+
 			if (downNotification != null) {
 				downNotification.creatNotification(bookName, "开始下载");
 				downNotification.setProgressAndNetSpeed(progress,
 						downNotification.getNetSpeed());
 			}
-			int allChapterLength = list.size();
-			float partProgress = (float) allChapterLength / 100;
-			for (int i = 0; i < allChapterLength; i++) {
-				BaiduBookChapter chapter = list.get(i);
-				String url = getChapterUrl(chapter);
-				String chapterName = chapter.getText().trim()
-						.replaceAll("/", "|")
-						+ "-|" + chapter.getIndex() + "-|" + i + ".txt";
-				File chapterFile = new File(dirFile.getAbsolutePath(),
-						chapterName);
-				// 如何该章节已经下载则不需要下载,跳过,下载下一个章节
-				if (!chapterFile.exists()) {
-					try {
-						chapterFile.createNewFile();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						// e.printStackTrace();
-						MyLogger.kLog().e("下载章节，创建文件出错:" + e);
-					}
-					com.himoo.ydsc.download.FileUtils.writeTosSd(url,
-							chapterFile);
-				}
-				len++;
-				if (partProgress <= 1) {
-					progress = getPartprogress(partProgress);
-					progress *= len;
-					if (downNotification != null) {
-						downNotification.creatNotification(bookName, "开始下载");
-						downNotification.setProgressAndNetSpeed(progress,
-								downNotification.getNetSpeed());
-					}
+			try {
 
-				} else {
-					if (len % (int) partProgress == 0) {
-						progress++;
-						if (progress <= 99) {
-							if (progress % 2 == 0) {
-								if (downNotification != null) {
-									downNotification.creatNotification(
-											bookName, "开始下载");
-									downNotification.setProgressAndNetSpeed(
-											progress,
-											downNotification.getNetSpeed());
+				int allChapterLength = list.size();
+				float partProgress = (float) allChapterLength / 100;
+				for (int i = 0; i < allChapterLength; i++) {
+					BaiduBookChapter chapter = list.get(i);
+					String url = getChapterUrl(chapter);
+					String chapterName = chapter.getText().trim()
+							.replaceAll("/", "|")
+							+ "-|" + chapter.getIndex() + "-|" + i + ".txt";
+					File chapterFile = new File(dirFile.getAbsolutePath(),
+							chapterName);
+					// 如何该章节已经下载则不需要下载,跳过,下载下一个章节
+					if (!chapterFile.exists()) {
+						try {
+							chapterFile.createNewFile();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							// e.printStackTrace();
+							MyLogger.kLog().e("下载章节，创建文件出错:" + e);
+						}
+						com.himoo.ydsc.download.FileUtils.writeTosSd(url,
+								chapterFile);
+					}
+					len++;
+					if (partProgress <= 1) {
+						progress = getPartprogress(partProgress);
+						progress *= len;
+						if (downNotification != null) {
+							downNotification
+									.creatNotification(bookName, "开始下载");
+							downNotification.setProgressAndNetSpeed(progress,
+									downNotification.getNetSpeed());
+						}
+
+					} else {
+						if (len % (int) partProgress == 0) {
+							progress++;
+							if (progress <= 99) {
+								if (progress % 2 == 0) {
+									if (downNotification != null) {
+										downNotification.creatNotification(
+												bookName, "开始下载");
+										downNotification
+												.setProgressAndNetSpeed(
+														progress,
+														downNotification
+																.getNetSpeed());
+									}
 								}
-							}
 
+							}
 						}
 					}
-				}
 
-				if (allChapterLength - len == 0) {
-					if (downNotification != null) {
-						downNotification.creatNotification(bookName, "下载完成");
-						downNotification.setProgressAndNetSpeed(100,
-								downNotification.getNetSpeed());
+					if (allChapterLength - len == 0) {
+						if (downNotification != null) {
+							downNotification
+									.creatNotification(bookName, "下载完成");
+							downNotification.setProgressAndNetSpeed(100,
+									downNotification.getNetSpeed());
+						}
+					}
+
+				}
+				if (isAfreashDownload) {
+
+					// 下载之后可能会有新的章节，需要重新初始化章节列表
+					IOHelper.getBook(
+							BookMarkActivity.this,
+							bookName,
+							LocalReaderUtil.getInstance().parseLocalBook(
+									bookName, 2));
+					BookMark bookMark = BookMarkDb.getInstance(
+							BookMarkActivity.this, "book").querryReaderPos(
+							bookName);
+					if (list != null && bookMark != null
+							&& list.size() - 1 > bookMark.getPosition()) {
+						bookMark.setPosition(list.size() - 1);
+						bookMark.setCurrentPage(-1);
+						bookMark.setPageCount(-1);
+						BookMarkDb.getInstance(BookMarkActivity.this, "book")
+								.saveReaderPosition(bookMark);
 					}
 				}
-
-			}
-			// 下载之后可能会有新的章节，需要重新初始化章节列表
-			IOHelper.getBook(BookMarkActivity.this, bookName, LocalReaderUtil
-					.getInstance().parseLocalBook(bookName, 2));
-			BookMark bookMark = BookMarkDb.getInstance(BookMarkActivity.this,
-					"book").querryReaderPos(bookName);
-			if (list != null && bookMark != null
-					&& list.size() - 1 > bookMark.getPosition()) {
-				bookMark.setPosition(list.size() - 1);
-				bookMark.setCurrentPage(-1);
-				bookMark.setPageCount(-1);
-				BookMarkDb.getInstance(BookMarkActivity.this, "book")
-						.saveReaderPosition(bookMark);
+			} catch (Exception e) {
+				MyLogger.kLog().e(e);
+				SP.getInstance().putBoolean(bookName, true);
 			}
 			return null;
 		}
@@ -697,7 +727,8 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			Toast.show(context, "删除《" + bookName + "》成功");
-			new SaveAsyncTask(null, lastUrl).execute();
+			new SaveAsyncTask(null, lastUrl, true)
+					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			new Handler().postDelayed(new Runnable() {
 
 				@Override

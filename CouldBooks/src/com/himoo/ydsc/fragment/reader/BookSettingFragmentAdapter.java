@@ -12,7 +12,7 @@ import com.viewpagerindicator.IconPagerAdapter;
 
 public class BookSettingFragmentAdapter extends FragmentPagerAdapter implements
 		IconPagerAdapter {
-	private List<Fragment> fragmentList = new ArrayList<Fragment>();
+	public List<Fragment> fragmentList = new ArrayList<Fragment>();
 	private int mCount = 3;
 
 	public BookSettingFragmentAdapter(FragmentManager fm, Context context,String bookName,int position,int type,int bookType,String statue,String gid,String lastUrl,boolean isNightMode) {

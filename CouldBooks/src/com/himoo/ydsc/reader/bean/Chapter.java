@@ -21,6 +21,12 @@ public class Chapter {
 	private String coverImageUrl;
 	/** 章节的来源，详情界面还是书架 */
 	private int jumpType = 1;
+	/** gid */
+	private String gid;
+	/** src */
+	private String src;
+	/** cid */
+	private String cid;
 
 	public String getContent() {
 		return content;
@@ -84,6 +90,30 @@ public class Chapter {
 
 	public void setJumpType(int jumpType) {
 		this.jumpType = jumpType;
+	}
+
+	public String getGid() {
+		return gid;
+	}
+
+	public void setGid(String gid) {
+		this.gid = gid;
+	}
+
+	public String getSrc() {
+		return src;
+	}
+
+	public void setSrc(String src) {
+		this.src = src;
+	}
+
+	public String getCid() {
+		return cid;
+	}
+
+	public void setCid(String cid) {
+		this.cid = cid;
 	}
 
 }

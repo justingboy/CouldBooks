@@ -84,6 +84,7 @@ public class UIHelper {
 
 		Intent intent = new Intent(context, className);
 		intent.putExtra("key", value);
+		intent.putExtra("unlock", true);
 		context.startActivity(intent);
 		context.overridePendingTransition(R.anim.activity_zoom_in, 0);
 

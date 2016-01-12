@@ -13,7 +13,7 @@
         android:padding="10dp" >
 
         <com.viewpagerindicator.TabPageIndicator
-            android:id="@+id/pager_indicator"
+            android:id="@+id/book_pager_indicator"
             android:layout_width="220dp"
             android:layout_height="36dp"
             android:layout_centerInParent="true"

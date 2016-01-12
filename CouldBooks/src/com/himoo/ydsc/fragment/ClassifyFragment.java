@@ -35,7 +35,7 @@ public class ClassifyFragment extends BaseFragment {
 	private List<Fragment> fragmentList;
 
 	/** TabPageIndicator */
-	@ViewInject(R.id.pager_indicator)
+	@ViewInject(R.id.book_pager_indicator)
 	private TabPageIndicator tabPageIndicator;
 
 	/** NoScrollViewPager */

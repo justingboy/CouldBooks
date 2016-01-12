@@ -21,6 +21,7 @@ import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.reader.dao.BookMarkDb;
+import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
@@ -77,10 +78,12 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	private boolean isNightMode = false;
 	private int position;
 	private boolean isNigthModeHand;
+	// 是否是第一次展示
+	private boolean isFirstShow = true;
 
 	public static BookSettingFragment1 newInstance(String bookName,
 			int chapterSize, int type, int bookType, String statue, String gid,
-			String lastUrl,boolean isNightMode) {
+			String lastUrl, boolean isNightMode) {
 		BookSettingFragment1 fragment = new BookSettingFragment1();
 		Bundle bundle = new Bundle();
 		bundle.putInt("chapterSize", chapterSize);
@@ -142,6 +145,9 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
 		setListener();
 		setBooksettingNight();
+		jumpType = getArguments().getInt("type", 1);
+		isAutoLoad = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_SETTING_AUTO_LOAD, false);
 
 	}
 
@@ -293,6 +299,10 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 
 	};
 
+	private int jumpType;
+
+	private boolean isAutoLoad;
+
 	/**
 	 * 改变图片选中时的图片
 	 * 
@@ -355,7 +365,7 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	 */
 	private void initTextTypeChildrenSeleted() {
 		int index = SharedPreferences.getInstance().getInt(
-				SpConstant.BOOK_SETTING_TEXT_CHILDREN_TYPE, 1);
+				SpConstant.BOOK_SETTING_TEXT_CHILDREN_TYPE, 3);
 		switch (index) {
 		case 1:
 			booksetting_textface_1.setTextColor(getResources().getColor(
@@ -389,7 +399,14 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 			boolean fromUser) {
 		// TODO Auto-generated method stub
 		// changeNightMode();
-		mListener.onSeekBarChapter(progress);
+		if (jumpType == 1 && !isAutoLoad) {
+			if (isFirstShow) {
+				Toast.show(getActivity(), "在线看书，不可以自由拖动！");
+				isFirstShow = false;
+			}
+		} else {
+			mListener.onSeekBarChapter(progress);
+		}
 
 	}
 
@@ -432,7 +449,7 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	/**
 	 * 设置夜间模式
 	 */
-	private void setBooksettingNight() {
+	public void setBooksettingNight() {
 		if (getArguments().getBoolean("mode")) {
 			ViewSelector.setTextViewSelected(getActivity(), tv_next_chapter,
 					BookTheme.BOOK_SETTING_PRESS_BG, BookTheme.BOOK_SETTING_BG);

@@ -196,17 +196,17 @@ public class WallActivity extends SwipeBackActivity {
 		mTitleBar.setRightLogoGone();
 	}
 
-	/**
-	 * 加压zip文件
-	 * 
-	 * @param inPath
-	 * @param outPath
-	 */
-	public void doZipExtractorWork(String inPath, String outPath) {
-		ZipExtractorTask task = new ZipExtractorTask("", inPath, outPath, this,
-				true);
-		task.execute();
-	}
+//	/**
+//	 * 加压zip文件
+//	 * 
+//	 * @param inPath
+//	 * @param outPath
+//	 */
+//	public void doZipExtractorWork(String inPath, String outPath) {
+//		ZipExtractorTask task = new ZipExtractorTask("", inPath, outPath, this,
+//				true,null);
+//		task.execute();
+//	}
 
 	public class MyChapter {
 		private String chapterName;
@@ -231,7 +231,7 @@ public class WallActivity extends SwipeBackActivity {
 	}
 
 	private void showDialog() {
-		BookDownloadDialog mDialog = new BookDownloadDialog(this);
+		BookDownloadDialog mDialog = new BookDownloadDialog(this,false);
 
 		mDialog.setMessage("正在下载");
 		mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);

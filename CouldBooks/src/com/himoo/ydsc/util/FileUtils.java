@@ -25,9 +25,47 @@ public class FileUtils {
 			.getExternalStorageDirectory().getPath();
 	private static String mDataRootPath = null;
 	private final static String FOLDER_DOWNLOAD_BOOK = "/CouldBook/download/";
+	private final static String FOLDER_DOWNLOAD_BOOK_BAIDU = "/CouldBook/baidu/";
+	private final static String mChapterDbPath = Environment
+			.getExternalStorageDirectory().getPath() + "/CouldBook/db/";
 
 	public FileUtils(Context context) {
 		mDataRootPath = context.getCacheDir().getPath();
+	}
+
+	/**
+	 * 删除ChapterDb文件
+	 * 
+	 * @param bookName
+	 */
+	public void deleteChapterDbByName(String bookName) {
+		File file1 = new File(mChapterDbPath, bookName);
+		File file2 = new File(mChapterDbPath, bookName + "-journal");
+		deleteFile(file1);
+		deleteFile(file2);
+	}
+
+	/**
+	 * 删除百度书籍
+	 * 
+	 * @param bookName
+	 */
+	public void deleteBaiduBook(String bookName) {
+		File file = new File(mSdRootPath+FOLDER_DOWNLOAD_BOOK_BAIDU, bookName);
+		deleteFile(file);
+	}
+
+	/**
+	 * 删除自己服务器上的书籍
+	 * 
+	 * @param bookName
+	 */
+	public void deleteMeBook(String bookName) {
+
+		File file1 = new File(mSdRootPath+FOLDER_DOWNLOAD_BOOK, bookName);
+		File file2 = new File(mSdRootPath+FOLDER_DOWNLOAD_BOOK, bookName + ".zip");
+		deleteFile(file1);
+		deleteFile(file2);
 	}
 
 	public String getStorageDirectory() {

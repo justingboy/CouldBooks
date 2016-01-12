@@ -33,6 +33,7 @@ import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 /**
@@ -75,10 +76,10 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 //		BaiduBookDownload.getInstance(this, 3, this);
 		// 设置主题皮肤
 		BookTheme.setThemeColor(SharedPreferences.getInstance().getInt(
-				SpConstant.BOOK_SKIN_INDEX, 3));
+				SpConstant.BOOK_SKIN_INDEX, 2));
 		// 设置主题皮肤
 		BookTheme.setBookCover(SharedPreferences.getInstance().getInt(
-				SpConstant.BOOK_COVER_INDEX, 0));
+				SpConstant.BOOK_COVER_INDEX, 1));
 		// 设置阅读背景
 		BookTheme.setReaderBookTextBg(SharedPreferences.getInstance().getInt(
 				SpConstant.BOOK_SETTING_TEXT_BG, 3));
@@ -200,7 +201,7 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				context).threadPoolSize(3)
 				// 线程池的个数（默认3个）
-				.threadPriority(Thread.NORM_PRIORITY - 2)
+				.threadPriority(Thread.NORM_PRIORITY-2)
 				// 线程的优先级
 				.denyCacheImageMultipleSizesInMemory()
 				.memoryCache(new LruMemoryCache(10 * 1024 * 1024)) // 可以通过自己的内存缓存实现
@@ -223,6 +224,7 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 	public DisplayImageOptions displayImageOptionsBuider(int resId) {
 		DisplayImageOptions options = new DisplayImageOptions.Builder()
 				.showImageOnLoading(resId).showImageForEmptyUri(resId)
+				.imageScaleType(ImageScaleType.IN_SAMPLE_INT)
 				.showImageOnFail(resId).cacheInMemory(true).cacheOnDisk(true)
 				.considerExifParams(true).bitmapConfig(Bitmap.Config.RGB_565)
 				.build();

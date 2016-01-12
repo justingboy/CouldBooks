@@ -222,7 +222,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 								R.layout.adapter_search_item, baiduBookList);
 						mRefrshListView.setAdapter(mBaiduAdapter);
 					} else {
-						Toast.show(SearchResultActivity.this, "对不起,书库中无收录此书!");
+						Toast.showBg(SearchResultActivity.this, "对不起,书库中无收录此书!");
 						tv_search_empty.setVisibility(View.VISIBLE);
 						mRefrshListView.setVisibility(View.GONE);
 						mTitleBar.setRightLogoVisible();
@@ -264,7 +264,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		// TODO Auto-generated method stub
 		dismissRefreshDialog();
 		AnimationUtils.cancelAnim(imgRefersh);
-		Toast.show(SearchResultActivity.this, "对不起,书库中无收录此书!");
+		Toast.showBg(SearchResultActivity.this, "对不起,书库中无收录此书!");
 		firstReSuccess = whoservice;
 	}
 

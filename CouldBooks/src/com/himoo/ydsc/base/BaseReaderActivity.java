@@ -1,7 +1,9 @@
 package com.himoo.ydsc.base;
 
+import com.himoo.ydsc.R;
 import com.himoo.ydsc.dialog.RefreshDialog;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
@@ -25,7 +27,7 @@ public class BaseReaderActivity extends FragmentActivity {
 					mDialog.setTextColor();
 					mDialog.setIndeterminateDrawable();
 					mDialog.setCancelable(false);
-					
+
 				}
 				mDialog.setMessage(msg.obj.toString());
 				if (!mDialog.isShowing()) {
@@ -64,5 +66,6 @@ public class BaseReaderActivity extends FragmentActivity {
 		msg.what = REFRESH_DIALOG_DIMISS;
 		refreshHandler.sendMessage(msg);
 	}
+
 
 }

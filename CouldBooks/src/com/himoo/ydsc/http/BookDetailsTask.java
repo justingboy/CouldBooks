@@ -386,6 +386,34 @@ public class BookDetailsTask {
 
 	}
 
+	/**
+	 * get方式获取String 
+	 * @param urlString
+	 * @return
+	 */
+	public String getStringFormServe(String urlString)
+	{
+		try {
+			URL url = new URL(urlString);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setConnectTimeout(5000);
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
+			int code = conn.getResponseCode();
+			if (code == 200) {
+				InputStream is = conn.getInputStream();
+				return  streamToString(is);
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			return null;
+		}
+
+	}
+	
+	
 	
 	/**
 	 * 将流转换成String

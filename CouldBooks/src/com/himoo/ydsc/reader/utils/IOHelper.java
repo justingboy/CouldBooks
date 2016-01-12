@@ -122,7 +122,10 @@ public class IOHelper {
 		position = position >= length ? length - 1 : position;
 		Chapter chapter = new Chapter();
 		chapter.setPosition(position);
-		chapter.setIndex(book.getChapterList().get(position).getIndex());
+		BaiduBookChapter bdchapter = book.getChapterList().get(position);
+		chapter.setIndex(bdchapter.getIndex());
+		chapter.setGid(bdchapter.getCid());
+		chapter.setSrc(bdchapter.getHref());
 		chapter.setBookName(book.getBookname());
 		BaiduBookChapter bookChapter = book.getChapterList().get(position);
 		String chapterName = bookChapter.getText().trim();
@@ -235,6 +238,7 @@ public class IOHelper {
 		return book.getBaiduBook();
 	}
 
+	
 	/**
 	 * 开启线程获取小说章节, 防止在网络的不好的情况下出现应用程序无响应的现象
 	 * 

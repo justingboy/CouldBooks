@@ -17,7 +17,6 @@
 package com.himoo.ydsc.ui.swipebacklayout;
 
 import java.util.Arrays;
-
 import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
@@ -1563,17 +1562,20 @@ public class ViewDragHelper {
     }
 
     private int getEdgeTouched(int x, int y) {
-        int result = 0;
+    	
+    	   int result = 0;
+           result = EDGE_LEFT;//这样每次都是全屏左滑删除
 
-        if (x < mParentView.getLeft() + mEdgeSize)
-            result = EDGE_LEFT;
-        if (y < mParentView.getTop() + mEdgeSize)
-            result = EDGE_TOP;
-        if (x > mParentView.getRight() - mEdgeSize)
-            result = EDGE_RIGHT;
-        if (y > mParentView.getBottom() - mEdgeSize)
-            result = EDGE_BOTTOM;
+           //解决只有点击屏幕左边才有响应的问题
+           /*if (x < mParentView.getLeft() + mEdgeSize)
+               result = EDGE_LEFT;
+           if (y < mParentView.getTop() + mEdgeSize)
+               result = EDGE_TOP;
+           if (x > mParentView.getRight() - mEdgeSize)
+               result = EDGE_RIGHT;
+           if (y > mParentView.getBottom() - mEdgeSize)
+               result = EDGE_BOTTOM;*/
 
-        return result;
+           return result;
     }
 }

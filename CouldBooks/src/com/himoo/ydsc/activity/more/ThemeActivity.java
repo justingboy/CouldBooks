@@ -48,20 +48,21 @@ public class ThemeActivity extends SwipeBackActivity implements
 			R.drawable.fm_big };
 	private String[] title = { "封面一", "封面二", "封面三", "封面四" };
 
-	/** 当前选择皮肤的颜色 */
-	private int mCurrentSkinColor = R.drawable.theme_shape_green;
+	// /** 当前选择皮肤的颜色 */
+	// private int mCurrentSkinColor = R.drawable.theme_shape_green;
 
 	/** 当前选择皮的小说默认封面 */
 	private String mCurrentTitle = title[1];
+
+	private int mCurrentSkinIndex;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_more_theme);
-
-		mCurrentSkinColor = SharedPreferences.getInstance().getInt(
-				SpConstant.BOOK_SKIN_TYPE, R.drawable.theme_shape_green);
+		mCurrentSkinIndex = SharedPreferences.getInstance().getInt(
+				SpConstant.BOOK_SKIN_INDEX, 2);
 		mCurrentTitle = SharedPreferences.getInstance().getString(
 				SpConstant.BOOK_COVER_TYPE, title[1]);
 
@@ -99,6 +100,7 @@ public class ThemeActivity extends SwipeBackActivity implements
 		for (int i = 0; i < skinDrawable.length; i++) {
 			ThemeSkin skin = new ThemeSkin();
 			skin.setDrawableId(skinDrawable[i]);
+			skin.setSkinIndex(i + 1);
 			themeList.add(skin);
 		}
 		final QuickAdapter<ThemeSkin> skinAdapter = new QuickAdapter<ThemeSkin>(
@@ -109,7 +111,7 @@ public class ThemeActivity extends SwipeBackActivity implements
 				// TODO Auto-generated method stub
 				helper.setBackgroundRes(R.id.theme_skin_image,
 						item.getDrawableId());
-				if (item.getDrawableId() == mCurrentSkinColor)
+				if (item.getSkinIndex() == mCurrentSkinIndex)
 					helper.setVisible(R.id.theme_skinChoice_image, true);
 				else
 					helper.setVisible(R.id.theme_skinChoice_image, false);
@@ -123,10 +125,8 @@ public class ThemeActivity extends SwipeBackActivity implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// TODO Auto-generated method stub
-				mCurrentSkinColor = skinDrawable[position];
+				mCurrentSkinIndex = position + 1;
 				skinAdapter.notifyDataSetChanged();
-				SharedPreferences.getInstance().putInt(
-						SpConstant.BOOK_SKIN_TYPE, mCurrentSkinColor);
 				SharedPreferences.getInstance().putInt(
 						SpConstant.BOOK_SKIN_INDEX, position + 1);
 				BookTheme.setThemeColor(position + 1);

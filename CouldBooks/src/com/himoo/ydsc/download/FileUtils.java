@@ -259,7 +259,8 @@ public class FileUtils {
 									.replaceAll("readx.* ", "       ")
 									.replaceAll("<a  class=\" yi-fontcolor\" .*", "")
 									.replaceAll("<p  class=\" .*p\">", "\n         ")
-									.replaceAll("<p  class=\".*p\">", "\n        ");
+									.replaceAll("<p  class=\".*p\">", "\n        ")
+									.replaceAll("<a  class=\".*</a>", "");
 				bw = new BufferedWriter(new FileWriter(file));
 				bw.write(bookContent);
 

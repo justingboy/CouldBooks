@@ -42,16 +42,16 @@ public class ChapterParseUtil {
 						.replaceAll("readx.* ", "       ")
 						.replaceAll("<a  class=\" yi-fontcolor\" .*", "")
 						.replaceAll("<p  class=\" .*p\">", "\n         ")
-						.replaceAll("<p  class=\".*p\">", "\n        ");
-				
+						.replaceAll("<p  class=\".*p\">", "\n        ")
+						.replaceAll("<a  class=\".*</a>", "");
 				return bookContent;
 			} else {
 
 //				Toast.showLong(context, "本章暂无内容");
 			}
 		} catch (JSONException e1) {
-
-			Toast.showLong(context, "解析章节内容失败");
+			return null;
+//			Toast.showLong(context, "解析章节内容失败");
 		}
 		
 		return null;

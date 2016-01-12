@@ -38,7 +38,7 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * 阅读界面设置
  * 
  */
-public final class BookSettingFragment2 extends Fragment implements
+public class BookSettingFragment2 extends Fragment implements
 		OnClickListener, OnLongClickListener {
 
 	private static final String ACTION = "com.himoo.ydsc.booksettingfragment1.receiver";

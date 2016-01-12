@@ -5,6 +5,7 @@ import org.apache.http.message.BasicNameValuePair;
 import android.content.Context;
 
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.util.MyLogger;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
@@ -137,21 +138,30 @@ public class HttpOperator {
 						// TODO Auto-generated method stubｓ
 						mCurrentIndex++;
 						if (responseInfo.result.equalsIgnoreCase("true")) {
-
-							SharedPreferences.getInstance().putString("host",
-									baseUrl[mCurrentIndex] + "bookinfo/");
-							mCurrentIndex =0;
+							try {
+								SharedPreferences.getInstance().putString(
+										"host",
+										baseUrl[mCurrentIndex] + "bookinfo/");
+							} catch (Exception e) {
+								MyLogger.kLog().e(e);
+							}
+							mCurrentIndex = 0;
 						} else if (responseInfo.result
 								.equalsIgnoreCase("false")) {
-							SharedPreferences.getInstance().putString(
-									"host",
-									baseUrl[mCurrentIndex]
-											+ HttpConstant.BASE_URL_TEST);
-							mCurrentIndex =0;
+							try {
+
+								SharedPreferences.getInstance().putString(
+										"host",
+										baseUrl[mCurrentIndex]
+												+ HttpConstant.BASE_URL_TEST);
+							} catch (Exception e) {
+								MyLogger.kLog().e(e);
+							}
+							mCurrentIndex = 0;
 						} else {
 							if (mCurrentIndex == 3) {
 								mCurrentIndex = 0;
-								Toast.showLong(context, "服务器出现错误！");
+								Toast.showLong(context, "服务器出现错误");
 								return;
 							}
 							validateHostUrlWork(context);
@@ -164,8 +174,8 @@ public class HttpOperator {
 						// TODO Auto-generated method stub
 						mCurrentIndex++;
 						if (mCurrentIndex == 3) {
-							mCurrentIndex=0;
-							Toast.showLong(context, "服务器出现错误！");
+							mCurrentIndex = 0;
+							Toast.showLong(context, "服务器出现错误 ");
 							return;
 						}
 						validateHostUrlWork(context);

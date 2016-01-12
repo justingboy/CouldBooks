@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechSynthesizer;
+import com.iflytek.cloud.SynthesizerListener;
 
 public class SpeechReader {
 
@@ -28,18 +29,23 @@ public class SpeechReader {
 
 	}
 
-	public void initSpeech(Context context) {
+	public void initSpeech(Context context, int speed) {
 		mTts = SpeechSynthesizer.createSynthesizer(context, null);
-		set_mTts();
+		set_mTts(speed);
 
 	}
 
-	private void set_mTts() {
+	/**
+	 * 设置语速
+	 * 
+	 * @param speed
+	 */
+	private void set_mTts(int speed) {
 		// 设置发音人
 		mTts.setParameter(SpeechConstant.VOICE_NAME, "yufeng");
 
 		// 设置语速
-		mTts.setParameter(SpeechConstant.SPEED, "30");
+		mTts.setParameter(SpeechConstant.SPEED, String.valueOf(speed));
 
 		// 设置音调
 		mTts.setParameter(SpeechConstant.PITCH, "50");
@@ -60,9 +66,9 @@ public class SpeechReader {
 	 * 
 	 * @param chapter
 	 */
-	public void speechChapter(String chapter) {
+	public void speechChapter(String chapter, SynthesizerListener listener) {
 
-		mTts.startSpeaking(chapter, null);
+		mTts.startSpeaking(chapter, listener);
 	}
 
 	/**

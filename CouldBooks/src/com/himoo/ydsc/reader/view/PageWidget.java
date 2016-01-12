@@ -13,12 +13,11 @@ import android.graphics.Region;
 import android.graphics.drawable.GradientDrawable;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.util.SharedPreferences;
-
-//import android.util.Log;
 
 /**
  * 该类只实现了翻书效果
@@ -26,10 +25,15 @@ import com.himoo.ydsc.util.SharedPreferences;
  * 
  */
 public class PageWidget extends View {
+
+	// 记录上一次滑动的点
+	private int aniTouchX, aniTouchY, aniDx, aniDy;
+	private boolean isMove = false;
+
+	private float firstDownX = 0;
+	private float firstDownY = 0;
 	
-	
-	//记录上一次滑动的点
-	private int aniTouchX, aniTouchY,aniDx ,aniDy;
+	private int duration = 450;
 
 	private int mWidth;// 宽度
 	private int mHeight;// 高度
@@ -69,15 +73,15 @@ public class PageWidget extends View {
 	int[] mFrontShadowColors;// 背景色
 
 	// 渐变图片，共有8中方向，3种颜色的变化组合
-	GradientDrawable mBackShadowDrawableLR;
-	GradientDrawable mBackShadowDrawableRL;
-	GradientDrawable mFolderShadowDrawableLR;
-	GradientDrawable mFolderShadowDrawableRL;
+	private GradientDrawable mBackShadowDrawableLR;
+	private GradientDrawable mBackShadowDrawableRL;
+	private GradientDrawable mFolderShadowDrawableLR;
+	private GradientDrawable mFolderShadowDrawableRL;
 
-	GradientDrawable mFrontShadowDrawableHBT;
-	GradientDrawable mFrontShadowDrawableHTB;
-	GradientDrawable mFrontShadowDrawableVLR;
-	GradientDrawable mFrontShadowDrawableVRL;
+	// private GradientDrawable mFrontShadowDrawableHBT;
+	// private GradientDrawable mFrontShadowDrawableHTB;
+	// private GradientDrawable mFrontShadowDrawableVLR;
+	// private GradientDrawable mFrontShadowDrawableVRL;
 
 	Paint mPaint;
 
@@ -85,10 +89,10 @@ public class PageWidget extends View {
 	private boolean isNightMode;
 	private boolean isAutoNightMode;
 
-	static enum Mode {
+	public static enum Mode {
 		TURN_LEFT(0), TURN_CURL(1), TURN_NO(2), TURN_MOVE(3), TURN_UPANDDOWN(4);
 
-		int Auto;
+		public int Auto;
 
 		Mode(int auto) {
 			Auto = auto;
@@ -96,7 +100,7 @@ public class PageWidget extends View {
 	}
 
 	/** 默认动画的类型 */
-	private Mode mMode = Mode.TURN_CURL;
+	public Mode mMode = Mode.TURN_CURL;
 
 	public PageWidget(Context context, int w, int h) {
 		super(context);
@@ -117,7 +121,7 @@ public class PageWidget extends View {
 
 		mColorMatrixFilter = new ColorMatrixColorFilter(cm);
 		mMatrix = new Matrix();
-		mScroller = new Scroller(getContext());
+		mScroller = new Scroller(context, new LinearInterpolator());
 
 		mTouch.x = 0.01f; // 不让x,y为0,否则在点计算时会有问题
 		mTouch.y = 0.01f;
@@ -166,22 +170,30 @@ public class PageWidget extends View {
 		if (event.getAction() == MotionEvent.ACTION_MOVE) {
 			mTouch.x = event.getX();
 			mTouch.y = event.getY();
+			if (Math.abs(firstDownX - mTouch.x) > 20)
+				isMove = true;
 			this.postInvalidate();
 		}
 
 		if (event.getAction() == MotionEvent.ACTION_DOWN) {
 			mTouch.x = event.getX();
 			mTouch.y = event.getY();
+			firstDownX = mTouch.x;
+			firstDownY = mTouch.y;
+			isMove = false;
 			// calcCornerXY(mTouch.x, mTouch.y);
 			// this.postInvalidate();
 		}
 
 		if (event.getAction() == MotionEvent.ACTION_UP) {
+			isMove = false;
 			if (canDragOver()) {
-				// Log.i("msg", "--canDragOver");
-				startAnimation(1200);
+				if (mMode == Mode.TURN_UPANDDOWN) {
+					startUpdownAnimation(duration);
+				} else {
+					startAnimation(duration);
+				}
 			} else {
-				// Log.i("msg", "--canDragOver --mTouch.x");
 				mTouch.x = mCornerX - 0.09f;
 				mTouch.y = mCornerY - 0.09f;
 			}
@@ -358,14 +370,88 @@ public class PageWidget extends View {
 		canvas.restore();
 	}
 
+	/**
+	 * 无动画的翻到下一页
+	 * 
+	 * @param canvas
+	 * @param bitmap
+	 */
 	private void drawNextPageNoAnim(Canvas canvas, Bitmap bitmap) {
+		canvas.save();
 		canvas.drawBitmap(bitmap, 0, 0, null);
 		canvas.restore();
 	}
 
+	/**
+	 * 无动画的绘制下一页
+	 * 
+	 * @param canvas
+	 * @param bitmap
+	 */
 	private void drawCurrentPageNoAnim(Canvas canvas, Bitmap bitmap) {
 		canvas.save();
 		canvas.drawBitmap(bitmap, 0, 0, null);
+		canvas.restore();
+	}
+
+	/**
+	 * 左右联动动画 绘制当前页
+	 * 
+	 * @param canvas
+	 * @param bitmap
+	 */
+	private void drawCurrentPageMoveAnim(Canvas canvas, Bitmap bitmap) {
+		canvas.save();
+		if (firstDownX > mWidth / 2) {
+			canvas.drawBitmap(bitmap, mTouch.x - mWidth, 0.0F, null);
+			drawShade(canvas, -mWidth + (int) mTouch.x, false);
+		} else {
+			drawShade(canvas, -mWidth + (int) mTouch.x, true);
+			canvas.drawBitmap(bitmap, this.mTouch.x, 0.0F, null);
+		}
+
+		canvas.restore();
+	}
+
+	/**
+	 * 覆盖动画绘制下一页
+	 * 
+	 * @param canvas
+	 * @param pointLeft
+	 */
+	private void drawNextPageMoveAnim(Canvas canvas, Bitmap nextBitmap) {
+		canvas.save();
+		canvas.drawBitmap(nextBitmap, 0.0F, 0.0F, null);
+		canvas.restore();
+	}
+
+	/**
+	 * 上和下联动动画 绘制当前页
+	 * 
+	 * @param canvas
+	 * @param bitmap
+	 */
+	private void drawCurrentPageUpAnim(Canvas canvas, Bitmap bitmap) {
+		canvas.save();
+		if (firstDownY > mHeight / 2) {
+			canvas.drawBitmap(bitmap, 0.0F, mTouch.y - mHeight, null);
+		} else {
+			canvas.drawBitmap(bitmap, 0.0F, this.mTouch.y, null);
+		}
+
+		canvas.restore();
+	}
+
+	/**
+	 * 上和下联动动画 绘制下一页
+	 * 
+	 * @param canvas
+	 * @param mCurPageBitmap2
+	 */
+	private void drawNextPageUpAnim(Canvas canvas, Bitmap nextBitmap) {
+		// TODO Auto-generated method stub
+		canvas.save();
+		canvas.drawBitmap(nextBitmap, 0.0F, 0.0F, null);
 		canvas.restore();
 	}
 
@@ -411,7 +497,6 @@ public class PageWidget extends View {
 				canvas.drawColor(0xFFAAAAAA);
 			}
 		}
-
 		calcPoints();
 		perforTurnPageAnim(canvas);
 
@@ -435,10 +520,12 @@ public class PageWidget extends View {
 			drawNextPageNoAnim(canvas, mNextPageBitmap);
 			break;
 		case TURN_MOVE:
-
+			drawNextPageMoveAnim(canvas, mNextPageBitmap);
+			drawCurrentPageMoveAnim(canvas, mCurPageBitmap);
 			break;
 		case TURN_UPANDDOWN:
-
+			drawNextPageUpAnim(canvas, mNextPageBitmap);
+			drawCurrentPageUpAnim(canvas, mCurPageBitmap);
 			break;
 
 		default:
@@ -459,15 +546,18 @@ public class PageWidget extends View {
 			break;
 		case 1:
 			mMode = Mode.TURN_CURL;
+			duration = 450;
 			break;
 		case 2:
 			mMode = Mode.TURN_NO;
 			break;
 		case 3:
-			mMode = Mode.TURN_UPANDDOWN;
+			mMode = Mode.TURN_MOVE;
+			duration = 600;
 			break;
 		case 4:
-			mMode = Mode.TURN_LEFT;
+			mMode = Mode.TURN_UPANDDOWN;
+			duration = 600;
 			break;
 
 		default:
@@ -500,130 +590,130 @@ public class PageWidget extends View {
 				GradientDrawable.Orientation.LEFT_RIGHT, mBackShadowColors);
 		mBackShadowDrawableLR.setGradientType(GradientDrawable.LINEAR_GRADIENT);
 
-		mFrontShadowColors = new int[] { 0x80111111, 0x111111 };
-		mFrontShadowDrawableVLR = new GradientDrawable(
-				GradientDrawable.Orientation.LEFT_RIGHT, mFrontShadowColors);
-		mFrontShadowDrawableVLR
-				.setGradientType(GradientDrawable.LINEAR_GRADIENT);
+		// mFrontShadowColors = new int[] { 0x80111111, 0x111111 };
+		// mFrontShadowDrawableVLR = new GradientDrawable(
+		// GradientDrawable.Orientation.LEFT_RIGHT, mFrontShadowColors);
+		// mFrontShadowDrawableVLR
+		// .setGradientType(GradientDrawable.LINEAR_GRADIENT);
 
-		mFrontShadowDrawableVRL = new GradientDrawable(
-				GradientDrawable.Orientation.RIGHT_LEFT, mFrontShadowColors);
-		mFrontShadowDrawableVRL
-				.setGradientType(GradientDrawable.LINEAR_GRADIENT);
-
-		mFrontShadowDrawableHTB = new GradientDrawable(
-				GradientDrawable.Orientation.TOP_BOTTOM, mFrontShadowColors);
-		mFrontShadowDrawableHTB
-				.setGradientType(GradientDrawable.LINEAR_GRADIENT);
-
-		mFrontShadowDrawableHBT = new GradientDrawable(
-				GradientDrawable.Orientation.BOTTOM_TOP, mFrontShadowColors);
-		mFrontShadowDrawableHBT
-				.setGradientType(GradientDrawable.LINEAR_GRADIENT);
+		// mFrontShadowDrawableVRL = new GradientDrawable(
+		// GradientDrawable.Orientation.RIGHT_LEFT, mFrontShadowColors);
+		// mFrontShadowDrawableVRL
+		// .setGradientType(GradientDrawable.LINEAR_GRADIENT);
+		//
+		// mFrontShadowDrawableHTB = new GradientDrawable(
+		// GradientDrawable.Orientation.TOP_BOTTOM, mFrontShadowColors);
+		// mFrontShadowDrawableHTB
+		// .setGradientType(GradientDrawable.LINEAR_GRADIENT);
+		//
+		// mFrontShadowDrawableHBT = new GradientDrawable(
+		// GradientDrawable.Orientation.BOTTOM_TOP, mFrontShadowColors);
+		// mFrontShadowDrawableHBT
+		// .setGradientType(GradientDrawable.LINEAR_GRADIENT);
 	}
 
-	/**
-	 * 绘制每页右边的阴影
-	 * 
-	 * @param canvas
-	 */
-	private void drawCurrentPageShadow(Canvas canvas) {
-		double degree;
-		if (mIsRTandLB) {
-			degree = Math.PI
-					/ 4
-					- Math.atan2(mBezierControl1.y - mTouch.y, mTouch.x
-							- mBezierControl1.x);
-		} else {
-			degree = Math.PI
-					/ 4
-					- Math.atan2(mTouch.y - mBezierControl1.y, mTouch.x
-							- mBezierControl1.x);
-		}
-		// 翻起页阴影顶点与touch点的距离
-		double d1 = (float) 25 * 1.414 * Math.cos(degree);
-		double d2 = (float) 25 * 1.414 * Math.sin(degree);
-		float x = (float) (mTouch.x + d1);
-		float y;
-		if (mIsRTandLB) {
-			y = (float) (mTouch.y + d2);
-		} else {
-			y = (float) (mTouch.y - d2);
-		}
-		mPath1.reset();
-		mPath1.moveTo(x, y);
-		mPath1.lineTo(mTouch.x, mTouch.y);
-		mPath1.lineTo(mBezierControl1.x, mBezierControl1.y);
-		mPath1.lineTo(mBezierStart1.x, mBezierStart1.y);
-		mPath1.close();
-		float rotateDegrees;
-		canvas.save();
-
-		canvas.clipPath(mPath0, Region.Op.XOR);
-		canvas.clipPath(mPath1, Region.Op.INTERSECT);
-		int leftx;
-		int rightx;
-		GradientDrawable mCurrentPageShadow;
-		if (mIsRTandLB) {
-			leftx = (int) (mBezierControl1.x);
-			rightx = (int) mBezierControl1.x + 25;
-			mCurrentPageShadow = mFrontShadowDrawableVLR;
-		} else {
-			leftx = (int) (mBezierControl1.x - 25);
-			rightx = (int) mBezierControl1.x + 1;
-			mCurrentPageShadow = mFrontShadowDrawableVRL;
-		}
-
-		rotateDegrees = (float) Math.toDegrees(Math.atan2(mTouch.x
-				- mBezierControl1.x, mBezierControl1.y - mTouch.y));
-		canvas.rotate(rotateDegrees, mBezierControl1.x, mBezierControl1.y);
-		mCurrentPageShadow.setBounds(leftx,
-				(int) (mBezierControl1.y - mMaxLength), rightx,
-				(int) (mBezierControl1.y));
-		mCurrentPageShadow.draw(canvas);
-		canvas.restore();
-
-		mPath1.reset();
-		mPath1.moveTo(x, y);
-		mPath1.lineTo(mTouch.x, mTouch.y);
-		mPath1.lineTo(mBezierControl2.x, mBezierControl2.y);
-		mPath1.lineTo(mBezierStart2.x, mBezierStart2.y);
-		mPath1.close();
-		canvas.save();
-		canvas.clipPath(mPath0, Region.Op.XOR);
-		canvas.clipPath(mPath1, Region.Op.INTERSECT);
-		if (mIsRTandLB) {
-			leftx = (int) (mBezierControl2.y);
-			rightx = (int) (mBezierControl2.y + 25);
-			mCurrentPageShadow = mFrontShadowDrawableHTB;
-		} else {
-			leftx = (int) (mBezierControl2.y - 25);
-			rightx = (int) (mBezierControl2.y + 1);
-			mCurrentPageShadow = mFrontShadowDrawableHBT;
-		}
-		rotateDegrees = (float) Math.toDegrees(Math.atan2(mBezierControl2.y
-				- mTouch.y, mBezierControl2.x - mTouch.x));
-		canvas.rotate(rotateDegrees, mBezierControl2.x, mBezierControl2.y);
-		float temp;
-		if (mBezierControl2.y < 0)
-			temp = mBezierControl2.y - mHeight;
-		else
-			temp = mBezierControl2.y;
-
-		int hmg = (int) Math.hypot(mBezierControl2.x, temp);
-		if (hmg > mMaxLength)
-			mCurrentPageShadow
-					.setBounds((int) (mBezierControl2.x - 25) - hmg, leftx,
-							(int) (mBezierControl2.x + mMaxLength) - hmg,
-							rightx);
-		else
-			mCurrentPageShadow.setBounds(
-					(int) (mBezierControl2.x - mMaxLength), leftx,
-					(int) (mBezierControl2.x), rightx);
-
-		mCurrentPageShadow.draw(canvas);
-		canvas.restore();
-	}
+	// /**
+	// * 绘制每页右边的阴影
+	// *
+	// * @param canvas
+	// */
+	// private void drawCurrentPageShadow(Canvas canvas) {
+	// double degree;
+	// if (mIsRTandLB) {
+	// degree = Math.PI
+	// / 4
+	// - Math.atan2(mBezierControl1.y - mTouch.y, mTouch.x
+	// - mBezierControl1.x);
+	// } else {
+	// degree = Math.PI
+	// / 4
+	// - Math.atan2(mTouch.y - mBezierControl1.y, mTouch.x
+	// - mBezierControl1.x);
+	// }
+	// // 翻起页阴影顶点与touch点的距离
+	// double d1 = (float) 25 * 1.414 * Math.cos(degree);
+	// double d2 = (float) 25 * 1.414 * Math.sin(degree);
+	// float x = (float) (mTouch.x + d1);
+	// float y;
+	// if (mIsRTandLB) {
+	// y = (float) (mTouch.y + d2);
+	// } else {
+	// y = (float) (mTouch.y - d2);
+	// }
+	// mPath1.reset();
+	// mPath1.moveTo(x, y);
+	// mPath1.lineTo(mTouch.x, mTouch.y);
+	// mPath1.lineTo(mBezierControl1.x, mBezierControl1.y);
+	// mPath1.lineTo(mBezierStart1.x, mBezierStart1.y);
+	// mPath1.close();
+	// float rotateDegrees;
+	// canvas.save();
+	//
+	// canvas.clipPath(mPath0, Region.Op.XOR);
+	// canvas.clipPath(mPath1, Region.Op.INTERSECT);
+	// int leftx;
+	// int rightx;
+	// GradientDrawable mCurrentPageShadow;
+	// if (mIsRTandLB) {
+	// leftx = (int) (mBezierControl1.x);
+	// rightx = (int) mBezierControl1.x + 25;
+	// mCurrentPageShadow = mFrontShadowDrawableVLR;
+	// } else {
+	// leftx = (int) (mBezierControl1.x - 25);
+	// rightx = (int) mBezierControl1.x + 1;
+	// mCurrentPageShadow = mFrontShadowDrawableVRL;
+	// }
+	//
+	// rotateDegrees = (float) Math.toDegrees(Math.atan2(mTouch.x
+	// - mBezierControl1.x, mBezierControl1.y - mTouch.y));
+	// canvas.rotate(rotateDegrees, mBezierControl1.x, mBezierControl1.y);
+	// mCurrentPageShadow.setBounds(leftx,
+	// (int) (mBezierControl1.y - mMaxLength), rightx,
+	// (int) (mBezierControl1.y));
+	// mCurrentPageShadow.draw(canvas);
+	// canvas.restore();
+	//
+	// mPath1.reset();
+	// mPath1.moveTo(x, y);
+	// mPath1.lineTo(mTouch.x, mTouch.y);
+	// mPath1.lineTo(mBezierControl2.x, mBezierControl2.y);
+	// mPath1.lineTo(mBezierStart2.x, mBezierStart2.y);
+	// mPath1.close();
+	// canvas.save();
+	// canvas.clipPath(mPath0, Region.Op.XOR);
+	// canvas.clipPath(mPath1, Region.Op.INTERSECT);
+	// if (mIsRTandLB) {
+	// leftx = (int) (mBezierControl2.y);
+	// rightx = (int) (mBezierControl2.y + 25);
+	// mCurrentPageShadow = mFrontShadowDrawableHTB;
+	// } else {
+	// leftx = (int) (mBezierControl2.y - 25);
+	// rightx = (int) (mBezierControl2.y + 1);
+	// mCurrentPageShadow = mFrontShadowDrawableHBT;
+	// }
+	// rotateDegrees = (float) Math.toDegrees(Math.atan2(mBezierControl2.y
+	// - mTouch.y, mBezierControl2.x - mTouch.x));
+	// canvas.rotate(rotateDegrees, mBezierControl2.x, mBezierControl2.y);
+	// float temp;
+	// if (mBezierControl2.y < 0)
+	// temp = mBezierControl2.y - mHeight;
+	// else
+	// temp = mBezierControl2.y;
+	//
+	// int hmg = (int) Math.hypot(mBezierControl2.x, temp);
+	// if (hmg > mMaxLength)
+	// mCurrentPageShadow
+	// .setBounds((int) (mBezierControl2.x - 25) - hmg, leftx,
+	// (int) (mBezierControl2.x + mMaxLength) - hmg,
+	// rightx);
+	// else
+	// mCurrentPageShadow.setBounds(
+	// (int) (mBezierControl2.x - mMaxLength), leftx,
+	// (int) (mBezierControl2.x), rightx);
+	//
+	// mCurrentPageShadow.draw(canvas);
+	// canvas.restore();
+	// }
 
 	/**
 	 * 绘制翻起页背面
@@ -686,6 +776,7 @@ public class PageWidget extends View {
 	/**
 	 * 实现子View的平滑滚动
 	 */
+	@Override
 	public void computeScroll() {
 		super.computeScroll();
 		if (mScroller.computeScrollOffset()) {
@@ -704,6 +795,8 @@ public class PageWidget extends View {
 	 * @param delayMillis
 	 */
 	private void startAnimation(int delayMillis) {
+		if (!this.mScroller.isFinished())
+			this.mScroller.abortAnimation();
 		int dx, dy;
 		if (mCornerX > 0) {
 			dx = -(int) (mWidth + mTouch.x);
@@ -724,15 +817,46 @@ public class PageWidget extends View {
 	}
 
 	/**
+	 * 开始动画
+	 * 
+	 * @param delayMillis
+	 */
+	private void startUpdownAnimation(int delayMillis) {
+		if (!this.mScroller.isFinished())
+			this.mScroller.abortAnimation();
+		int dx, dy;
+		if (firstDownY > mHeight / 2) {
+			dy = -(int) mTouch.y;
+		} else {
+			dy = (int) (mHeight - mTouch.y);
+		}
+		aniTouchX = (int) mTouch.x;
+		aniTouchY = (int) mTouch.y;
+		aniDy = dy;
+		mScroller.startScroll(0, (int) mTouch.y, 0, dy, delayMillis);
+	}
+
+	/**
 	 * 执行默认翻书动画
 	 */
 	public void startAnimation() {
 		if (mScroller != null) {
-			// int dx = -1278, dy = 331;
-			// int touchX = 558, touchY = 948;
-			mScroller.startScroll(aniTouchX, aniTouchY, aniDx, aniDy, 1200);
+			if (!this.mScroller.isFinished())
+				this.mScroller.abortAnimation();
+			mScroller.startScroll(aniTouchX, aniTouchY, aniDx, aniDy, duration);
 		}
 	}
+	/**
+	 * 执行默认翻书动画
+	 */
+	public void startUpAnimation() {
+		if (mScroller != null) {
+			if (!this.mScroller.isFinished())
+				this.mScroller.abortAnimation();
+			mScroller.startScroll(0, (int) mTouch.y, 0, aniDy, duration);
+		}
+	}
+	
 
 	/**
 	 * 停止滚动的动画
@@ -763,11 +887,71 @@ public class PageWidget extends View {
 		return true;
 	}
 
+	/**
+	 * 是否向上滑动
+	 * @return
+	 */
+	public boolean DragToUp() {
+		if (firstDownY > mHeight / 2) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 关闭夜间模式
+	 */
 	public void setAutoNightFalse() {
 		isAutoNightMode = false;
 		isNightMode = false;
 	}
 
+	/**
+	 * 绘制覆盖动画的阴影
+	 * 
+	 * @param canvas
+	 * @param shadeWidth
+	 * @param isLeft
+	 */
+	private void drawShade(Canvas canvas, int shadeWidth, boolean isLeft) {
+		int i = this.mWidth / 2;
+		int j = this.mWidth / 20;
+		int k = this.mWidth / 50;
+		int m = this.mWidth / 100;
+		GradientDrawable.Orientation orientation = GradientDrawable.Orientation.LEFT_RIGHT;
+		if (isLeft) {
+			orientation = GradientDrawable.Orientation.RIGHT_LEFT;
+		}
+		GradientDrawable gradient1 = new GradientDrawable(orientation,
+				new int[] { 0x99000000, 0x66000000 });
+
+		GradientDrawable gradient2 = new GradientDrawable(orientation,
+				new int[] { 0x66000000, 0x9333333 });
+		int n = shadeWidth + this.mWidth;
+		if (Math.abs(n) > m) {
+			if (isLeft) {
+				gradient1.setBounds(n - m, 0, n, this.mHeight);
+			} else {
+
+				gradient1.setBounds(n, 0, n + m, this.mHeight);
+			}
+			gradient1.draw(canvas);
+			int i1 = j - Math.abs(n - i) * (j - k) / i;
+			int i2 = n + m;
+			if (isLeft) {
+				i2 = n - m;
+				gradient2.setBounds(i2 - i1, 0, i2, this.mHeight);
+			} else {
+
+				gradient2.setBounds(i2, 0, i2 + i1, this.mHeight);
+			}
+			gradient2.draw(canvas);
+		}
+	}
+
+	/**
+	 * 释放资源
+	 */
 	public void destroy() {
 		if (mCurPageBitmap != null) {
 			mCurPageBitmap.recycle();
@@ -778,5 +962,4 @@ public class PageWidget extends View {
 			mNextPageBitmap = null;
 		}
 	}
-
 }

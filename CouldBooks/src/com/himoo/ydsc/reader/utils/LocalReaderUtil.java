@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import android.util.Log;
+import android.content.Context;
 
-import com.himoo.ydsc.activity.more.WallActivity.MyChapter;
 import com.himoo.ydsc.aescrypt.AESCrypt;
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.db.ChapterDb;
 import com.himoo.ydsc.util.FileUtils;
 
 public class LocalReaderUtil {
@@ -40,7 +40,9 @@ public class LocalReaderUtil {
 	public ArrayList<BaiduBookChapter> parseLocalBook(String bookName,
 			int bookType) {
 		ArrayList<BaiduBookChapter> list = new ArrayList<BaiduBookChapter>();
+		
 		if (bookType == 2) {
+//			ChapterDb.getInstance().createDb(context, bookName);
 			ArrayList<File> chapterFile = new ArrayList<File>();
 			File bookFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
 					+ File.separator + bookName + File.separator);
@@ -55,6 +57,7 @@ public class LocalReaderUtil {
 					String path = chapterFile.get(i).getName();
 					String[] str = path.split("-\\|");
 					BaiduBookChapter chapter = new BaiduBookChapter();
+//					BaiduBookChapter dbChap = ChapterDb.getInstance().queryChapterByPosition(i);
 					chapter.setText(str[0]);
 					chapter.setIndex(str[1]);
 					String pos = str[2];
@@ -63,6 +66,8 @@ public class LocalReaderUtil {
 					list.add(chapter);
 
 				}
+				
+				
 				chapterFile.clear();
 				chapterFile = null;
 

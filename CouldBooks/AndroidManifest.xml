@@ -156,6 +156,10 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
+            android:name="com.himoo.ydsc.activity.ChangeSourceActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.himoo.ydsc.excption.CrashActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" >

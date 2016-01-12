@@ -37,6 +37,7 @@ import com.himoo.ydsc.speech.JsonParser;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.view.BookTitleBar;
 import com.himoo.ydsc.ui.view.KeywordsFlow;
+import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.iflytek.cloud.ErrorCode;
 import com.iflytek.cloud.InitListener;
@@ -198,7 +199,12 @@ public class SearchFragment extends BaseFragment implements
 			if (keyword.equals("换一换")) {
 				if (isClickable) {
 					isClickable = false;
-					getKeyWordRequest(mCurrentPage, 9);
+					if (NetWorkUtils.isNetConnected(getActivity())) {
+						getKeyWordRequest(mCurrentPage, 9);
+					} else {
+						Toast.show(getActivity(), "未连接网络");
+						isClickable = true;
+					}
 				}
 			} else {
 				save(keyword);
@@ -269,8 +275,10 @@ public class SearchFragment extends BaseFragment implements
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
 				isClickable = true;
-				if (getActivity() != null)
-					Toast.showShort(getActivity(), "请求关键字失败 ：" + msg);
+				if (getActivity() != null) {
+					Log.e(error);
+					Toast.show(getActivity(), "获取关键字失败 ");
+				}
 			}
 		});
 	}
