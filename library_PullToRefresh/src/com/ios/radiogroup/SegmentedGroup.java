@@ -19,8 +19,7 @@ import android.widget.RadioGroup;
 import com.handmark.pulltorefresh.library.R;
 
 /**
- * 仿IOS效果,RadioButton
- * 分段效果
+ * 仿IOS效果,RadioButton 分段效果
  * 
  */
 public class SegmentedGroup extends RadioGroup {
@@ -254,5 +253,10 @@ public class SegmentedGroup extends RadioGroup {
 			setChildRadii(newChildren, newChild);
 			return radii;
 		}
+	}
+
+	public void setCheckOnTextColor(String color) {
+		mCheckedTextColor = Color.parseColor(color);
+		updateBackground();
 	}
 }

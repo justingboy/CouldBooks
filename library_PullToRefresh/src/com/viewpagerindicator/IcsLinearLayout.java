@@ -7,7 +7,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
@@ -61,8 +60,8 @@ class IcsLinearLayout extends LinearLayout {
 		if (divider != null) {
 			mDividerWidth = (int) (divider.getIntrinsicWidth() + dividerWidth);
 			mDividerHeight = divider.getIntrinsicHeight();
-			Log.i("msg", "mDividerWidth = " + mDividerWidth);
-			Log.i("msg", "mDividerHeight = " + mDividerHeight);
+//			Log.i("msg", "mDividerWidth = " + mDividerWidth);
+//			Log.i("msg", "mDividerHeight = " + mDividerHeight);
 		} else {
 			mDividerWidth = 0;
 			mDividerHeight = 0;

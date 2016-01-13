@@ -24,6 +24,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -354,19 +355,70 @@ public class TabPageIndicator extends HorizontalScrollView implements
 
 	}
 
+	public void setTextColor(ColorStateList colors) {
+		for (TabView tabview : tabViews) {
+			tabview.setTextColor(colors);
+		}
+	}
+
 	@Override
-	protected void onRestoreInstanceState(Parcelable state) {
+	public void onRestoreInstanceState(Parcelable state) {
 		try {
-			super.onRestoreInstanceState(state);
+
+			SavedState savedState = (SavedState) state;
+			super.onRestoreInstanceState(savedState.getSuperState());
+			mSelectedTabIndex = savedState.currentPage;
+			requestLayout();
 		} catch (Exception e) {
 			Log.e("msg", e.getMessage());
 		}
 	}
 
-	public void setTextColor(ColorStateList colors) {
-		for (TabView tabview : tabViews) {
-			tabview.setTextColor(colors);
+	
+	@Override
+	public Parcelable onSaveInstanceState() {
+		try {
+
+			Parcelable superState = super.onSaveInstanceState();
+			SavedState savedState = new SavedState(superState);
+			savedState.currentPage = mSelectedTabIndex;
+			return savedState;
+		} catch (Exception e) {
+			Log.e("msg", e.getMessage());
+			return null;
 		}
+	}
+
+	static class SavedState extends View.BaseSavedState {
+		int currentPage;
+
+		public SavedState(Parcelable superState) {
+			super(superState);
+		}
+
+		private SavedState(Parcel in) {
+			super(in);
+			currentPage = in.readInt();
+		}
+
+		@Override
+		public void writeToParcel(Parcel dest, int flags) {
+			super.writeToParcel(dest, flags);
+			dest.writeInt(currentPage);
+		}
+
+		public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+
+			@Override
+			public SavedState createFromParcel(Parcel in) {
+				return new SavedState(in);
+			}
+
+			@Override
+			public SavedState[] newArray(int size) {
+				return new SavedState[size];
+			}
+		};
 	}
 
 }
