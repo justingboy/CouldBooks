@@ -39,7 +39,7 @@ public class ClassifySubHotFragment extends BaseFragment {
 		BookClassFragment bookClassFragment = new BookClassFragment();
 		transaction.add(R.id.classify_book_list, fragment);
 		transaction.add(R.id.classify_book_datails, bookClassFragment);
-		transaction.commit();
+		transaction.commitAllowingStateLoss();
 
 	}
 

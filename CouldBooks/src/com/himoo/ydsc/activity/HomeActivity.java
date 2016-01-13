@@ -190,7 +190,7 @@ public class HomeActivity extends BaseActivity {
 			}
 		}
 		toggleFragment(fragmentTransaction);
-		fragmentTransaction.commit();
+		fragmentTransaction.commitAllowingStateLoss();
 	}
 
 	/**
@@ -291,6 +291,14 @@ public class HomeActivity extends BaseActivity {
 		setRadioButtonTextColorSelector();
 
 	}
+	
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+//		super.onSaveInstanceState(outState);
+	}
+	
 /*
 	@Override
 	protected void onRestoreInstanceState(Bundle savedInstanceState) {

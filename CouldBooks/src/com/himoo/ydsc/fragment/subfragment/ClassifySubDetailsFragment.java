@@ -35,7 +35,7 @@ public class ClassifySubDetailsFragment extends BaseFragment {
 		BaiduBookClassFragment bookClassFragment = new BaiduBookClassFragment();
 		transaction.add(R.id.classify_book_list, fragment);
 		transaction.add(R.id.classify_book_datails, bookClassFragment);
-		transaction.commit();
+		transaction.commitAllowingStateLoss();
 
 	}
 	

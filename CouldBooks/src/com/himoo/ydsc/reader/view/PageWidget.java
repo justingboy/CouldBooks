@@ -546,7 +546,7 @@ public class PageWidget extends View {
 			break;
 		case 1:
 			mMode = Mode.TURN_CURL;
-			duration = 450;
+			duration = 400;
 			break;
 		case 2:
 			mMode = Mode.TURN_NO;
