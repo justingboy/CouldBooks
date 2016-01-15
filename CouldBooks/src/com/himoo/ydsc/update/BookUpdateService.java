@@ -16,8 +16,6 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -66,12 +64,16 @@ public class BookUpdateService extends Service {
 		return START_STICKY;
 	}
 
-	private void creatNotification(LastChapter chapter) {
+	private void creatNotification(LastChapter chapter, int noticNum) {
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(
-				this).setSmallIcon(R.drawable.icon)
+				this)
+				.setSmallIcon(R.drawable.icon)
 				.setContentTitle(chapter.bookName + " 更新啦!")
-				.setContentText("最新章节: " + chapter.chapterName + ",赶快去看看吧!")
+				.setContentText(
+						noticNum > 1 ? "同时本地书架上还有" + noticNum + "本更新了,赶快去看看吧!"
+								: "最新章节: " + chapter.chapterName + ",赶快去看看吧!")
 				.setAutoCancel(true);
+
 		boolean isPlaySound = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_UPATE_SETTING_SOUND, false);
 		if (isPlaySound) {
@@ -103,9 +105,11 @@ public class BookUpdateService extends Service {
 	 * 检查是否有最新章节更新
 	 * 
 	 */
-	class UpdateAsyncTask extends AsyncTask<Void, LastChapter, LastChapter> {
+	class UpdateAsyncTask extends
+			AsyncTask<Void, LastChapter, List<LastChapter>> {
 
 		Context context;
+		int index_Notic = 2;
 
 		public UpdateAsyncTask(Context context) {
 			this.context = context;
@@ -115,11 +119,14 @@ public class BookUpdateService extends Service {
 		protected void onPreExecute() {
 			// TODO Auto-generated method stub
 			super.onPreExecute();
+			index_Notic = SharedPreferences.getInstance().getInt(
+					SpConstant.BOOK_UPATE_SETTING_NOTICE, 2);
 		}
 
 		@Override
-		protected LastChapter doInBackground(Void... params) {
+		protected List<LastChapter> doInBackground(Void... params) {
 			// TODO Auto-generated method stub
+			List<LastChapter> noticeList = new ArrayList<LastChapter>();
 			List<BaiduInfo> list = BaiduBookDownload.getInstance(context)
 					.queryNeedUpdate();
 			if (list != null && !list.isEmpty()) {
@@ -142,8 +149,16 @@ public class BookUpdateService extends Service {
 									updateNewChapter(book.getBookName(),
 											listChapter);
 								}
-								onProgressUpdate(chapter);
-								// 将最新章节的名字更新
+								if (index_Notic != 3) {
+									// 聚合通知
+									if (index_Notic == 1) {
+										noticeList.add(chapter);
+										// 详情通知
+									} else if (index_Notic == 2) {
+										onProgressUpdate(chapter);
+									}
+								}
+								// 将最新章节的名字更新,保存到数据库中
 								BaiduBookDownload.getInstance(context)
 										.updateChapterName(book, newChapter);
 
@@ -153,26 +168,23 @@ public class BookUpdateService extends Service {
 				}
 			}
 
-			return null;
+			return noticeList;
 		}
 
 		@Override
 		protected void onProgressUpdate(LastChapter... values) {
 			// TODO Auto-generated method stub
 			super.onProgressUpdate(values);
-			Log.i("msg", "onProgressUpdate");
-			creatNotification(values[0]);
+			creatNotification(values[0], 1);
 
 		}
 
 		@Override
-		protected void onPostExecute(LastChapter result) {
+		protected void onPostExecute(List<LastChapter> result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			if (result != null) {
-				Toast.makeText(context, result.chapterName, Toast.LENGTH_LONG)
-						.show();
-
+			if (result != null && !result.isEmpty()) {
+				creatNotification(result.get(0), result.size());
 			}
 
 		}
@@ -248,14 +260,14 @@ public class BookUpdateService extends Service {
 		ArrayList<String> chapterNameList = new ArrayList<String>();
 		int localSize = localList.size();
 		int localStartLen = 0;
-		if(localSize>12){
+		if (localSize > 12) {
 			localStartLen = localSize - 11;
 		}
 		for (int i = localStartLen; i < localSize; i++) {
 			chapterNameList.add(localList.get(i).getText().trim());
 		}
 		int statLen = 0;
-		if (localList != null&&localList.size()>12) {
+		if (localList != null && localList.size() > 12) {
 			statLen = localList.size() - 10;
 		}
 		int pos = localList.size();

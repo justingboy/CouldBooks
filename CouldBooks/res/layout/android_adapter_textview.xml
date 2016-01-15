@@ -13,6 +13,6 @@
     android:paddingStart="?android:attr/listPreferredItemPaddingStart"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
     android:drawableRight="@drawable/more_arrow"
-    android:paddingRight="25dp"
+    android:paddingRight="29dp"
     
    />

@@ -11,6 +11,7 @@ import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.update.BookUpdateUtil;
+import com.himoo.ydsc.update.Constants;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.ios.radiogroup.SegmentedGroup;
@@ -75,7 +76,7 @@ public class UpdateSettingActivity extends SwipeBackActivity implements
 		initSeleted();
 		initListener();
 		boolean isOpen = SharedPreferences.getInstance().getBoolean(
-				SpConstant.BOOK_UPATE_SETTING, false);
+				SpConstant.BOOK_UPATE_SETTING, true);
 		boolean isSoundOpen = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_UPATE_SETTING_SOUND, false);
 		sbBookUdate.setChecked(isOpen ? true : false);
@@ -126,7 +127,10 @@ public class UpdateSettingActivity extends SwipeBackActivity implements
 			SharedPreferences.getInstance().putBoolean(
 					SpConstant.BOOK_UPATE_SETTING, isChecked);
 			if (isChecked) {
-				BookUpdateUtil.startTimerService(this);
+				if (!BookUpdateUtil.isServiceRunning(this,
+						Constants.BOOKUPDATE_SERVICE)) {
+					BookUpdateUtil.startTimerService(this);
+				}
 			} else {
 				BookUpdateUtil.cancleAlarmManager(this);
 			}

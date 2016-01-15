@@ -45,6 +45,7 @@ import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.UIHelper;
 import com.himoo.ydsc.ui.utils.ViewSelector;
+import com.himoo.ydsc.ui.view.MoreTextView;
 import com.himoo.ydsc.update.BookUpdateTask;
 import com.himoo.ydsc.update.BookUpdateTask.OnNewChapterUpdateListener;
 import com.himoo.ydsc.update.LastChapter;
@@ -172,7 +173,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				.findViewById(R.id.baidu_book_statue);
 		TextView bookCategory = (TextView) headerView
 				.findViewById(R.id.baidu_book_category);
-		TextView bookSummary = (TextView) headerView
+		MoreTextView bookSummary = (MoreTextView) headerView
 				.findViewById(R.id.baidu_book_summary);
 		bookDownload = (Button) headerView
 				.findViewById(R.id.baidu_book_download);

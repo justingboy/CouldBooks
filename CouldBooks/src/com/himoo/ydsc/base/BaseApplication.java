@@ -20,6 +20,8 @@ import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.db.bean.EntityBase;
 import com.himoo.ydsc.excption.CrashHandler;
 import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.update.BookUpdateUtil;
+import com.himoo.ydsc.update.Constants;
 import com.himoo.ydsc.util.MyLogger;
 import com.himoo.ydsc.util.SP;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -73,7 +75,7 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 		instance = this;
 		Log = MyLogger.kLog();
 		SP.getInstance().putBoolean("isDown", true);
-//		BaiduBookDownload.getInstance(this, 3, this);
+		// BaiduBookDownload.getInstance(this, 3, this);
 		// 设置主题皮肤
 		BookTheme.setThemeColor(SharedPreferences.getInstance().getInt(
 				SpConstant.BOOK_SKIN_INDEX, 2));
@@ -87,17 +89,25 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 		// 初始化科大讯飞语音功能5638453a 5638453a
 		SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5638453a");
 		// 以下语句用于设置日志开关（默认开启），设置成false时关闭语音云SDK日志打印
-		 Setting.setShowLog(true);
+		Setting.setShowLog(true);
 
 		// 配置ImageLoader
 		initImageLoader(this);
-		
+
 		// 注册App异常崩溃处理器
 		CrashHandler crashHandler = CrashHandler.getInstance();
 		crashHandler.init(getApplicationContext());
-		
-		
-//		 registerUncaughtExceptionHandler();
+
+		boolean isOpenUpdate = SharedPreferences.getInstance().getBoolean(
+				SpConstant.BOOK_UPATE_SETTING, true);
+		// 开启自动更新
+		if (!BookUpdateUtil
+				.isServiceRunning(this, Constants.BOOKUPDATE_SERVICE)
+				&& isOpenUpdate) {
+			BookUpdateUtil.startTimerService(this);
+		}
+
+		// registerUncaughtExceptionHandler();
 
 	}
 
@@ -201,7 +211,7 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				context).threadPoolSize(3)
 				// 线程池的个数（默认3个）
-				.threadPriority(Thread.NORM_PRIORITY-2)
+				.threadPriority(Thread.NORM_PRIORITY - 2)
 				// 线程的优先级
 				.denyCacheImageMultipleSizesInMemory()
 				.memoryCache(new LruMemoryCache(10 * 1024 * 1024)) // 可以通过自己的内存缓存实现

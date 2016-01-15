@@ -32,7 +32,7 @@ import com.viewpagerindicator.TabPageIndicator;
 public class ChoiceFragment extends BaseFragment {
 
 	/** Tab标题 */
-	private static final String[] TITLE = new String[] { "精选", "排行", "热搜" };
+	private static final String[] TITLE = new String[] { "排行", "热搜", "精选" };
 	/** Fragment */
 	private Fragment subChoiceFragment = null;
 	private Fragment subRankingFragment = null;
@@ -80,9 +80,9 @@ public class ChoiceFragment extends BaseFragment {
 	 */
 	private void initFragmentList() {
 		fragmentList = new ArrayList<Fragment>();
-		fragmentList.add(subChoiceFragment);
 		fragmentList.add(subRankingFragment);
 		fragmentList.add(subHotSearchFragment);
+		fragmentList.add(subChoiceFragment);
 	}
 
 	@Override
@@ -107,17 +107,17 @@ public class ChoiceFragment extends BaseFragment {
 		@Override
 		public Fragment getItem(int position) {
 			if (fragmentList.get(position) == null && position == 0) {
-				subChoiceFragment = new SubChoiceFragment();
-				fragmentList.add(subChoiceFragment);
-				return subChoiceFragment;
-			} else if (fragmentList.get(position) == null && position == 1) {
 				subRankingFragment = new SubRankingFragment();
 				fragmentList.add(subRankingFragment);
 				return subRankingFragment;
-			} else if (fragmentList.get(position) == null && position == 2) {
+			} else if (fragmentList.get(position) == null && position == 1) {
 				subHotSearchFragment = new SubHotSearchFragment();
 				fragmentList.add(subHotSearchFragment);
 				return subHotSearchFragment;
+			} else if (fragmentList.get(position) == null && position == 2) {
+				subChoiceFragment = new SubChoiceFragment();
+				fragmentList.add(subChoiceFragment);
+				return subChoiceFragment;
 			} else
 
 				return fragmentList.get(position);

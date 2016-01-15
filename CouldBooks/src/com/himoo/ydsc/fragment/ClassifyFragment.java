@@ -27,7 +27,7 @@ import com.viewpagerindicator.TabPageIndicator;
 public class ClassifyFragment extends BaseFragment {
 
 	/** Tab标题 */
-	private static final String[] TITLE = new String[] { "热门分类", "详细分类" };
+	private static final String[] TITLE = new String[] { "详细分类", "热门分类" };
 
 	/** Fragment */
 	private Fragment subHotClassifyFragment = null;
@@ -87,8 +87,8 @@ public class ClassifyFragment extends BaseFragment {
 	 */
 	private void initFragmentList() {
 		fragmentList = new ArrayList<Fragment>();
-		fragmentList.add(subHotClassifyFragment);
 		fragmentList.add(subDetailsClassifyFragment);
+		fragmentList.add(subHotClassifyFragment);
 	}
 
 	/**
@@ -102,13 +102,13 @@ public class ClassifyFragment extends BaseFragment {
 		@Override
 		public Fragment getItem(int position) {
 			if (fragmentList.get(position) == null && position == 0) {
-				subHotClassifyFragment = new ClassifySubHotFragment();
-				fragmentList.add(subHotClassifyFragment);
-				return subHotClassifyFragment;
-			} else if (fragmentList.get(position) == null && position == 1) {
 				subDetailsClassifyFragment = new ClassifySubDetailsFragment();
 				fragmentList.add(subDetailsClassifyFragment);
 				return subDetailsClassifyFragment;
+			} else if (fragmentList.get(position) == null && position == 1) {
+				subHotClassifyFragment = new ClassifySubHotFragment();
+				fragmentList.add(subHotClassifyFragment);
+				return subHotClassifyFragment;
 			} else
 
 				return fragmentList.get(position);

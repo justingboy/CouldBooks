@@ -11,12 +11,14 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Region;
 import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 
 import com.himoo.ydsc.config.SpConstant;
+import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.SharedPreferences;
 
 /**
@@ -32,7 +34,7 @@ public class PageWidget extends View {
 
 	private float firstDownX = 0;
 	private float firstDownY = 0;
-	
+
 	private int duration = 450;
 
 	private int mWidth;// 宽度
@@ -88,6 +90,8 @@ public class PageWidget extends View {
 	Scroller mScroller;
 	private boolean isNightMode;
 	private boolean isAutoNightMode;
+	private Context mContext;
+	private boolean isTouchOnMove = false;
 
 	public static enum Mode {
 		TURN_LEFT(0), TURN_CURL(1), TURN_NO(2), TURN_MOVE(3), TURN_UPANDDOWN(4);
@@ -102,11 +106,22 @@ public class PageWidget extends View {
 	/** 默认动画的类型 */
 	public Mode mMode = Mode.TURN_CURL;
 
-	public PageWidget(Context context, int w, int h) {
+	public OnTouchClickListener listener;
+
+	public interface OnTouchClickListener {
+		public void onReaderOnClick();
+
+		public boolean onReaderFilpPage(MotionEvent event);
+	}
+
+	public PageWidget(Context context, int w, int h,
+			OnTouchClickListener listener) {
 		super(context);
 		// TODO Auto-generated constructor stub
-		mWidth = w;
-		mHeight = h;
+		this.mContext = context;
+		this.mWidth = w;
+		this.mHeight = h;
+		this.listener = listener;
 		mPath0 = new Path();
 		mPath1 = new Path();
 		createDrawable();
@@ -159,49 +174,70 @@ public class PageWidget extends View {
 			mIsRTandLB = false;
 	}
 
-	/**
-	 * 处理触摸时坐标的改变
-	 * 
-	 * @param event
-	 * @return
-	 */
-	public boolean doTouchEvent(MotionEvent event) {
-		// TODO Auto-generated method stub
-		if (event.getAction() == MotionEvent.ACTION_MOVE) {
-			mTouch.x = event.getX();
-			mTouch.y = event.getY();
-			if (Math.abs(firstDownX - mTouch.x) > 20)
-				isMove = true;
-			this.postInvalidate();
-		}
-
-		if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			mTouch.x = event.getX();
-			mTouch.y = event.getY();
-			firstDownX = mTouch.x;
-			firstDownY = mTouch.y;
-			isMove = false;
-			// calcCornerXY(mTouch.x, mTouch.y);
-			// this.postInvalidate();
-		}
-
-		if (event.getAction() == MotionEvent.ACTION_UP) {
-			isMove = false;
-			if (canDragOver()) {
-				if (mMode == Mode.TURN_UPANDDOWN) {
-					startUpdownAnimation(duration);
-				} else {
-					startAnimation(duration);
-				}
-			} else {
-				mTouch.x = mCornerX - 0.09f;
-				mTouch.y = mCornerY - 0.09f;
-			}
-			this.postInvalidate();
-		}
-		// return super.onTouchEvent(event);
-		return true;
-	}
+	// /**
+	// * 处理触摸时坐标的改变
+	// *
+	// * @param event
+	// * @return
+	// */
+	// public boolean doTouchEvent(MotionEvent event) {
+	// // TODO Auto-generated method stub
+	//
+	// if (event.getAction() == MotionEvent.ACTION_DOWN) {
+	// isTouchOnMove = false;
+	// mTouch.x = event.getX();
+	// mTouch.y = event.getY();
+	// firstDownX = mTouch.x;
+	// firstDownY = mTouch.y;
+	// isMove = false;
+	// // calcCornerXY(mTouch.x, mTouch.y);
+	// // this.postInvalidate();
+	// }
+	//
+	// if (event.getAction() == MotionEvent.ACTION_MOVE) {
+	//
+	// mTouch.x = event.getX();
+	// mTouch.y = event.getY();
+	// if (Math.abs(firstDownX - mTouch.x) < 20 && isClickable(event)) {
+	// if (!isTouchOnMove) {
+	// if (listener != null) {
+	// listener.onReaderFilpPage(event);
+	// isTouchOnMove = true;
+	// }
+	// }
+	// } else {
+	//
+	// this.postInvalidate();
+	// }
+	//
+	// }
+	//
+	// if (event.getAction() == MotionEvent.ACTION_UP) {
+	// isMove = false;
+	// isTouchOnMove = false;
+	// if (Math.abs(firstDownX - mTouch.x) < 20 && isClickable(event)) {
+	// isMove = true;
+	// if (listener != null) {
+	// listener.onReaderOnClick();
+	// }
+	// return false;
+	// }
+	// if (canDragOver()) {
+	// if (mMode == Mode.TURN_UPANDDOWN) {
+	// startUpdownAnimation(duration);
+	// } else {
+	// startAnimation(duration);
+	// }
+	// } else {
+	// mTouch.x = mCornerX - 0.09f;
+	// mTouch.y = mCornerY - 0.09f;
+	// }
+	// this.postInvalidate();
+	// Log.i("msg", "canDragOver");
+	// }
+	// // return super.onTouchEvent(event);
+	// return true;
+	// }
 
 	/**
 	 * 求解直线P1P2和直线P3P4的交点坐标
@@ -846,6 +882,7 @@ public class PageWidget extends View {
 			mScroller.startScroll(aniTouchX, aniTouchY, aniDx, aniDy, duration);
 		}
 	}
+
 	/**
 	 * 执行默认翻书动画
 	 */
@@ -856,7 +893,6 @@ public class PageWidget extends View {
 			mScroller.startScroll(0, (int) mTouch.y, 0, aniDy, duration);
 		}
 	}
-	
 
 	/**
 	 * 停止滚动的动画
@@ -889,6 +925,7 @@ public class PageWidget extends View {
 
 	/**
 	 * 是否向上滑动
+	 * 
 	 * @return
 	 */
 	public boolean DragToUp() {
@@ -962,4 +999,88 @@ public class PageWidget extends View {
 			mNextPageBitmap = null;
 		}
 	}
+
+	/**
+	 * 判断是否可以被点击
+	 * 
+	 * @param event
+	 * @return
+	 */
+	private boolean isClickable(MotionEvent event) {
+		int extraWidth = DeviceUtil.dip2px(mContext, 25);
+		int disWith = (int) Math.abs(event.getX() - mWidth);
+		int disHeight = (int) Math.abs(event.getY() - mHeight);
+		if ((extraWidth + mWidth / 3) < disWith
+				&& disWith < (2 * mWidth / 3 - extraWidth)
+				&& (extraWidth + mHeight / 3) < disHeight
+				&& disHeight < (2 * mHeight / 3 - extraWidth)) {
+			return true;
+		}
+		return false;
+
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		// TODO Auto-generated method stub
+
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			Log.i("msg", "ACTION_DOWN");
+			mTouch.x = event.getX();
+			mTouch.y = event.getY();
+			firstDownX = mTouch.x;
+			firstDownY = mTouch.y;
+			break;
+		case MotionEvent.ACTION_MOVE:
+			Log.i("msg", "ACTION_MOVE");
+			mTouch.x = event.getX();
+			mTouch.y = event.getY();
+			// 是点击
+			if (Math.abs(firstDownX - mTouch.x) < 5
+					|| Math.abs(firstDownX - mTouch.y) < 5
+					&& isClickable(event)) {
+				if (listener != null) {
+					listener.onReaderOnClick();
+				}
+				return false;
+			} else {
+				//滑动刷新
+				this.postInvalidate();
+			}
+
+			break;
+		case MotionEvent.ACTION_UP:
+			Log.i("msg", "ACTION_UP");
+			Log.i("msg", "dx = "+Math.abs(firstDownX - mTouch.x));
+			Log.i("msg", "dx = "+Math.abs(firstDownY - mTouch.y));
+			
+//			if (Math.abs(firstDownX - mTouch.x) < 5 && isClickable(event)) {
+//				isMove = true;
+//				if (listener != null) {
+//					listener.onReaderOnClick();
+//				}
+//				return false;
+//			}
+
+			if (canDragOver()) {
+				if (mMode == Mode.TURN_UPANDDOWN) {
+					startUpdownAnimation(duration);
+				} else {
+					startAnimation(duration);
+				}
+			} else {
+				mTouch.x = mCornerX - 0.09f;
+				mTouch.y = mCornerY - 0.09f;
+			}
+			this.postInvalidate();
+			break;
+
+		default:
+			break;
+		}
+
+		return true;
+	}
+
 }

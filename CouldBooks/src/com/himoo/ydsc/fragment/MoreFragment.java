@@ -190,7 +190,7 @@ public class MoreFragment extends BaseFragment implements
 		if (BookTheme.isThemeChange)
 			titleBar.setBackgroundColor(BookTheme.THEME_COLOR);
 		boolean isOpenUpdate = SharedPreferences.getInstance().getBoolean(
-				SpConstant.BOOK_UPATE_SETTING, false);
+				SpConstant.BOOK_UPATE_SETTING, true);
 		segment_book_update.setTintColor(BookTheme.THEME_COLOR);
 		bookUpdateIdentify.setTextColor(BookTheme.THEME_COLOR);
 		bookUpdateIdentify.setText(isOpenUpdate ? "已开启" : "已关闭");
