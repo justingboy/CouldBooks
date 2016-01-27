@@ -114,7 +114,9 @@ public class IOHelper {
 	 */
 	public static Chapter getChapter(int jumpType, String index, int position,
 			int bookType) {
-		if(book.getChapterList()==null)
+		if (book == null)
+			return null;
+		if (book.getChapterList() == null)
 			return null;
 		int length = book.getChapterList().size();
 		if (position - length == 0 || position == -1)
@@ -238,7 +240,6 @@ public class IOHelper {
 		return book.getBaiduBook();
 	}
 
-	
 	/**
 	 * 开启线程获取小说章节, 防止在网络的不好的情况下出现应用程序无响应的现象
 	 * 

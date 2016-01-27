@@ -57,4 +57,32 @@ public class SP {
 		}
 	}
 
+	/**
+	 * 清除所有的保存信息
+	 */
+	public void clear() {
+		android.content.SharedPreferences sp = getSp();
+		if (sp != null) {
+			Editor editor = sp.edit();
+			editor.clear();
+			editor.commit();
+
+		}
+	}
+
+	/**
+	 * 清除指定的key的信息
+	 * 
+	 * @param bookName
+	 */
+	public void remove(String bookName) {
+		android.content.SharedPreferences sp = getSp();
+		if (sp != null) {
+			Editor editor = sp.edit();
+			editor.remove(bookName);
+			editor.commit();
+
+		}
+	}
+
 }

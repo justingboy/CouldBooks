@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.adapter.SearchBaiduBookAdapter;
@@ -31,6 +32,7 @@ import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.UIHelper;
+import com.himoo.ydsc.util.NetWorkUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
 public class SearchResultActivity extends SwipeBackActivity implements
@@ -80,27 +82,32 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	 * 设置PullToRefeshListView 事件监听
 	 */
 	private void initPullToRefeshListView() {
+		mRefrshListView.setMode(Mode.PULL_FROM_START);
 		// 设置点击事件
 		mRefrshListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if (mCurrentClickPosition != -1)
-					return;
-				mCurrentClickPosition = position;
-				if (firstReSuccess == 0) {
-					BookSearch book = (BookSearch) parent
-							.getItemAtPosition(position);
-					UIHelper.startToActivity(SearchResultActivity.this, book,
-							BookDialogActivity.class);
-				} else if (firstReSuccess == 1) {
-					BaiduBook book = (BaiduBook) parent
-							.getItemAtPosition(position);
-					UIHelper.startToActivity(SearchResultActivity.this, book,
-							BaiduDetailsActivity.class);
-				}
+				try {
 
+					if (mCurrentClickPosition != -1)
+						return;
+					mCurrentClickPosition = position;
+					if (firstReSuccess == 0) {
+						BookSearch book = (BookSearch) parent
+								.getItemAtPosition(position);
+						UIHelper.startToActivity(SearchResultActivity.this,
+								book, BookDialogActivity.class);
+					} else if (firstReSuccess == 1) {
+						BaiduBook book = (BaiduBook) parent
+								.getItemAtPosition(position);
+						UIHelper.startToActivity(SearchResultActivity.this,
+								book, BaiduDetailsActivity.class);
+					}
+				} catch (Exception e) {
+					Log.e(e);
+				}
 			}
 		});
 		// 设置滑动事件
@@ -222,7 +229,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 								R.layout.adapter_search_item, baiduBookList);
 						mRefrshListView.setAdapter(mBaiduAdapter);
 					} else {
-						Toast.showBg(SearchResultActivity.this, "对不起,书库中无收录此书!");
+						Toast.showBg(SearchResultActivity.this, "对不起,无收录此书!");
 						tv_search_empty.setVisibility(View.VISIBLE);
 						mRefrshListView.setVisibility(View.GONE);
 						mTitleBar.setRightLogoVisible();
@@ -264,7 +271,12 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		// TODO Auto-generated method stub
 		dismissRefreshDialog();
 		AnimationUtils.cancelAnim(imgRefersh);
-		Toast.showBg(SearchResultActivity.this, "对不起,书库中无收录此书!");
+		if (NetWorkUtils.isNetConnected(SearchResultActivity.this)) {
+			Toast.showBg(SearchResultActivity.this, "对不起,无收录此书!");
+		} else {
+			Toast.showBg(SearchResultActivity.this, "未连接网络");
+		}
+
 		firstReSuccess = whoservice;
 	}
 
@@ -327,7 +339,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	@Override
 	public void onPullToRefreshFailure(Exception error, String msg) {
 		// TODO Auto-generated method stub
-		Toast.showLong(this, "加载数据错误 ：" + msg);
+		Toast.showBg(this, "获取数据失败");
 		AnimationUtils.cancelAnim(imgRefersh);
 		notifyDataAndRefreshComplete();
 	}

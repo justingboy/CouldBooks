@@ -139,10 +139,12 @@ public class Toast {
 					false);
 			LinearLayout layout_toast = (LinearLayout) layout
 					.findViewById(R.id.layout_toast);
-			layout_toast.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.bg_toast));
+			layout_toast.setBackgroundDrawable(context.getResources()
+					.getDrawable(R.drawable.bg_toast));
 			tvBg = (TextView) layout.findViewById(R.id.tv_toast_msg);
+//			tvBg.setCompoundDrawables(null, null, null, null);
 			toastBg.setGravity(Gravity.CENTER, 0,
-					-DeviceUtil.dip2px(context, 25));
+					-DeviceUtil.dip2px(context, 35));
 			toastBg.setDuration(android.widget.Toast.LENGTH_SHORT);
 			toastBg.setView(layout);
 		}

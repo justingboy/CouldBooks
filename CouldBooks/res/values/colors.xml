@@ -6,6 +6,11 @@
     <color name="main_bottom_textcolor_default">#7E7D7B</color>
     <color name="bg_indicator_vpi">#00B64F</color>
 
+    <!-- 背景色 -->
+    <color name="main_bg_color">#f6f6f6</color>
+    
+    <color name="divider_line">#d9d9d9</color>
+    
     <!-- 标记关于创建图形的颜色值 -->
     <color name="shap_more_text_color">#E7E6E5</color>
 

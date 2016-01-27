@@ -15,13 +15,18 @@ import java.net.URLConnection;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnKeyListener;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import com.himoo.ydsc.dialog.BookDownloadDialog;
 import com.himoo.ydsc.http.OnAfreshDownloadListener;
 import com.himoo.ydsc.reader.utils.ZipExtractorTask;
+import com.himoo.ydsc.util.SP;
+import com.ios.dialog.AlertDialog;
 
 public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 	private final String TAG = "DownLoaderTask";
@@ -34,6 +39,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 	private String bookName;
 	private OnAfreshDownloadListener listener;
 	private boolean isFullWidth;
+	private boolean isHasToast = false;
 
 	public DownLoaderTask(String url, String bookName, String out,
 			Activity context, OnAfreshDownloadListener listener,
@@ -41,7 +47,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 		super();
 		this.mContext = context;
 		this.listener = listener;
-		this.isFullWidth =isFullWidth;
+		this.isFullWidth = isFullWidth;
 		this.bookName = bookName;
 		if (context != null) {
 			if (isFullWidth)
@@ -51,7 +57,9 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 		} else {
 			mDialog = null;
 		}
-
+		if (mDialog != null) {
+			mDialog.setOnKeyListener(keylistener);
+		}
 		try {
 			mUrl = new URL(url);
 			mFile = new File(out);
@@ -62,6 +70,45 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 
 	}
 
+	public OnKeyListener keylistener = new DialogInterface.OnKeyListener() {
+		public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+			if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+				if (!isHasToast) {
+					isHasToast = true;
+					new AlertDialog(mContext).builder().setTitle("提示")
+							.setMsg("您确定要取消下载?")
+							.setNegativeButton("取消", new OnClickListener() {
+
+								@Override
+								public void onClick(View v) {
+									// TODO Auto-generated method stub
+									isHasToast = false;
+									
+								}
+							}).setPositiveButton("确定", new OnClickListener() {
+
+								@Override
+								public void onClick(View v) {
+									// TODO Auto-generated method stub
+									DownLoaderTask.this.cancel(true);
+									mDialog.dismiss();
+									SP.getInstance().remove(bookName);
+									BookDownloadService.getDownloadManager(
+											mContext).updateDownSuccess(
+											bookName,false);
+									if(listener!=null)
+										listener.onCancelDownload();
+								}
+
+							}).show();
+				}
+				return true;
+			} else {
+				return false;
+			}
+		}
+	};
+
 	@Override
 	protected void onPreExecute() {
 		// TODO Auto-generated method stub
@@ -69,14 +116,12 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 		if (mDialog != null) {
 			mDialog.setMessage(mFile.getName());
 			mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			mDialog.setOnCancelListener(new OnCancelListener() {
-
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					// TODO Auto-generated method stub
-					cancel(false);
-				}
-			});
+			/*
+			 * mDialog.setOnCancelListener(new OnCancelListener() {
+			 * 
+			 * @Override public void onCancel(DialogInterface dialog) { // TODO
+			 * Auto-generated method stub cancel(false); } });
+			 */
 			mDialog.show();
 		}
 	}
@@ -203,7 +248,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 	public void doZipExtractorWork(Activity activity, String inPath,
 			String outPath) {
 		ZipExtractorTask task = new ZipExtractorTask(bookName, inPath, outPath,
-				activity, true, listener,isFullWidth);
+				activity, true, listener, isFullWidth);
 		task.execute();
 	}
 

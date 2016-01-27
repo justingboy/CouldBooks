@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:adsmogo="http://www.adsmogo.com"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/main_bg_color"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/layout_search_bg"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/titlebar_height"
+        android:background="@color/theme_skin_blue"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp" >
+
+        <com.ios.edittext.SearchEditText
+            android:id="@+id/more_book_search"
+            style="@style/editTextStyle"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:hint="@string/search_book_hint_text"
+            android:textColor="@color/status_bar_bg" />
+
+        <ImageView
+            android:id="@+id/search_speech"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/icon_mircophone" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:text="搜索热词"
+            android:textColor="@color/main_bottom_textcolor_default" />
+
+        <TextView
+            android:id="@+id/tv_hotwords"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:text="更多>>"
+            android:textColor="@color/main_bottom_textcolor_default" />
+    </RelativeLayout>
+
+    <View style="@style/diver_line" />
+
+    <com.ios.tagview.TagGroup
+        android:id="@+id/bookTagView"
+        style="@style/TagGroup.Large"
+        android:background="@android:color/white"
+        android:padding="15dp" />
+
+    <View style="@style/diver_line" />
+
+    <TextView
+        android:id="@+id/tv_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableRight="@drawable/story_delete"
+        android:paddingBottom="8dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="20dp"
+        android:paddingTop="8dp"
+        android:text="搜索历史"
+        android:textColor="@color/main_bottom_textcolor_default" />
+
+    <View style="@style/diver_line" />
+
+    <ListView
+        android:id="@+id/listview_history"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="@color/divider_line"
+        android:dividerHeight="0.6dp"
+        android:drawSelectorOnTop="false"
+        android:fadingEdge="none"
+        android:listSelector="@drawable/listview_selector"
+        android:scrollbarStyle="outsideOverlay" />
+
+</LinearLayout>

@@ -13,6 +13,7 @@ import android.graphics.Typeface;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.himoo.ydsc.R;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.reader.bean.Chapter;
@@ -68,6 +69,7 @@ public class BookPage {
 	private Context mContext;
 	private Typeface typeface;
 	private int typefaceIndex;
+	private int mogoAdHeight = 0;
 
 	/**
 	 * 在新建一个BookPage对象时，需要向其提供数据，以支持屏幕翻页功能。
@@ -80,11 +82,16 @@ public class BookPage {
 	 *            章节对象
 	 */
 	public BookPage(Context context, int screenWidth, int screenHeight,
-			Chapter chapter, int currentPage, int pageCount, int bookType) {
+			Chapter chapter, int currentPage, int pageCount, int bookType,
+			boolean isNeedMogoAd) {
 		mContext = context;
 		this.bookType = bookType;
 		this.screenHeight = screenHeight;
 		this.screenWidth = screenWidth;
+		if (isNeedMogoAd)
+			mogoAdHeight = (int) mContext.getResources().getDimension(
+					R.dimen.mogoAd_height);
+
 		// IOHelper.setOnChapterListener(this);
 		this.chapter = chapter;
 		initSetting();
@@ -104,7 +111,7 @@ public class BookPage {
 		setTextLineSpace(true);
 		init(mContext);
 		if (currentPage != -1 && pageCount != -1)
-			pageNum = (currentPage * (pagesVe.size())) / pageCount;
+			pageNum = ((currentPage * (pagesVe.size())) / pageCount) + 1;
 
 	}
 
@@ -115,10 +122,14 @@ public class BookPage {
 	 * @param screenWidth
 	 * @param screenHeight
 	 */
-	public BookPage(Context context, int screenWidth, int screenHeight) {
+	public BookPage(Context context, int screenWidth, int screenHeight,
+			boolean isNeedMogoAd) {
 		mContext = context;
 		this.screenHeight = screenHeight;
 		this.screenWidth = screenWidth;
+		if (isNeedMogoAd)
+			mogoAdHeight = (int) mContext.getResources().getDimension(
+					R.dimen.mogoAd_height);
 	}
 
 	/**
@@ -191,7 +202,7 @@ public class BookPage {
 			paintBottom.setTypeface(typeface);
 
 		visibleWidth = screenWidth - marginWidth * 2;
-		visibleHeight = screenHeight - marginHeight * 2;
+		visibleHeight = screenHeight - marginHeight * 2 - mogoAdHeight;
 		lineCount = visibleHeight / lineHgight - 2;
 		isfirstPage = true;
 		islastPage = false;
@@ -203,6 +214,7 @@ public class BookPage {
 
 	/**
 	 * 获取当前页及后后面页数的内容
+	 * 
 	 * @return
 	 */
 	public String getCurPage() {
@@ -351,12 +363,13 @@ public class BookPage {
 	 */
 	public void currentChapter(Chapter mchapter) {
 		chapter = mchapter;
-//		String index = chapter.getIndex();
-//		int position = chapter.getPosition();
-//		int jumpType = chapter.getJumpType();
-////		Chapter tempChapter = IOHelper.getChapter(jumpType, index, position,
-////				bookType);
-//		chapter = tempChapter;
+		// String index = chapter.getIndex();
+		// int position = chapter.getPosition();
+		// int jumpType = chapter.getJumpType();
+		// // Chapter tempChapter = IOHelper.getChapter(jumpType, index,
+		// position,
+		// // bookType);
+		// chapter = tempChapter;
 		content = textType == 1 ? JccUtil.changeToSimplified(chapter
 				.getContent()) : JccUtil.changeToTraditional(chapter
 				.getContent());
@@ -482,13 +495,15 @@ public class BookPage {
 				+ DeviceUtil.dip2px(context, 3);
 		int titWidth = (int) paintBottom.measureText(chapter.getBookName());
 
-		c.drawText(timeStr, marginWidth / 2, screenHeight - 5, paintBottom);
+		c.drawText(timeStr, marginWidth / 2, screenHeight - mogoAdHeight - 5,
+				paintBottom);
 		c.drawText(chapter.getBookName(), screenWidth / 2 - titWidth / 2,
-				screenHeight - DeviceUtil.dip2px(context, 4), paintBottom);
+				screenHeight - mogoAdHeight - DeviceUtil.dip2px(context, 4),
+				paintBottom);
 		c.drawText(chapter.getChapterName(), DeviceUtil.dip2px(context, 20),
 				DeviceUtil.dip2px(context, 15), paintBottom);
-		c.drawText(percetStr, screenWidth - pSWidth,
-				screenHeight - DeviceUtil.dip2px(context, 4), paintBottom);
+		c.drawText(percetStr, screenWidth - pSWidth, screenHeight
+				- mogoAdHeight - DeviceUtil.dip2px(context, 4), paintBottom);
 	}
 
 	/**
@@ -498,6 +513,8 @@ public class BookPage {
 	 * @param resId
 	 */
 	public void setBgBitmap(Context context, int resId) {
+		if (bgBitmap != null && !bgBitmap.isRecycled())
+			bgBitmap.recycle();
 		bgBitmap = Bitmap.createScaledBitmap(BitmapFactory.decodeStream(context
 				.getResources().openRawResource(resId)), screenWidth,
 				screenHeight, true);
@@ -638,9 +655,11 @@ public class BookPage {
 	 */
 	public void setBgColor(int color) {
 		this.bgColor = color;
-		if (bgBitmap != null && !bgBitmap.isRecycled())
+		if (bgBitmap != null && !bgBitmap.isRecycled()) {
 			bgBitmap.recycle();
-		bgBitmap = null;
+			bgBitmap = null;
+		}
+
 	}
 
 	/**
@@ -711,4 +730,12 @@ public class BookPage {
 	// // TODO Auto-generated method stub
 	//
 	// }
+
+	/**
+	 * 更新当前的页数
+	 */
+	public void updateCurrentpageNum(int currentPage, int pageCount) {
+		pageNum = ((currentPage * (pagesVe.size())) / pageCount)-1;
+	}
+
 }

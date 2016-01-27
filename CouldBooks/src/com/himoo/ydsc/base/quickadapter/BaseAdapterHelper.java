@@ -200,6 +200,7 @@ public class BaseAdapterHelper {
 
 	/**
 	 * 特殊，只能用于设置BookView
+	 * 
 	 * @param viewId
 	 * @param listener
 	 * @return
@@ -235,9 +236,13 @@ public class BaseAdapterHelper {
 	 */
 	public BaseAdapterHelper setTextRightDrawable(int viewId, int resId) {
 		TextView view = retrieveView(viewId);
-		Drawable img = context.getResources().getDrawable(resId);
-		img.setBounds(0, 0, img.getMinimumWidth(), img.getMinimumHeight());
-		view.setCompoundDrawables(null, null, img, null);
+		if (resId == -1) {
+			view.setCompoundDrawables(null, null, null, null);
+		} else {
+			Drawable img = context.getResources().getDrawable(resId);
+			img.setBounds(0, 0, img.getMinimumWidth(), img.getMinimumHeight());
+			view.setCompoundDrawables(null, null, img, null);
+		}
 		return this;
 	}
 
@@ -314,6 +319,19 @@ public class BaseAdapterHelper {
 		final ImageView view = retrieveView(viewId);
 		ImageLoader.getInstance().displayImage(imageUrl, view, option);
 
+		return this;
+	}
+
+	/**
+	 * 设置透明度
+	 * 
+	 * @param viewId
+	 * @param alpha
+	 * @return
+	 */
+	public BaseAdapterHelper setViewAlpha(int viewId, float alpha) {
+		final ImageView view = retrieveView(viewId);
+		view.setAlpha(alpha);
 		return this;
 	}
 

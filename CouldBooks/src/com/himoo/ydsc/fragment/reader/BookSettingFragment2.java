@@ -38,8 +38,8 @@ import com.lidroid.xutils.view.annotation.ViewInject;
  * 阅读界面设置
  * 
  */
-public class BookSettingFragment2 extends Fragment implements
-		OnClickListener, OnLongClickListener {
+public class BookSettingFragment2 extends Fragment implements OnClickListener,
+		OnLongClickListener {
 
 	private static final String ACTION = "com.himoo.ydsc.booksettingfragment1.receiver";
 	private boolean isFollowSystem = false;
@@ -314,22 +314,19 @@ public class BookSettingFragment2 extends Fragment implements
 			mListener.onTextBackgroundChange(-1);
 			break;
 		case R.id.booksetting_iv_bg5:
-			SharedPreferences.getInstance().putBoolean(
-					SpConstant.BOOK_AUTO_COLOR, true);
-			BookTheme.setReaderBookTextBg(5);
-			booksetting_iv_bg5.setImageResource(R.drawable.rukou_xuanzhong);
+
 			if (SharedPreferences.getInstance().getBoolean(
 					SpConstant.BOOK_AUTO_COLOR_FIRST, true)) {
 				showDialog();
-				SharedPreferences.getInstance().putBoolean(
-						SpConstant.BOOK_AUTO_COLOR_FIRST, false);
 			} else {
 				SharedPreferences.getInstance().putBoolean(
 						SpConstant.BOOK_AUTO_COLOR, true);
-
+				BookTheme.setReaderBookTextBg(5);
+				booksetting_iv_bg5.setImageResource(R.drawable.rukou_xuanzhong);
+				mListener.onTextBackgroundChange(SharedPreferences
+						.getInstance().getInt(SpConstant.BOOK_AUTO_COLOR_TEXT,
+								Color.BLACK));
 			}
-			mListener.onTextBackgroundChange(SharedPreferences.getInstance()
-					.getInt(SpConstant.BOOK_AUTO_COLOR_TEXT, Color.BLACK));
 			break;
 
 		default:
@@ -565,6 +562,7 @@ public class BookSettingFragment2 extends Fragment implements
 		// TODO Auto-generated method stub
 		SharedPreferences.getInstance().putBoolean(SpConstant.BOOK_AUTO_COLOR,
 				true);
+		BookTheme.setReaderBookTextBg(5);
 		booksetting_iv_bg5.setImageResource(R.drawable.rukou_xuanzhong);
 		if (mListener != null)
 			mListener.onTextColorBgChange();

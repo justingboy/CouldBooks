@@ -43,7 +43,7 @@ public class BookMarkFragment extends BaseFragment {
 	/** 书签的集合list */
 	private List<BookMark> bookMarklist;
 
-	private BookMarkAdapter adapter;
+	private BookMarkAdapter mAdapter;
 
 	private BookMarkDb db;
 
@@ -73,9 +73,9 @@ public class BookMarkFragment extends BaseFragment {
 		bookMarklist = db.querryReaderMark(bookName);
 
 		if (bookMarklist != null && !bookMarklist.isEmpty()) {
-			adapter = new BookMarkAdapter(getActivity(),
+			mAdapter = new BookMarkAdapter(getActivity(),
 					R.layout.adapter_bookmark_item, bookMarklist);
-			listView.setAdapter(adapter);
+			listView.setAdapter(mAdapter);
 			listView.setOnItemClickListener(this);
 		} else {
 			tv_bookmark_empty.setVisibility(View.VISIBLE);
@@ -151,8 +151,8 @@ public class BookMarkFragment extends BaseFragment {
 			@Override
 			public void onMenuItemClick(int position, SwipeMenu menu, int index) {
 				BookMark bookMark = bookMarklist.get(position);
-				adapter.remove(bookMark);
-				adapter.notifyDataSetChanged();
+				mAdapter.remove(bookMark);
+				mAdapter.notifyDataSetChanged();
 				db.deletBookMark(bookMark);
 			}
 		});
@@ -164,5 +164,12 @@ public class BookMarkFragment extends BaseFragment {
 		// TODO Auto-generated method stub
 		super.onResume();
 		mCurrentClickPosition = -1;
+	}
+
+	@Override
+	public void onDestroy() {
+		if (mAdapter != null)
+			mAdapter.destory();
+		super.onDestroy();
 	}
 }

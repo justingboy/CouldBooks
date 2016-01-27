@@ -202,6 +202,12 @@ public abstract class BaseQuickAdapter<T, H extends BaseAdapterHelper> extends
 		data.clear();
 		// notifyDataSetChanged();
 	}
+	/**
+	 * Clear data list
+	 */
+	public void destory() {
+		data.clear();
+	}
 
 	public void showIndeterminateProgress(boolean display) {
 		if (display == displayIndeterminateProgress)

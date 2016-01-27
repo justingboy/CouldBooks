@@ -164,6 +164,10 @@
             android:launchMode="singleInstance"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.himoo.ydsc.activity.HotwordsActivity"
+            android:screenOrientation="portrait" >
+        </activity>
 
         <service android:name="com.himoo.ydsc.download.BookDownloadService" >
             <intent-filter>

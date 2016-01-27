@@ -36,6 +36,7 @@
             android:src="@drawable/iphone_yuan" />
 
         <ImageView
+         
             android:id="@+id/booksetting_update"
             style="@style/book_setting_image_title_style"
             android:contentDescription="@string/app_name"

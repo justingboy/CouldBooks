@@ -300,11 +300,18 @@ public class BookClassFragment extends BaseFragment implements
 	@Override
 	public void onResume() {
 		// TODO Auto-generated method stub
-		super.onResume();
+		mCurrentClickPosition = -1;
 		if (BookTheme.isThemeChange)
 			if (mAdapter != null) {
 				mAdapter.notifyDataSetChanged();
 			}
+		super.onResume();
 	}
 
+	@Override
+	public void onDestroy() {
+		if (mAdapter != null)
+			mAdapter.destory();
+		super.onDestroy();
+	}
 }

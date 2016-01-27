@@ -12,6 +12,8 @@ import com.himoo.ydsc.base.quickadapter.QuickAdapter;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.download.BookDownloadInfo;
+import com.himoo.ydsc.download.BookDownloadManager;
+import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.util.RegularUtil;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
@@ -27,25 +29,26 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 	public boolean isSelectedState = false;
 	public boolean isChoice = false;
 	public static Context mContext;
-
+	public BookDownloadManager downloadManager;
 
 	public BookDownloadAdapter(Context context, int layoutResId,
 			List<BookDownloadInfo> data) {
 		super(context, layoutResId, data);
 		// TODO Auto-generated constructor stub
 		mContext = context;
-		option =  BaseApplication.getInstance().displayImageOptionsBuider(BookTheme.BOOK_COVER);
+		option = BaseApplication.getInstance().displayImageOptionsBuider(
+				BookTheme.BOOK_COVER);
+		downloadManager = BookDownloadService.getDownloadManager(mContext);
 	}
 
-/*	public DisplayImageOptions displayImageOptionsBuider(int resId) {
-		DisplayImageOptions options = new DisplayImageOptions.Builder()
-				.showImageOnLoading(resId).showImageForEmptyUri(resId)
-				.showImageOnFail(resId).cacheInMemory(true).cacheOnDisk(true)
-				.considerExifParams(true).bitmapConfig(Bitmap.Config.ARGB_8888)
-				.build();
-		return options;
-	}
-*/
+	/*
+	 * public DisplayImageOptions displayImageOptionsBuider(int resId) {
+	 * DisplayImageOptions options = new DisplayImageOptions.Builder()
+	 * .showImageOnLoading(resId).showImageForEmptyUri(resId)
+	 * .showImageOnFail(resId).cacheInMemory(true).cacheOnDisk(true)
+	 * .considerExifParams(true).bitmapConfig(Bitmap.Config.ARGB_8888) .build();
+	 * return options; }
+	 */
 	@Override
 	protected void convert(BaseAdapterHelper helper, BookDownloadInfo item) {
 		// TODO Auto-generated method stub
@@ -53,9 +56,18 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 				SpConstant.BOOK_SHELF_DIRECTION, true);
 		String imageUrl = RegularUtil.converUrl(item.getBookCoverImageUrl());
 		helper.setImageUrl(R.id.shelf_book_image, imageUrl, option);
-		// helper.setOnOpenBookListener(R.id.bookView, mListener);
+		boolean isSuccess = downloadManager.queryBookDownSuccess(item
+				.getBookName());
+		if (isSuccess) {
+			helper.setVisible(R.id.shelf_book_undown, false);
+		} else {
+			helper.setVisible(R.id.shelf_book_undown, true);
+		}
+
 		helper.setVisible(R.id.book_new_label, item.getBookIsRead() ? false
 				: true);
+
+		// helper.setOnOpenBookListener(R.id.bookView, mListener);
 		if (isHorizontal) {
 			helper.setVisible(R.id.shelf_delected_box, isSelectedState);
 			helper.setVisible(R.id.shelf_book_name, true);
@@ -103,8 +115,5 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 		}
 
 	}
-
-
-	
 
 }

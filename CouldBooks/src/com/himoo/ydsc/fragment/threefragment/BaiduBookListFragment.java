@@ -167,4 +167,11 @@ public class BaiduBookListFragment extends ListFragment {
 			if (mAdapter != null)
 				mAdapter.notifyDataSetChanged();
 	}
+
+	@Override
+	public void onDestroy() {
+		if (mAdapter != null)
+			mAdapter.destory();
+		super.onDestroy();
+	}
 }

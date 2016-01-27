@@ -22,6 +22,9 @@ public class BaiduInfo extends EntityBase {
 
 	@Column(column = "bookReadProgress")
 	private long bookReadProgress;
+	
+	@Column(column = "isDownSuccess")
+	private boolean isDownSuccess;
 
 	@Column(column = "bookIsRead")
 	private boolean bookIsRead;
@@ -255,6 +258,14 @@ public class BaiduInfo extends EntityBase {
 
 	public void setReaderTime(long readerTime) {
 		this.readerTime = readerTime;
+	}
+
+	public boolean isDownSuccess() {
+		return isDownSuccess;
+	}
+
+	public void setDownSuccess(boolean isDownSuccess) {
+		this.isDownSuccess = isDownSuccess;
 	}
 
 }

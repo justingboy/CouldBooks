@@ -30,7 +30,6 @@ import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
-import com.himoo.ydsc.db.ChapterDb;
 import com.himoo.ydsc.download.BaiduBookDownload;
 import com.himoo.ydsc.fragment.BookShelfFragment;
 import com.himoo.ydsc.fragment.BookShelfFragment.BookDownloadReceiver;
@@ -109,6 +108,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_baidu_book_details);
+//		setSwipeBackEnable(false);
 		isAutoLoad = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_AUTO_LOAD, false);
 		BookTheme.setChangeTheme(false);
@@ -142,6 +142,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 						BaiduDetailsActivity.this);
 			}
 		});
+
 	}
 
 	/**
@@ -216,6 +217,13 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		String statue = book.getStatus();
 		bookDownload.setText(isDownload ? statue.equals("完结") ? "完结" : "更新"
 				: "下载");
+		// 设置下载控件的状态
+		if (!SP.getInstance().getBoolean(book.getTitle(), true)) {
+			bookDownload.setText("正在下载");
+			bookDownload.setAlpha(0.5f);
+			bookDownload.setEnabled(false);
+			bookDownload.setClickable(false);
+		}
 
 	}
 
@@ -345,6 +353,12 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				new SaveAsyncTask(bookList)
 						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				registeBroadcast();
+				// 设置下载控件的状态
+				bookDownload.setText("正在下载");
+				bookDownload.setAlpha(0.5f);
+				bookDownload.setEnabled(false);
+				bookDownload.setClickable(false);
+
 			}
 			// 豆瓣评书
 		} else if (v == bookEvaluation) {
@@ -406,9 +420,9 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 			// TODO Auto-generated method stub
 			try {
 
-				ChapterDb.getInstance().createDb(BaiduDetailsActivity.this,
-						book.getTitle());
-				ChapterDb.getInstance().saveBookChapter(list);
+				// ChapterDb.getInstance().createDb(BaiduDetailsActivity.this,
+				// book.getTitle());
+				// ChapterDb.getInstance().saveBookChapter(list);
 				int len = 0;
 				int progress = 0;
 				int allChapterLength = list.size();
@@ -493,17 +507,24 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 			super.onPostExecute(result);
 			// BaiduBookDownload.getInstance(BaiduDetailsActivity.this)
 			// .updateDownlaodstatue(book.getTitle());
-			SP.getInstance().putBoolean(book.getTitle(), true);
-			Toast.showLong(BaiduDetailsActivity.this, "《" + book.getTitle()
-					+ "》下载完成");
-			new Handler().postDelayed(new Runnable() {
+			try {
+				SP.getInstance().putBoolean(book.getTitle(), true);
+				bookDownload.setText("完成");
+				BaiduBookDownload.getInstance(BaiduDetailsActivity.this)
+						.updateDownSuccess(book.getTitle());
+				Toast.showLong(BaiduDetailsActivity.this, "《" + book.getTitle()
+						+ "》下载完成");
+				new Handler().postDelayed(new Runnable() {
 
-				@Override
-				public void run() {
-					// TODO Auto-generated method stub
-					downNotification.notifiManger.cancelAll();
-				}
-			}, 3000);
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						downNotification.notifiManger.cancelAll();
+					}
+				}, 3000);
+			} catch (Exception e) {
+				Log.e(e);
+			}
 
 		}
 

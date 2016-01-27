@@ -137,7 +137,7 @@ public class MoreTextView extends LinearLayout {
 
 	public void setText(CharSequence charSequence) {
 		contentView.setText(charSequence);
-		if (charSequence != null && charSequence.length() > 110) {
+		if (charSequence != null && charSequence.length() >=100) {
 			expandView.setVisibility(View.VISIBLE);
 		} else {
 			int textHeight = contentView.getLineHeight() * (maxLine - 2);

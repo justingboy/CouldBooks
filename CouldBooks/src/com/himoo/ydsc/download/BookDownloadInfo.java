@@ -26,6 +26,9 @@ public class BookDownloadInfo extends EntityBase {
 
 	@Column(column = "bookReadProgress")
 	private long bookReadProgress;
+	
+	@Column(column = "isDownSuccess")
+	private boolean isDownSuccess;
 
 	@Column(column = "bookIsRead")
 	private boolean bookIsRead;
@@ -274,6 +277,15 @@ public class BookDownloadInfo extends EntityBase {
 		this.readerTime = readerTime;
 	}
 
+
+	public boolean isDownSuccess() {
+		return isDownSuccess;
+	}
+
+	public void setDownSuccess(boolean isDownSuccess) {
+		this.isDownSuccess = isDownSuccess;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)

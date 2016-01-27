@@ -22,7 +22,7 @@ import android.util.Log;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.dialog.BookDownloadDialog;
-import com.himoo.ydsc.download.BaiduBookDownload;
+import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.http.OnAfreshDownloadListener;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.SP;
@@ -116,13 +116,12 @@ public class ZipExtractorTask extends AsyncTask<Void, Integer, Long> {
 		// BaiduBookDownload.getInstance(mContext).updateDownlaodstatue(bookName);
 		SP.getInstance().putBoolean(bookName, true);
 		if (listener != null) {
-
 			listener.onPostDownloadSuccess(bookName);
-			Toast.show(mContext, "《" + bookName + "》" + "下载完成");
-		} else {
-
-			Toast.show(mContext, "下载解压成功,赶快去看看吧!");
 		}
+		Toast.showLong(mContext, "《" + bookName + "》" + "下载完成");
+		BookDownloadService.getDownloadManager(
+				mContext).updateDownSuccess(
+						bookName,true);
 
 		if (isCancelled())
 			return;

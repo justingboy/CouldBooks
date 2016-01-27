@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,6 +51,7 @@ public class ChangeSourceActivity extends BaseActivity implements
 	private String cid;
 	private String chapterIndex;
 	private String filePath;
+	private String lastUrl;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,21 +69,14 @@ public class ChangeSourceActivity extends BaseActivity implements
 
 		Intent intent = getIntent();
 		gid = intent.getStringExtra("gid");
+		lastUrl = intent.getStringExtra("lastUrl");
 		filePath = intent.getStringExtra("filePath");
 		position = intent.getIntExtra("position", -1);
 		String src = intent.getStringExtra("src");
 		cid = intent.getStringExtra("cid");
 		chapterIndex = intent.getStringExtra("index");
-
-		if (src != null) {
-			String str = src.replaceAll("http://", "");
-			tv_current_booksource.setText("当前："
-					+ str.substring(0, str.indexOf("/")));
-
-		} else {
-			tv_current_booksource.setText("当前：无");
-		}
-
+		
+		
 		String url = spiltBookSourceUrl(gid, src, cid, chapterIndex);
 		getBookSourceForServe(url);
 
@@ -146,7 +141,7 @@ public class ChangeSourceActivity extends BaseActivity implements
 	 * 
 	 * @param url
 	 */
-	public void getBookSourceForServe(final String url) {
+	public void getBookSourceForServe(final String chapteUrl) {
 
 		new AsyncTask<Void, Void, String>() {
 
@@ -158,8 +153,19 @@ public class ChangeSourceActivity extends BaseActivity implements
 
 			@Override
 			protected String doInBackground(Void... params) {
-				String result = BookDetailsTask.getInstance()
-						.getStringFormServe(url);
+				String result = null;
+				if (lastUrl != null) {
+					BaiduBookChapter chapter = getNeedChangeChapter(lastUrl,
+							position, chapterIndex);
+					String url = spiltBookSourceUrl(gid, chapter.getHref(),
+							cid, chapterIndex);
+					result = BookDetailsTask.getInstance().getStringFormServe(
+							url);
+
+				} else {
+					result = BookDetailsTask.getInstance().getStringFormServe(
+							chapteUrl);
+				}
 				return result;
 			}
 
@@ -172,6 +178,8 @@ public class ChangeSourceActivity extends BaseActivity implements
 					try {
 						json = new JSONObject(result);
 						if (json.getInt("status") == 1) {
+							String str = json.getJSONObject("data").getString("domain");
+							tv_current_booksource.setText("当前："+(TextUtils.isEmpty(str)?"无":str));
 							JSONArray jsonArray = json.getJSONObject("data")
 									.getJSONArray("replacements");
 							try {
@@ -187,11 +195,13 @@ public class ChangeSourceActivity extends BaseActivity implements
 							}
 
 						} else {
+							tv_current_booksource.setText("当前：无");
 							dismissRefreshDialog();
 						}
 
 					} catch (JSONException e) {
 						// TODO Auto-generated catch block
+						tv_current_booksource.setText("当前：无");
 						dismissRefreshDialog();
 					}
 				} else {
@@ -273,7 +283,7 @@ public class ChangeSourceActivity extends BaseActivity implements
 							chapterUrl);
 			if (isNeedToSdCard) {
 				File file = new File(filePath);
-				if (file != null && file.exists()) {
+				if (file != null && file.exists()&&!TextUtils.isEmpty(chapterContent)) {
 					// 重新写到文件中
 					BufferedWriter bw = null;
 					try {
@@ -333,6 +343,54 @@ public class ChangeSourceActivity extends BaseActivity implements
 				.append(chapter.getIndex()).append("&time=&skey=&id=wisenovel");
 
 		return sb.toString();
+
+	}
+
+	/**
+	 * 获取章节
+	 * 
+	 * @param lastUrl
+	 * @param position
+	 * @param index
+	 * @return
+	 */
+	public BaiduBookChapter getNeedChangeChapter(String lastUrl, int position,
+			String index) {
+		String content = BookDetailsTask.getInstance()
+				.geLasttChapterFormService(this, lastUrl);
+		if (content != null) {
+			ArrayList<BaiduBookChapter> list = praseBaiduBookChapter(content);
+			if (list != null && !list.isEmpty()) {
+				// updateNewChapter(bookName, list);
+				return list.get(position);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 解析百度章节信息
+	 * 
+	 * @param jsonString
+	 * @return
+	 */
+	private ArrayList<BaiduBookChapter> praseBaiduBookChapter(String jsonString) {
+		try {
+			Gson gson = new Gson();
+			JSONObject jsonObject = new JSONObject(jsonString);
+			if (jsonObject.getInt("status") == 1) {
+				JSONObject subJsonObject = jsonObject.getJSONObject("data");
+				String json = subJsonObject.getString("group");
+				return gson.fromJson(json,
+						new TypeToken<ArrayList<BaiduBookChapter>>() {
+						}.getType());
+
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+		return null;
 
 	}
 

@@ -1,11 +1,15 @@
 package com.himoo.ydsc.fragment;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -13,6 +17,7 @@ import android.graphics.drawable.StateListDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -254,39 +259,6 @@ public class BookShelfFragment extends BaseFragment implements
 			break;
 
 		case R.id.titlebar_refresh:
-			// int type = SharedPreferences.getInstance().getInt(
-			// "book_update_type", 2);
-			// if (type == 1) {
-			// new AlertDialog(getActivity())
-			// .builder()
-			// .setTitle("提醒")
-			// .setMsg("您现在选择的是整本更新模式，我们会更新您的整本书，这将会把您本地的书籍全部重新下载,是否继续。")
-			// .setNegativeButton("取消", new OnClickListener() {
-			//
-			// @Override
-			// public void onClick(View v) {
-			// // TODO Auto-generated method stub
-			//
-			// }
-			// }).setPositiveButton("确定", new OnClickListener() {
-			//
-			// @Override
-			// public void onClick(View v) {
-			// // TODO Auto-generated method stub
-			// if (NetWorkUtils.isNetConnected(getActivity())) {
-			// AnimationUtils.setViewRotating(
-			// getActivity(), imgRefresh);
-			// isRefresh = true;
-			// BookUpdateTask task = new BookUpdateTask(
-			// getActivity(), null, 2);
-			// task.setOnNewChapterListener(BookShelfFragment.this);
-			// task.execute();
-			// } else {
-			// Toast.show(getActivity(), "未连接网络!");
-			// }
-			// }
-			// }).show();
-			// } else if (type == 2) {
 			if (NetWorkUtils.isNetConnected(getActivity())) {
 				if (SP.getInstance().getBoolean(downlaodBookName, true)) {
 
@@ -445,7 +417,7 @@ public class BookShelfFragment extends BaseFragment implements
 				mAdapter.remove(deletedList);
 			}
 			new DeleteBookTask(null, null, 1, true).execute();
-			
+
 			break;
 		case R.id.btn_cancel:
 			if (popupWindow != null)
@@ -502,6 +474,11 @@ public class BookShelfFragment extends BaseFragment implements
 	public void onSearchClick(View view) {
 		// TODO Auto-generated method stub
 		if (isKeyEnterDown) {
+			if (TextUtils.isEmpty(searchText.getText())) {
+				Toast.showLong(getActivity(), "请输入要查找的书名或作者");
+				isKeyEnterDown = false;
+				return;
+			}
 			List<BookDownloadInfo> resultList = downloadManager
 					.queryByKeyword(searchText.getText().toString());
 			if (resultList != null && !resultList.isEmpty()) {
@@ -585,15 +562,6 @@ public class BookShelfFragment extends BaseFragment implements
 				new DeleteBookTask(book, book.getBookName(),
 						book.getBookSourceType(), false).execute();
 
-				/*
-				 * deletedList.add(book);
-				 * downloadManager.deletedBookList(deletedList); for (int i = 0;
-				 * i < deletedList.size(); i++) {
-				 * BookMarkDb.getInstance(getActivity(), "book")
-				 * .deletBookMark(deletedList.get(i).getBookName()); }
-				 * mDownloadList.remove(book); mAdapter.remove(deletedList);
-				 * deletedList.clear();
-				 */
 				break;
 
 			default:
@@ -661,7 +629,7 @@ public class BookShelfFragment extends BaseFragment implements
 		}
 		mCurrentClickPosition = -1;
 		if (null != bookView) {
-			bookView.startCloseBookAnimation();
+			bookView.startCloseBookAnimation(null);
 			bookView = null;
 		}
 	}
@@ -677,6 +645,7 @@ public class BookShelfFragment extends BaseFragment implements
 		public String statue;
 		public int bookType;
 		public String lastUrl;
+		ArrayList<BaiduBookChapter> list;
 
 		public OpenBookAsyncTask(Context context, String bookName,
 				String statue, int bookType, String lastUrl, BookView bookView) {
@@ -699,25 +668,32 @@ public class BookShelfFragment extends BaseFragment implements
 		@Override
 		protected BookMark doInBackground(Void... params) {
 			// TODO Auto-generated method stub
-			ArrayList<BaiduBookChapter> list = LocalReaderUtil.getInstance()
-					.parseLocalBook(bookName, bookType);
-			IOHelper.getBook(mContext, bookName, list);
-			list.clear();
-			list = null;
-			BookMark bookMark = BookMarkDb.getInstance(mContext, "book")
-					.querryReaderPos(bookName);
-
-			return bookMark;
+			list = LocalReaderUtil.getInstance().parseLocalBook(bookName,
+					bookType);
+			if (list == null || list.isEmpty()) {
+				return null;
+			} else {
+				IOHelper.getBook(mContext, bookName, list);
+				BookMark bookMark = BookMarkDb.getInstance(mContext, "book")
+						.querryReaderPos(bookName);
+				return bookMark;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(final BookMark result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			dismissRefreshDialog();
-			// readerBg = getActivity().getResources().getDrawable(
-			// BookTheme.READBOOK_BACKGROUND);
 
+			if (result == null && list == null || list.isEmpty()) {
+				dismissRefreshDialog();
+				mCurrentClickPosition = -1;
+				Toast.showBg(getActivity(), "加载章节失败，需重新下载!");
+				return;
+			}
+			list.clear();
+			list = null;
+			dismissRefreshDialog();
 			readerBg = getActivity().getResources().getDrawable(
 					BookTheme.READBOOK_BACKGROUND);
 
@@ -855,14 +831,24 @@ public class BookShelfFragment extends BaseFragment implements
 				return;
 			mCurrentClickPosition = position;
 			// 已经下载完成
-			if (SP.getInstance().getBoolean(book.getBookName(), true)
-					&& !isRefresh) {
-				new OpenBookAsyncTask(getActivity(), book.getBookName(),
-						book.getBookStatue(), book.getBookSourceType(),
-						book.getLastUrl(), bookView).execute();
-			} else {
+			if (downloadManager.queryBookDownSuccess(book.getBookName())) {
 
-				Toast.show(getActivity(), isRefresh ? "更新中,请稍后打开" : "下载中,请稍后打开");
+				if (SP.getInstance().getBoolean(book.getBookName(), true)
+						&& !isRefresh) {
+					new OpenBookAsyncTask(getActivity(), book.getBookName(),
+							book.getBookStatue(), book.getBookSourceType(),
+							book.getLastUrl(), bookView).execute();
+				} else {
+					Toast.showBg(getActivity(), isRefresh ? "更新中,请稍后打开"
+							: "下载中,请稍后打开");
+					mCurrentClickPosition = -1;
+				}
+			} else {
+				if (book.getBookSourceType() == 2) {
+					Toast.showBg(getActivity(), "下载中,请稍后打开");
+				} else {
+					Toast.showBg(getActivity(), "未下载完成,可长按重新下载!");
+				}
 				mCurrentClickPosition = -1;
 			}
 
@@ -956,17 +942,29 @@ public class BookShelfFragment extends BaseFragment implements
 	}
 
 	@Override
+	public void onCancelDownload() {
+		// TODO Auto-generated method stub
+		AnimationUtils.cancelAnim(imgRefresh);
+	}
+
+	@Override
 	public void onPostDownloadSuccess(String bookName) {
 		// TODO Auto-generated method stub
 		AnimationUtils.cancelAnim(imgRefresh);
 		SP.getInstance().putBoolean(bookName, true);
+		if (mAdapter != null)
+			mAdapter.notifyDataSetChanged();
+
 	}
 
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		ImageLoader.getInstance().clearMemoryCache();
-		// ImageLoader.getInstance().clearDiskCache();
+		if (readerBg != null)
+			readerBg = null;
+		if (mAdapter != null)
+			mAdapter.destory();
 		super.onDestroy();
 
 	}
@@ -1044,17 +1042,8 @@ public class BookShelfFragment extends BaseFragment implements
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 
-			if (isDeleteAll) {/*
-				if (popupWindow != null)
-					popupWindow.dismiss();
-				titleBar.setLeftDrawable(R.drawable.book_deleted);
-				isDelectStute = false;
-				if (mAdapter != null) {
-					mAdapter.isSelectedState = false;
-					mDownloadList.removeAll(deletedList);
-					mAdapter.remove(deletedList);
-				}
-			*/} else {
+			if (isDeleteAll) {
+			} else {
 
 				deletedList.add(book);
 				downloadManager.deletedBookList(deletedList);
@@ -1071,7 +1060,21 @@ public class BookShelfFragment extends BaseFragment implements
 				Toast.show(getActivity(), " 删除完成 ");
 				dismissRefreshDialog();
 			}
+			if (mDownloadList.isEmpty()) {
+				shelf_empty_image.setVisibility(View.VISIBLE);
+			}
 
+		}
+	}
+
+	public Bitmap getLoacalBitmap(String url) {
+		try {
+			FileInputStream fis = new FileInputStream(url);
+			return BitmapFactory.decodeStream(fis); // /把流转化为Bitmap图片
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 

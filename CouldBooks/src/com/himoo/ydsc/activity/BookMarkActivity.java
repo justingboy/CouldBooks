@@ -32,7 +32,6 @@ import com.himoo.ydsc.base.BaseActivity;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.config.BookTheme;
-import com.himoo.ydsc.db.ChapterDb;
 import com.himoo.ydsc.download.BaiduBookDownload;
 import com.himoo.ydsc.fragment.BookShelfFragment;
 import com.himoo.ydsc.fragment.BookShelfFragment.BookDownloadReceiver;
@@ -512,8 +511,8 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 			}
 
 			// 保存章节的换源信息
-			ChapterDb.getInstance().createDb(BookMarkActivity.this, bookName);
-			ChapterDb.getInstance().saveBookChapter(list);
+//			ChapterDb.getInstance().createDb(BookMarkActivity.this, bookName);
+//			ChapterDb.getInstance().saveBookChapter(list);
 
 			if (downNotification != null) {
 				downNotification.creatNotification(bookName, "开始下载");
@@ -620,6 +619,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 			AnimationUtils.cancelAnim(book_refresh);
 			sendToBookMarkBroadcast(false);
 			sendToBookShelfBroadcastSucess(false);
+			BaiduBookDownload.getInstance(BookMarkActivity.this).updateDownSuccess(bookName);
 			new Handler().postDelayed(new Runnable() {
 
 				@Override

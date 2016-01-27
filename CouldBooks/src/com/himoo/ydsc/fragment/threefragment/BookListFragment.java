@@ -159,4 +159,11 @@ public class BookListFragment extends ListFragment {
 				mAdapter.notifyDataSetChanged();
 			}
 	}
+
+	@Override
+	public void onDestroy() {
+		if (mAdapter != null)
+			mAdapter.destory();
+		super.onDestroy();
+	}
 }

@@ -283,6 +283,7 @@ public class BookDownloadManager {
 		bookDownloadInfo.setAutoRename(autoRename);
 		bookDownloadInfo.setAutoResume(false);
 		bookDownloadInfo.setBookStatue("完结");
+		bookDownloadInfo.setDownSuccess(false);
 		bookDownloadInfo.setSerialize(false);
 		bookDownloadInfo.setBookSourceType(1);
 		bookDownloadInfo.setBookName(bookDetails.getBook_Name());
@@ -295,14 +296,6 @@ public class BookDownloadManager {
 		bookDownloadInfo.setLastReaderProgress("0%");
 		bookDownloadInfo.setBookReadProgress(0L);
 		bookDownloadInfo.setFileSavePath(bookSavePath + saveFileName);
-		// HttpUtils http = new HttpUtils();
-		// http.configRequestThreadPoolSize(maxDownloadThread);
-		// HttpHandler<File> handler = http.download(bookDetails
-		// .getBook_Download(), bookSavePath + saveFileName, autoResume,
-		// autoRename, new ManagerCallBack(bookDownloadInfo, callback));
-		// bookDownloadInfo.setHandler(handler);
-		// bookDownloadInfo.setState(handler.getState());
-		// downloadInfoList.add(bookDownloadInfo);
 		db.saveBindingId(bookDownloadInfo);
 		BaseApplication.getInstance().putHashMap(
 				bookDetails.getBook_Download(), bookDownloadInfo);
@@ -355,6 +348,26 @@ public class BookDownloadManager {
 			}
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
+			Log.e("msg", e.getMessage());
+		}
+
+	}
+
+	/**
+	 * 设置阅读
+	 * @param bookName
+	 */
+	public void setBookReader(String bookName) {
+		List<BaiduInfo> list;
+		try {
+			list = db.findAll(Selector.from(BaiduInfo.class).where("bookName",
+					"=", bookName));
+			if (list != null && !list.isEmpty()) {
+				BaiduInfo bookinfo = list.get(0);
+				bookinfo.setBookIsRead(true);
+				db.update(bookinfo);
+			}
+		} catch (DbException e) {
 			Log.e("msg", e.getMessage());
 		}
 
@@ -419,6 +432,50 @@ public class BookDownloadManager {
 		}
 		downloadInfoList.remove(BookDownloadInfo);
 		db.delete(BookDownloadInfo);
+	}
+
+	/**
+	 * 设置下载完成
+	 * 
+	 * @param bookName
+	 */
+	public void updateDownSuccess(String bookName, boolean isSuccess) {
+		List<BaiduInfo> list;
+		try {
+			list = db.findAll(Selector.from(BaiduInfo.class).where("bookName",
+					"=", bookName));
+			if (list != null && !list.isEmpty()) {
+				BaiduInfo bookinfo = list.get(0);
+				bookinfo.setAutoResume(isSuccess);
+				db.update(bookinfo);
+			}
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			Log.e("msg", e.getMessage());
+		}
+	}
+
+	/**
+	 * 查询状态
+	 * 
+	 * @return
+	 */
+	public boolean queryBookDownSuccess(String bookName) {
+
+		List<BaiduInfo> list;
+		try {
+			list = db.findAll(Selector.from(BaiduInfo.class).where("bookName",
+					"=", bookName));
+			if (list != null && !list.isEmpty()) {
+				BaiduInfo bookinfo = list.get(0);
+				return bookinfo.isAutoResume();
+			}
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			Log.e("msg", e.getMessage());
+		}
+
+		return false;
 	}
 
 	/**

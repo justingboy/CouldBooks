@@ -23,8 +23,9 @@ import com.himoo.ydsc.fragment.BookShelfFragment;
 import com.himoo.ydsc.fragment.ChoiceFragment;
 import com.himoo.ydsc.fragment.ClassifyFragment;
 import com.himoo.ydsc.fragment.MoreFragment;
-import com.himoo.ydsc.fragment.SearchFragment;
+import com.himoo.ydsc.fragment.SearchFragment2;
 import com.himoo.ydsc.http.HttpConstant;
+import com.himoo.ydsc.reader.config.BitmapConfig;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
@@ -63,7 +64,7 @@ public class HomeActivity extends BaseActivity {
 	/** Fragment */
 	private Fragment choiceFragment = new ChoiceFragment();
 	private Fragment classifyFragment = new ClassifyFragment();
-	private Fragment searchFragment = new SearchFragment();
+	private Fragment searchFragment = new SearchFragment2();
 	public Fragment bookshelfFragment = new BookShelfFragment();
 	private Fragment moreFragment = new MoreFragment();
 	private List<Fragment> fragmentList;
@@ -92,7 +93,7 @@ public class HomeActivity extends BaseActivity {
 		initEvent();
 		addFirstToast(this.getActivityName());
 		OnlineConfigAgent.getInstance().updateOnlineConfig(this);
-		
+
 		Log.d(SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST));
 
@@ -258,7 +259,7 @@ public class HomeActivity extends BaseActivity {
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		ImageLoader.getInstance().clearMemoryCache();
-//		ImageLoader.getInstance().clearDiskCache();  
+		BitmapConfig.getInstace().destory();
 		stopDownloadService();
 		System.gc();
 		super.onDestroy();
@@ -291,24 +292,11 @@ public class HomeActivity extends BaseActivity {
 		setRadioButtonTextColorSelector();
 
 	}
-	
-	
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		// TODO Auto-generated method stub
-//		super.onSaveInstanceState(outState);
+		// super.onSaveInstanceState(outState);
 	}
-	
-/*
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		try {
-			super.onRestoreInstanceState(savedInstanceState);
-		} catch (Exception e) {
-			// TODO: handle exception
-			Log.e(e);
-		}
-	}*/
 
 }

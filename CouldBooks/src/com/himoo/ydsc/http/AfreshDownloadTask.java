@@ -14,7 +14,9 @@ import android.os.Handler;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.himoo.ydsc.activity.BaiduDetailsActivity;
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.download.BaiduBookDownload;
 import com.himoo.ydsc.notification.DownlaodNotification;
 import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.reader.dao.BookMarkDb;
@@ -217,6 +219,7 @@ public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			Toast.show(context, "《" + bookName + "》下载完成");
+			BaiduBookDownload.getInstance(context).updateDownSuccess(bookName);
 			if (mListener != null) {
 				mListener.onPostDownloadSuccess(bookName);
 			}

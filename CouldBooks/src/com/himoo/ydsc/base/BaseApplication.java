@@ -74,7 +74,7 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 		super.onCreate();
 		instance = this;
 		Log = MyLogger.kLog();
-		SP.getInstance().putBoolean("isDown", true);
+		SP.getInstance().clear();
 		// BaiduBookDownload.getInstance(this, 3, this);
 		// 设置主题皮肤
 		BookTheme.setThemeColor(SharedPreferences.getInstance().getInt(

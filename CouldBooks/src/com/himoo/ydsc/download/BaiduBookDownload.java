@@ -77,6 +77,7 @@ public class BaiduBookDownload {
 						.currentTimeMillis() + "");
 				bookDownloadInfo.setBookCoverImageUrl(book.getCoverImage());
 				bookDownloadInfo.setBookIsRead(false);
+				bookDownloadInfo.setDownSuccess(false);
 				bookDownloadInfo.setAutoResume(false);
 				bookDownloadInfo.setBookReadHository("此书您还没有阅读!");
 				bookDownloadInfo.setBookReadProgress(100L);
@@ -118,6 +119,7 @@ public class BaiduBookDownload {
 
 	/**
 	 * 查询下载的状态
+	 * 
 	 * @param bookName
 	 * @return
 	 */
@@ -155,6 +157,27 @@ public class BaiduBookDownload {
 			return 0;
 		}
 
+	}
+
+	/**
+	 * 设置下载完成的状态
+	 * 
+	 * @param bookName
+	 */
+	public void updateDownSuccess(String bookName) {
+
+		try {
+			List<BaiduInfo> list = db.findAll(Selector.from(BaiduInfo.class)
+					.where("bookName", "=", bookName));
+			if (list != null && !list.isEmpty()) {
+				BaiduInfo book = list.get(0);
+				book.setAutoResume(true);
+				db.update(book);
+			}
+
+		} catch (DbException e) {
+			MyLogger.kLog().e(e);
+		}
 	}
 
 	/**

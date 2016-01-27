@@ -39,6 +39,7 @@ public class CatalogFragment extends BaseFragment {
 	/** 通知广播的Action */
 	private static final String ACTION = "com.himoo.ydsc.catalog.receiver";
 	private boolean isDownloading;
+	private BookCatalogdapter mAdapter;
 
 	public static CatalogFragment newInstance(String bookName, int type,
 			int bookType) {
@@ -68,9 +69,9 @@ public class CatalogFragment extends BaseFragment {
 		bookName = getArguments().getString("bookName");
 		bookMark = BookMarkDb.getInstance(getActivity(), "book")
 				.querryReaderPos(bookName);
-		BookCatalogdapter adapter = new BookCatalogdapter(getActivity(),
+		mAdapter = new BookCatalogdapter(getActivity(),
 				R.layout.adapter_catalog_item, list);
-		listView.setAdapter(adapter);
+		listView.setAdapter(mAdapter);
 		if (bookMark != null) {
 			int pos = bookMark.getPosition();
 			listView.setSelection(pos > 10 ? pos - 5 : 0);
@@ -163,6 +164,15 @@ public class CatalogFragment extends BaseFragment {
 		mCurrentClickPosition = -1;
 	}
 
+	
+	@Override
+	public void onDestroy() {
+		if(mAdapter!=null)
+			mAdapter.destory();
+		super.onDestroy();
+	}
+	
+	
 	public class BookUpdateReceiver extends BroadcastReceiver {
 
 		@Override

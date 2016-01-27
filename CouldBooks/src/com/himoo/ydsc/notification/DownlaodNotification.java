@@ -22,7 +22,7 @@ public class DownlaodNotification {
 	private Notification notification;
 	private RemoteViews remoteViews;
 	private int progress = 0;
-	private static final int NOTIFI_ID = 0;
+	private int NOTIFI_ID = (int) (Math.random()*65535);
 	private String bookName = "凡人修仙传";
 
 	public DownlaodNotification(Context context) {

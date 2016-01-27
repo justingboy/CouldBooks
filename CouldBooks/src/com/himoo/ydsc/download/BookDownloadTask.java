@@ -15,7 +15,6 @@ import android.os.Handler;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.himoo.ydsc.bean.BaiduBookChapter;
-import com.himoo.ydsc.db.ChapterDb;
 import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.notification.DownlaodNotification;
@@ -78,8 +77,8 @@ public class BookDownloadTask extends AsyncTask<Void, String, String> {
 			}
 		}
 		// 保存章节的换源信息
-		ChapterDb.getInstance().createDb(context, bookName);
-		ChapterDb.getInstance().saveBookChapter(list);
+//		ChapterDb.getInstance().createDb(context, bookName);
+//		ChapterDb.getInstance().saveBookChapter(list);
 
 		if (downNotification != null) {
 			downNotification.creatNotification(bookName, "开始下载");
@@ -162,6 +161,7 @@ public class BookDownloadTask extends AsyncTask<Void, String, String> {
 		super.onPostExecute(result);
 		if (listener != null)
 			listener.onCompleteDownlaod();
+		BaiduBookDownload.getInstance(context).updateDownSuccess(bookName);
 		new Handler().postDelayed(new Runnable() {
 
 			@Override

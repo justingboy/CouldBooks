@@ -27,11 +27,11 @@ public class BookTheme {
 	public static int THEME_COLOR_TYPE = 2;
 
 	/** 五种主题皮肤 */
-	public static final int BOOK_RED = Color.parseColor("#FFFF5A5A");
-	public static final int BOOK_BLUE = Color.parseColor("#FF00B6DF");
-	public static final int BOOK_GREEN = Color.parseColor("#FF00B758");
-	public static final int BOOK_YELLOW = Color.parseColor("#FFF5BB18");
-	public static final int BOOK_GRAY = Color.parseColor("#FF2C2000");
+	public static final int BOOK_RED = Color.parseColor("#FFff3333");
+	public static final int BOOK_BLUE = Color.parseColor("#FF13a9ef");
+	public static final int BOOK_GREEN = Color.parseColor("#FF2aa924");
+	public static final int BOOK_YELLOW = Color.parseColor("#FFf8b500");
+	public static final int BOOK_GRAY = Color.parseColor("#FF333333");
 	public static final int BOOK_WHITE = Color.parseColor("#FFFFFFFF");
 	public static final int BOOK_TEXT_WHITE = Color.parseColor("#FFA6A5A2");
 

@@ -85,22 +85,28 @@ public class LocalReaderUtil {
 			}
 
 		} else if (bookType == 1) {
+			try {
+		
 			File bookFile = new File(FileUtils.mSdRootPath
 					+ "/CouldBook/download" + File.separator + bookName
 					+ File.separator + "index.txt");
-			if (bookFile != null && bookFile.exists()) {
-				String bookContent = AESCrypt.readBookFile(bookFile
-						.getAbsolutePath());
-				String chapter[] = bookContent.split("\n");
-				for (int i = 0; i < chapter.length; i++) {
-					BaiduBookChapter baiduBookChapter = new BaiduBookChapter();
-					String[] str = chapter[i].split("\\|\\|\\|");
-					baiduBookChapter.setText(str[0].trim());
-					baiduBookChapter.setIndex(str[1].split("\\.")[0].trim());
-					baiduBookChapter.setPosition(i);
-					list.add(baiduBookChapter);
+				if (bookFile != null && bookFile.exists()) {
+					String bookContent = AESCrypt.readBookFile(bookFile
+							.getAbsolutePath());
+					String chapter[] = bookContent.split("\n");
+					for (int i = 0; i < chapter.length; i++) {
+						BaiduBookChapter baiduBookChapter = new BaiduBookChapter();
+						String[] str = chapter[i].split("\\|\\|\\|");
+						baiduBookChapter.setText(str[0].trim());
+						baiduBookChapter
+								.setIndex(str[1].split("\\.")[0].trim());
+						baiduBookChapter.setPosition(i);
+						list.add(baiduBookChapter);
+					}
+					chapter = null;
 				}
-				chapter = null;
+			} catch (Exception e) {
+				return null;
 			}
 
 		}

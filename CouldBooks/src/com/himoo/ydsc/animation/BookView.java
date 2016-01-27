@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -244,8 +245,11 @@ public class BookView extends RelativeLayout implements AnimatorListener {
 	 * @param gridview
 	 *            BookItemView's parent.
 	 */
-	public synchronized void startCloseBookAnimation() {
+	public synchronized void startCloseBookAnimation(Bitmap bitmap) {
 		if (mIsOpen.get()) {
+			if(bitmap!=null)
+			mAnimBackground.setBackgroundDrawable(new BitmapDrawable(bitmap));
+			
 			/** You can change mLocation here. */
 			// if (mGridParent != null) {
 			// View firstView = mGridParent.getChildAt(0);

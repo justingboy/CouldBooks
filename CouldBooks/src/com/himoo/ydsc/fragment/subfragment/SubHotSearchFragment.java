@@ -253,4 +253,11 @@ public class SubHotSearchFragment extends BaseFragment implements
 			if (mAdapter != null)
 				mAdapter.notifyDataSetChanged();
 	}
+	
+	@Override
+	public void onDestroy() {
+		if(mAdapter!=null)
+			mAdapter.destory();
+		super.onDestroy();
+	}
 }

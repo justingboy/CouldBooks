@@ -98,7 +98,7 @@ public class SubChoiceFragment extends BaseFragment implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				if (mCurrentClickPosition !=-1)
+				if (mCurrentClickPosition != -1)
 					return;
 				mCurrentClickPosition = position;
 				Book book = (Book) parent.getItemAtPosition(position);
@@ -288,4 +288,10 @@ public class SubChoiceFragment extends BaseFragment implements
 				mAdapter.notifyDataSetChanged();
 	}
 
+	@Override
+	public void onDestroy() {
+		if (mAdapter != null)
+			mAdapter.destory();
+		super.onDestroy();
+	}
 }
