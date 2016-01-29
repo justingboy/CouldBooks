@@ -144,6 +144,8 @@ public class ReaderActivity extends BaseReaderActivity implements
 	private int bottomHight;
 	/** 用于判断是否翻页了 */
 	private boolean isFilp = false;
+	/** 用于判断是否是第一章或者是最后一章 */
+	private boolean isLastOrFistChapetr = false;
 	private String index;
 	private int currentPage, pageCount;
 	private boolean isNeedSaveProgress = false;
@@ -246,8 +248,10 @@ public class ReaderActivity extends BaseReaderActivity implements
 			}
 		}
 		screenHeight = DeviceUtil.getHeight(this);
-		curBitmap = BitmapConfig.getInstace().createCurBitmap(screenWith, screenHeight);
-		nextBitmap = BitmapConfig.getInstace().createNextBitmap(screenWith, screenHeight);
+		curBitmap = BitmapConfig.getInstace().createCurBitmap(screenWith,
+				screenHeight);
+		nextBitmap = BitmapConfig.getInstace().createNextBitmap(screenWith,
+				screenHeight);
 		curCanvas = new Canvas(curBitmap);
 		nextCanvas = new Canvas(nextBitmap);
 		if (jumpType != 1 || (jumpType == 1 && isAutoLoad)) {
@@ -336,10 +340,12 @@ public class ReaderActivity extends BaseReaderActivity implements
 								}
 							}
 							if (bookpage.prePage()) {
+								isLastOrFistChapetr = false;
 								bookpage.draw(ReaderActivity.this, nextCanvas);
 								isFilp = true;
 							} else {
 								Toast.showShort(ReaderActivity.this, "已经是第一页了");
+								isLastOrFistChapetr = true;
 								return false;
 							}
 						} else {
@@ -353,10 +359,11 @@ public class ReaderActivity extends BaseReaderActivity implements
 								}
 							}
 							if (bookpage.nextPage()) {
-								MyLogger.kLog().d("执行翻页");
+								isLastOrFistChapetr = false;
 								bookpage.draw(ReaderActivity.this, nextCanvas);
 								isFilp = true;
 							} else {
+								isLastOrFistChapetr = true;
 								Toast.showShort(ReaderActivity.this, "已经是最后一页了");
 								return false;
 							}
@@ -375,9 +382,11 @@ public class ReaderActivity extends BaseReaderActivity implements
 								}
 							}
 							if (bookpage.prePage()) {
+								isLastOrFistChapetr = false;
 								bookpage.draw(ReaderActivity.this, nextCanvas);
 								isFilp = true;
 							} else {
+								isLastOrFistChapetr = true;
 								Toast.showShort(ReaderActivity.this, "已经是第一页了");
 								return false;
 							}
@@ -392,10 +401,11 @@ public class ReaderActivity extends BaseReaderActivity implements
 								}
 							}
 							if (bookpage.nextPage()) {
-								MyLogger.kLog().d("执行翻页");
+								isLastOrFistChapetr = false;
 								bookpage.draw(ReaderActivity.this, nextCanvas);
 								isFilp = true;
 							} else {
+								isLastOrFistChapetr = true;
 								Toast.showShort(ReaderActivity.this, "已经是最后一页了");
 								return false;
 							}
@@ -413,9 +423,11 @@ public class ReaderActivity extends BaseReaderActivity implements
 								}
 							}
 							if (bookpage.prePage()) {
+								isLastOrFistChapetr = false;
 								bookpage.draw(ReaderActivity.this, nextCanvas);
 								isFilp = true;
 							} else {
+								isLastOrFistChapetr = true;
 								Toast.showShort(ReaderActivity.this, "已经是第一页了");
 								return false;
 							}
@@ -430,10 +442,11 @@ public class ReaderActivity extends BaseReaderActivity implements
 								}
 							}
 							if (bookpage.nextPage()) {
-								MyLogger.kLog().d("执行翻页");
+								isLastOrFistChapetr = false;
 								bookpage.draw(ReaderActivity.this, nextCanvas);
 								isFilp = true;
 							} else {
+								isLastOrFistChapetr = true;
 								Toast.showShort(ReaderActivity.this, "已经是最后一页了");
 								return false;
 							}
@@ -1199,8 +1212,8 @@ public class ReaderActivity extends BaseReaderActivity implements
 						pageWidget.startAnimation();
 					isAutoNextChapter = false;
 				}
-				bookpage.setCurrentPageNum();
-				// bookpage.prePage();
+				bookpage.setAsyPageNum();
+				bookpage.prePage();
 			}
 			dismissRefreshDialog();
 			bookpage.draw(this, isFilp ? nextCanvas : curCanvas);

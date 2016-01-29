@@ -231,6 +231,7 @@ public class BaiduBookDownload {
 	public void updateChapterName(BaiduInfo book, String newChapterName) {
 		try {
 			book.setLastChapterName(newChapterName);
+			book.setBookLastUpdateTime(System.currentTimeMillis()+"");
 			db.update(book);
 		} catch (DbException e) {
 			// TODO Auto-generated catch block

@@ -283,7 +283,7 @@ public class BookTheme {
 				index);
 		switch (index) {
 		case 1:
-			READBOOK_BACKGROUND = READBOOK_BACKGROUND_ID[0];
+			READBOOK_BACKGROUND = READBOOK_BACKGROUND_ID[0]; 
 			break;
 		case 2:
 			READBOOK_BACKGROUND = READBOOK_BACKGROUND_ID[1];

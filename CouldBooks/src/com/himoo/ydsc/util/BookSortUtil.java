@@ -132,7 +132,7 @@ public class BookSortUtil {
 
 			public int compare(BookDownloadInfo o1, BookDownloadInfo o2) {
 
-				return (Long.valueOf(o1.getBookLastUpdateTime()))
+				return (Long.valueOf(o2.getBookLastUpdateTime()))
 						.compareTo(Long.valueOf(o1.getBookLastUpdateTime()));
 			}
 		});

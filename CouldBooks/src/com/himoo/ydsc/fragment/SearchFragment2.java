@@ -140,9 +140,7 @@ public class SearchFragment2 extends BaseFragment implements
 	public void initData() {
 		getKeyWordRequest((int) (Math.random() * 30), 9);
 		initSpeech(getActivity());
-		http = new HttpUtils();
-		http.configTimeout(3000);
-		http.configSoTimeout(3000);
+		
 		loadHistoryData();
 		layout_search_bg.setBackgroundColor(BookTheme.THEME_COLOR);
 		bookSearch.setTextColor(BookTheme.THEME_COLOR);
@@ -242,7 +240,11 @@ public class SearchFragment2 extends BaseFragment implements
 	 */
 	private void getKeyWordRequest(int page, int size) {
 		if (http == null)
+		{
 			http = new HttpUtils();
+			http.configTimeout(3000);
+			http.configSoTimeout(3000);
+		}
 		showRefreshDialog(" 加载热词中 ");
 		String url = HttpConstant.BASE_URL_KEYWORD
 				+ HttpOperator.getKeyWordRequestHeard(page, size);

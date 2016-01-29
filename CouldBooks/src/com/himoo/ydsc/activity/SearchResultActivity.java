@@ -67,6 +67,8 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	private SearchBookAdapter mBookAdapter;
 
 	private ImageView imgRefersh;
+	/** 表示是否搜索到了书 */
+	private boolean isHasSearchBook = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -210,6 +212,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 								R.layout.adapter_search_item, bookList);
 						mRefrshListView.setAdapter(mBookAdapter);
 						mCurrentMePage++;
+						isHasSearchBook = true;
 					} else {
 						tv_search_empty.setVisibility(View.VISIBLE);
 						mRefrshListView.setVisibility(View.GONE);
@@ -228,6 +231,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 								SearchResultActivity.this,
 								R.layout.adapter_search_item, baiduBookList);
 						mRefrshListView.setAdapter(mBaiduAdapter);
+						isHasSearchBook = true;
 					} else {
 						Toast.showBg(SearchResultActivity.this, "对不起,无收录此书!");
 						tv_search_empty.setVisibility(View.VISIBLE);
@@ -271,7 +275,8 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		// TODO Auto-generated method stub
 		dismissRefreshDialog();
 		AnimationUtils.cancelAnim(imgRefersh);
-		if (NetWorkUtils.isNetConnected(SearchResultActivity.this)) {
+		if (NetWorkUtils.isNetConnected(SearchResultActivity.this)&&
+				!isHasSearchBook) {
 			Toast.showBg(SearchResultActivity.this, "对不起,无收录此书!");
 		} else {
 			Toast.showBg(SearchResultActivity.this, "未连接网络");

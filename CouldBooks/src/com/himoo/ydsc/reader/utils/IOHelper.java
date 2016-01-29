@@ -296,10 +296,11 @@ public class IOHelper {
 	private static String getChapterContent(String index, String chapterUrl) {
 		String chapterContent = BookDetailsTask.getInstance()
 				.getChapterFormService(mContext, chapterUrl);
-		if (chapterContent != null && !chapterContent.equals(""))
+		if (!TextUtils.isEmpty(chapterContent)
+				&& chapterContent.indexOf("\n", 0) != -1) {
 			return chapterContent;
-		else {
-			if (Integer.valueOf(index) > 0) {
+		} else {
+			if (Integer.valueOf(index) >= 0) {
 				try {
 					InputStream is = mContext.getAssets().open("error.txt");
 					int size = is.available();

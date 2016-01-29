@@ -697,6 +697,12 @@ public class BookPage {
 	public void setCurrentPageNum() {
 		this.pageNum = pagesVe.size() - 1;
 	}
+	/**
+	 * 设置当前页
+	 */
+	public void setAsyPageNum() {
+		this.pageNum = pagesVe.size();
+	}
 
 	// @Override
 	// public void onGetChapterPre() {
