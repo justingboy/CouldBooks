@@ -89,7 +89,7 @@ public class HomeActivity extends BaseActivity {
 		setRadioButtonTextColorSelector();
 		this.fragmentManager = getSupportFragmentManager();
 		initFragmentList();
-		setCurrentClickPoint(RB_VIEW_BOOKSHELF);
+		setCurrentClickPoint(SharedPreferences.getInstance().getInt("mCurrentSelected", 3));
 		initEvent();
 		addFirstToast(this.getActivityName());
 		OnlineConfigAgent.getInstance().updateOnlineConfig(this);
@@ -103,7 +103,29 @@ public class HomeActivity extends BaseActivity {
 	protected void initEvent() {
 		// TODO Auto-generated method stub
 		rGroup.setOnCheckedChangeListener(new OnRadioGroupCheckedChangeListener());
-		rBBookshelf.setChecked(true);
+		int index = SharedPreferences.getInstance().getInt("mCurrentSelected",
+				3);
+		switch (index) {
+		case 0:
+			rBChoice.setChecked(true);
+			break;
+		case 1:
+			rBClassify.setChecked(true);
+			break;
+		case 2:
+			rBSearch.setChecked(true);
+			break;
+		case 3:
+			rBBookshelf.setChecked(true);
+			break;
+		case 4:
+			rBMore.setChecked(true);
+			break;
+
+		default:
+			break;
+		}
+		SharedPreferences.getInstance().putInt("mCurrentSelected", 3);
 	}
 
 	/**
@@ -296,7 +318,10 @@ public class HomeActivity extends BaseActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		// TODO Auto-generated method stub
+		SharedPreferences.getInstance().putInt("mCurrentSelected",
+				mCurrentSelected);
 		// super.onSaveInstanceState(outState);
+
 	}
 
 }

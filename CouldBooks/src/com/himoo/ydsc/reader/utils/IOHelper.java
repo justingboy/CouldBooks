@@ -227,7 +227,7 @@ public class IOHelper {
 	 * 
 	 * @return
 	 */
-	public static List<BaiduBookChapter> getBookChapter() {
+	public static ArrayList<BaiduBookChapter> getBookChapter() {
 		return book.getChapterList();
 	}
 

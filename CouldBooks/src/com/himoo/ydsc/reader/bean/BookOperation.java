@@ -20,7 +20,7 @@ public class BookOperation {
 	/** 作者 */
 	private String author;
 	/** 章节列表 */
-	private List<BaiduBookChapter> mChapterList = new ArrayList<BaiduBookChapter>();
+	private ArrayList<BaiduBookChapter> mChapterList = new ArrayList<BaiduBookChapter>();
 
 	private static BookOperation book = null;
 	
@@ -56,7 +56,7 @@ public class BookOperation {
 		this.author = author;
 	}
 
-	public List<BaiduBookChapter> getChapterList() {
+	public ArrayList<BaiduBookChapter> getChapterList() {
 		return mChapterList;
 	}
 

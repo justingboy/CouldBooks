@@ -1,6 +1,7 @@
 package com.himoo.ydsc.reader;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -50,6 +51,7 @@ import com.himoo.ydsc.fragment.reader.BookSettingFragment2.OnFragment2Listener;
 import com.himoo.ydsc.fragment.reader.BookSettingFragment3.OnFragment3Listener;
 import com.himoo.ydsc.fragment.reader.BookSettingFragmentAdapter;
 import com.himoo.ydsc.http.HttpConstant;
+import com.himoo.ydsc.listener.NoDoubleClickListener;
 import com.himoo.ydsc.reader.bean.Chapter;
 import com.himoo.ydsc.reader.config.BitmapConfig;
 import com.himoo.ydsc.reader.dao.BookMark;
@@ -174,6 +176,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 	private boolean isAutoNextChapter = false;
 	private View speech_view;
 	private SpeechPopupWindow popupWindow;
+	private boolean isSaveInstanceState = false;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -182,7 +185,13 @@ public class ReaderActivity extends BaseReaderActivity implements
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setNetWorkOnMainMode();
 		downloadManager = BookDownloadService.getDownloadManager(this);
-		initIntent();
+		if (savedInstanceState != null) {
+			getSaveParm(savedInstanceState);
+			isSaveInstanceState = true;
+		} else {
+			isSaveInstanceState = false;
+			initIntent();
+		}
 		view = LayoutInflater.from(this)
 				.inflate(R.layout.activity_reader, null);
 		layout = (LinearLayout) view.findViewById(R.id.pagewidget_layout);
@@ -198,7 +207,6 @@ public class ReaderActivity extends BaseReaderActivity implements
 		SpeechReader.getInstance().initSpeech(this, speed);
 		setListener();
 		setTitleBarNight();
-		// if (type != 1) {
 		initChapter();
 		if (isAutoLoad && jumpType == 1) {
 			initReaderBook(2);
@@ -221,7 +229,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 			setBrightness(this, brigHtness);
 		}
 		setMogoAdVisible();
-		initChapter();
+		initAgChapter();
 		initUpdateImageVIew();
 	}
 
@@ -230,7 +238,18 @@ public class ReaderActivity extends BaseReaderActivity implements
 		booksetting_back.setOnClickListener(this);
 		booksetting_speech.setOnClickListener(this);
 		booksetting_bookmark.setOnClickListener(this);
-		booksetting_source.setOnClickListener(this);
+		// booksetting_source.setOnClickListener(this);
+		booksetting_source.setOnClickListener(new NoDoubleClickListener() {
+
+			@Override
+			public void onNoDoubleClick(View v) {
+				if (NetWorkUtils.isNetConnected(ReaderActivity.this)) {
+					startToActivity();
+				} else {
+					Toast.show(ReaderActivity.this, "未连接网络");
+				}
+			}
+		});
 		booksetting_update.setOnClickListener(this);
 	}
 
@@ -515,6 +534,15 @@ public class ReaderActivity extends BaseReaderActivity implements
 		}
 	}
 
+	/**
+	 * 初始化章节
+	 */
+	private void initAgChapter() {
+		if (jumpType == 1 && !isAutoLoad) {
+			chapter = IOHelper.getChapter(1, index, position, bookType);
+		}
+	}
+
 	public void initIntent() {
 		Intent intent = getIntent();
 		index = intent.getStringExtra("index");
@@ -693,7 +721,10 @@ public class ReaderActivity extends BaseReaderActivity implements
 	@Override
 	public void onTextTypeChange() {
 		// TODO Auto-generated method stub
+		int pageNum = bookpage.pageNum;
+		int pageCount = bookpage.pagesVe.size();
 		bookpage.setTextType();
+		bookpage.updateCurrentpageNum(pageNum, pageCount);
 		bookpage.draw(this, isFilp ? nextCanvas : curCanvas);
 		pageWidget.invalidate();
 
@@ -702,7 +733,10 @@ public class ReaderActivity extends BaseReaderActivity implements
 	@Override
 	public void onTextTypeChildrenChange() {
 		// TODO Auto-generated method stub
+		int pageNum = bookpage.pageNum;
+		int pageCount = bookpage.pagesVe.size();
 		bookpage.setTextTypeChildren(false);
+		bookpage.updateCurrentpageNum(pageNum, pageCount);
 		pageWidget.initNightMode();
 		bookpage.draw(this, isFilp ? nextCanvas : curCanvas);
 		pageWidget.invalidate();
@@ -1190,11 +1224,16 @@ public class ReaderActivity extends BaseReaderActivity implements
 			this.chapter = chapter;
 			bookpage.initChapter(chapter, currentPage, pageCount, bookType);
 			pageWidget.setOnTouchListener(this);
+			Log.i("msg", "currentPage = " + currentPage + "pageCount = "
+					+ pageCount);
 			isFirstloading = false;
 		} else {
-
+			Log.i("msg", "第二次加载");
 			this.chapter = chapter;
 			bookpage.currentAsyncChapter(this.chapter);
+			//恢复时记录的当前页数
+			if(isSaveInstanceState)
+				bookpage.setCurrentPage(currentPage);
 			if (isToNextPage) {
 				if (!isAutoNextChapter) {
 					if (pageWidget.mMode == Mode.TURN_UPANDDOWN) {
@@ -1428,6 +1467,51 @@ public class ReaderActivity extends BaseReaderActivity implements
 		intent.putExtra("dowloadUrl", url);
 		sendBroadcast(intent);
 
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		// TODO Auto-generated method stub
+
+		outState.putString("bookName", chapter.getBookName());
+		outState.putInt("jumpType", jumpType);
+		outState.putString("index", chapter.getIndex());
+		outState.putInt("position", chapter.getPosition());
+		outState.putInt("bookType", bookType);
+		outState.putInt("pageNum", bookpage.pageNum);
+		outState.putBoolean("isAutoLoad", isAutoLoad);
+		outState.putString("lastUrl", lastUrl);
+		outState.putString("gid", gid);
+		outState.putString("statue", statue);
+		outState.putInt("pageCount", bookpage.pagesVe.size());
+		outState.putBoolean("isNeedSave", isNeedSaveProgress);
+		outState.putParcelableArrayList("list", IOHelper.getBookChapter());
+		super.onSaveInstanceState(outState);
+		Log.i("msg", "onSaveInstanceState  --Activity被回收了");
+
+	}
+
+	public void getSaveParm(Bundle savedInstanceState) {
+		Log.i("msg", "onSaveInstanceState  --数据恢复");
+		jumpType = savedInstanceState.getInt("jumpType", 1);
+		String bookName = savedInstanceState.getString("bookName");
+		// BaiduBook baiduBook = savedInstanceState.getParcelable("baiduBook");
+		ArrayList<BaiduBookChapter> chapterList = savedInstanceState
+				.getParcelableArrayList("list");
+		IOHelper.getBook(this, bookName, chapterList);
+
+		index = savedInstanceState.getString("index");
+		isAutoLoad = savedInstanceState.getBoolean("isAutoLoad", false);
+		lastUrl = savedInstanceState.getString("lastUrl");
+		gid = savedInstanceState.getString("gid");
+		position = savedInstanceState.getInt("position", 0);
+		currentPage = savedInstanceState.getInt("pageNum", -1)-1;
+		if (currentPage <= -2)
+			currentPage = -1;
+		bookType = savedInstanceState.getInt("bookType", 1);
+		statue = savedInstanceState.getString("statue");
+		pageCount = savedInstanceState.getInt("pageCount", -1);
+		isNeedSaveProgress = savedInstanceState.getBoolean("isNeedSave", false);
 	}
 
 }

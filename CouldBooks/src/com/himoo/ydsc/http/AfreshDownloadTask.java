@@ -14,7 +14,6 @@ import android.os.Handler;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.himoo.ydsc.activity.BaiduDetailsActivity;
 import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.download.BaiduBookDownload;
 import com.himoo.ydsc.notification.DownlaodNotification;

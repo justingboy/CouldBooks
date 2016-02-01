@@ -29,6 +29,7 @@ public class BootBroadcastReceiver extends BroadcastReceiver {
 							if (!BookUpdateUtil.isServiceRunning(context,
 									Constants.BOOKUPDATE_SERVICE)) {
 								BookUpdateUtil.startTimerService(context);
+								
 							}
 						}
 					}, Constants.BROADCAST_ELAPSED_TIME_DELAY);

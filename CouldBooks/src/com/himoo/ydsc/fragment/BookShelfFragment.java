@@ -688,7 +688,7 @@ public class BookShelfFragment extends BaseFragment implements
 			if (result == null && list == null || list.isEmpty()) {
 				dismissRefreshDialog();
 				mCurrentClickPosition = -1;
-				Toast.showBg(getActivity(), "加载章节失败，需重新下载!");
+				Toast.showBg(getActivity(), "未下载，'长按'进行重新下载");
 				return;
 			}
 			list.clear();

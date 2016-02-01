@@ -19,7 +19,6 @@ import com.himoo.ydsc.util.MyLogger;
 import com.lidroid.xutils.DbUtils;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.db.converter.ColumnConverter;
-import com.lidroid.xutils.db.converter.ColumnConverterFactory;
 import com.lidroid.xutils.db.sqlite.ColumnDbType;
 import com.lidroid.xutils.db.sqlite.Selector;
 import com.lidroid.xutils.exception.DbException;
@@ -49,16 +48,14 @@ public class BookDownloadManager {
 	public BookDownloadManager(Context appContext) {
 		FileUtils fileUtils = new FileUtils(appContext);
 		bookSavePath = fileUtils.getStorageDirectory();
-		ColumnConverterFactory.registerColumnConverter(HttpHandler.State.class,
-				new HttpHandlerStateConverter());
+		// ColumnConverterFactory.registerColumnConverter(HttpHandler.State.class,
+		// new HttpHandlerStateConverter());
 		mContext = appContext;
 		db = DbUtils.create(mContext, "Book");
 		db.configAllowTransaction(true);
 		try {
 			downloadInfoList = (ArrayList<BookDownloadInfo>) db
 					.findAll(BookDownloadInfo.class);
-			Log.i("msg", "downloadInfoList"
-					+ (downloadInfoList == null ? 0 : downloadInfoList.size()));
 		} catch (DbException e) {
 			LogUtils.e(e.getMessage(), e);
 		}
@@ -354,7 +351,27 @@ public class BookDownloadManager {
 	}
 
 	/**
+	 * 更新所有的更新时间
+	 */
+	public void updateAllLastTime() {
+		try {
+			if (downloadInfoList != null && !downloadInfoList.isEmpty()) {
+				for (int i = 0; i < downloadInfoList.size(); i++) {
+					BookDownloadInfo book = downloadInfoList.get(i);
+					book.setBookLastUpdateTime(System.currentTimeMillis() + "");
+					db.update(book);
+				}
+			}
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			Log.e("msg", e.getMessage());
+		}
+
+	}
+
+	/**
 	 * 设置阅读
+	 * 
 	 * @param bookName
 	 */
 	public void setBookReader(String bookName) {

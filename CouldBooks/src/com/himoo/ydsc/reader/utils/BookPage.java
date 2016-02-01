@@ -98,7 +98,7 @@ public class BookPage {
 		setTextTypeChildren(true);
 		setTextLineSpace(true);
 		init(context);
-		if (currentPage != -1 && pageCount != -1)
+		if (currentPage != -1 && pageCount != -1&&pagesVe!=null&&!pagesVe.isEmpty())
 			pageNum = (currentPage * (pagesVe.size())) / pageCount;
 	}
 
@@ -110,8 +110,8 @@ public class BookPage {
 		setTextTypeChildren(true);
 		setTextLineSpace(true);
 		init(mContext);
-		if (currentPage != -1 && pageCount != -1)
-			pageNum = ((currentPage * (pagesVe.size())) / pageCount) + 1;
+		if (currentPage != -1 && pageCount != -1&&pagesVe!=null&&!pagesVe.isEmpty())
+			pageNum = ((currentPage * (pagesVe.size())) / pageCount);
 
 	}
 
@@ -744,4 +744,10 @@ public class BookPage {
 		pageNum = ((currentPage * (pagesVe.size())) / pageCount)-1;
 	}
 
+	/**
+	 * 更新当前的页数
+	 */
+	public void setCurrentPage(int pageNum) {
+		this.pageNum = pageNum;
+	}
 }

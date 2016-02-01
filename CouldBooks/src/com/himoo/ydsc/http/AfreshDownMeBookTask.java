@@ -20,6 +20,7 @@ public class AfreshDownMeBookTask extends AsyncTask<Void, Void, Void> {
 	private File dirFile;
 	private File zipFile;
 	private OnAfreshDownloadListener mListener;
+	private boolean isBookFileExist = false;
 
 	public AfreshDownMeBookTask(Context context, String bookName,
 			String dowmloadUrl, OnAfreshDownloadListener listner) {
@@ -36,10 +37,13 @@ public class AfreshDownMeBookTask extends AsyncTask<Void, Void, Void> {
 		super.onPreExecute();
 		if (mListener != null)
 			mListener.onPreDeleted(bookName);
-		Toast.show(context, "正在删除《" + bookName+"》");
 		fileUtils = new FileUtils(context);
 		dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/download"
 				+ File.separator + bookName + File.separator);
+		if (dirFile.exists()) {
+			isBookFileExist = true;
+			Toast.show(context, "正在删除《" + bookName + "》");
+		}
 		zipFile = new File(FileUtils.mSdRootPath + "/CouldBook/download"
 				+ File.separator + bookName + ".zip");
 	}
@@ -63,14 +67,16 @@ public class AfreshDownMeBookTask extends AsyncTask<Void, Void, Void> {
 		super.onPostExecute(result);
 		if (mListener != null)
 			mListener.onPreDeleted(bookName);
-		Toast.show(context, "删除《"+ bookName + "》成功");
+		if (isBookFileExist)
+			Toast.show(context, "删除《" + bookName + "》成功");
 		new Handler().postDelayed(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				Toast.show(context, "重新下载《" + bookName + "》");
-				doDownLoadWork(dowmloadUrl, bookName,mListener);
+				if (isBookFileExist)
+					Toast.show(context, "重新下载《" + bookName + "》");
+				doDownLoadWork(dowmloadUrl, bookName, mListener);
 			}
 		}, 2000);
 
@@ -82,11 +88,12 @@ public class AfreshDownMeBookTask extends AsyncTask<Void, Void, Void> {
 	 * @param downloadUrl
 	 * @param bookName
 	 */
-	private void doDownLoadWork(String downloadUrl, String bookName,OnAfreshDownloadListener listener) {
+	private void doDownLoadWork(String downloadUrl, String bookName,
+			OnAfreshDownloadListener listener) {
 
 		String filePath = fileUtils.getStorageDirectory() + bookName + ".zip";
 		DownLoaderTask task = new DownLoaderTask(downloadUrl, bookName,
-				filePath, (Activity) context,listener,true);
+				filePath, (Activity) context, listener, true);
 		task.execute();
 	}
 }
