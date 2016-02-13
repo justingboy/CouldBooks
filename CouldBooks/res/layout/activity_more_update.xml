@@ -209,6 +209,7 @@
                     segmentedgroup:sc_tint_color="@color/status_bar_bg" >
 
                     <RadioButton
+                        android:singleLine="true"
                         android:id="@+id/book_notice_together"
                         style="@style/RadioButton"
                         android:layout_width="0dp"
@@ -218,6 +219,7 @@
                         android:textSize="15sp" />
 
                     <RadioButton
+                        android:singleLine="true"
                         android:id="@+id/book_notice_details"
                         style="@style/RadioButton"
                         android:layout_width="0dp"
@@ -227,6 +229,7 @@
                         android:textSize="15sp" />
 
                     <RadioButton
+                        android:singleLine="true"
                         android:id="@+id/book_notice_none"
                         style="@style/RadioButton"
                         android:layout_width="0dp"

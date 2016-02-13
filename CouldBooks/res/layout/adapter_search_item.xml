@@ -33,24 +33,24 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:textColor="@color/status_bar_bg"
-            android:textSize="18sp" />
+            android:textSize="17sp" />
 
         <TextView
             android:id="@+id/search_book_author"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:layout_weight="1"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textSize="16sp" />
+            android:textSize="15.5sp" />
 
         <TextView
             android:paddingRight="5dp"
             android:id="@+id/search_book_summary"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:layout_weight="2"
             android:ellipsize="end"
             android:lines="2"

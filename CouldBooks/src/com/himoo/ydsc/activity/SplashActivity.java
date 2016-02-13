@@ -14,6 +14,7 @@ import com.himoo.ydsc.ui.utils.UIHelper;
 import com.himoo.ydsc.util.MyLogger;
 import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.SharedPreferences;
+import com.umeng.update.UmengUpdateAgent;
 
 /**
  * 启动Activity 不需要继承
@@ -25,6 +26,8 @@ public class SplashActivity extends Activity implements OnLoadDbSuccessListener 
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		getWindow().setBackgroundDrawableResource(R.drawable.splash_bg);
+		SharedPreferences.getInstance().putInt("mCurrentSelected", 3);
+		
 		// Log.i("msg",
 		// DeviceUtil.getWidth(this) + "*" + DeviceUtil.getHeight(this));
 		// Log.i("msg", "Density = " + DeviceUtil.getDisplayDensity(this));

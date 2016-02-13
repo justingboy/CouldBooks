@@ -89,7 +89,7 @@ public final class BookSettingFragment3 extends Fragment {
 
 	private void initReadBookGridView() {
 		this.mCurrentTitle = SharedPreferences.getInstance().getString(
-				SpConstant.BOOK_TURNPAGE_TITLE_TYPE, title[1]);
+				SpConstant.BOOK_TURNPAGE_TITLE_TYPE, title[3]);
 		ArrayList<ReaderBookAnimation> readerAniList = new ArrayList<ReaderBookAnimation>();
 		for (int i = 0; i < title.length; i++) {
 			ReaderBookAnimation ani = new ReaderBookAnimation(title[i],

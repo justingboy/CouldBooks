@@ -140,7 +140,7 @@ public class HotwordsActivity extends SwipeBackActivity implements
 				Log.e(error);
 				dismissRefreshDialog();
 				if (NetWorkUtils.isNetConnected(HotwordsActivity.this)) {
-					Toast.showBg(HotwordsActivity.this, "获取关键字失败 ");
+					Toast.showBg(HotwordsActivity.this, "加载关键字失败 ");
 				} else {
 					Toast.showBg(HotwordsActivity.this, "未连接网络");
 				}

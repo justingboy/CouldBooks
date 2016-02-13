@@ -15,6 +15,7 @@
         android:textColor="@android:color/white" />
 
     <Button
+        android:singleLine="true"
         android:id="@+id/btn_allNotSelected"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

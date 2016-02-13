@@ -1,12 +1,12 @@
 package com.himoo.ydsc.base;
 
-import com.himoo.ydsc.R;
-import com.himoo.ydsc.dialog.RefreshDialog;
-
-import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+
+import com.himoo.ydsc.dialog.RefreshDialog;
 
 public class BaseReaderActivity extends FragmentActivity {
 	/** 展示 刷新Dialog */
@@ -66,6 +66,15 @@ public class BaseReaderActivity extends FragmentActivity {
 		msg.what = REFRESH_DIALOG_DIMISS;
 		refreshHandler.sendMessage(msg);
 	}
+	
+	@Override  
+	public Resources getResources() {  
+	    Resources res = super.getResources();    
+	    Configuration config=new Configuration();    
+	    config.setToDefaults();    
+	    res.updateConfiguration(config,res.getDisplayMetrics() );  
+	    return res;  
+	} 
 
 
 }

@@ -38,6 +38,7 @@ import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.db.bean.BookSearchRecords;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.http.HttpOperator;
+import com.himoo.ydsc.listener.NoDoubleClickListener;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.speech.JsonParser;
 import com.himoo.ydsc.ui.utils.Toast;
@@ -138,7 +139,8 @@ public class SearchFragment2 extends BaseFragment implements
 
 	@Override
 	public void initData() {
-		getKeyWordRequest((int) (Math.random() * 30), 9);
+//		getKeyWordRequest((int) (Math.random() * 30), 9);
+		getKeyWordRequest(1, 9);
 		initSpeech(getActivity());
 		
 		loadHistoryData();
@@ -159,6 +161,16 @@ public class SearchFragment2 extends BaseFragment implements
 		bookTagView.setTags(keys == null ? keywords : keys);
 		bookTagView.setOnTagClickListener(this);
 		tv_hotwords.setOnClickListener(this);
+		tv_hotwords.setOnClickListener(new NoDoubleClickListener() {
+			
+			@Override
+			public void onNoDoubleClick(View v) {
+				// TODO Auto-generated method stub
+				isAfresh = true;
+				Intent intent = new Intent(getActivity(), HotwordsActivity.class);
+				startActivity(intent);
+			}
+		});
 	}
 
 	@Override
@@ -181,12 +193,12 @@ public class SearchFragment2 extends BaseFragment implements
 		super.onClick(v);
 
 		switch (v.getId()) {
-		case R.id.tv_hotwords:
-			isAfresh = true;
-			Intent intent = new Intent(getActivity(), HotwordsActivity.class);
-			startActivity(intent);
-
-			break;
+//		case R.id.tv_hotwords:
+//			isAfresh = true;
+//			Intent intent = new Intent(getActivity(), HotwordsActivity.class);
+//			startActivity(intent);
+//
+//			break;
 		case R.id.tv_delete:
 
 			new AlertDialog(getActivity()).builder().setTitle("删除")

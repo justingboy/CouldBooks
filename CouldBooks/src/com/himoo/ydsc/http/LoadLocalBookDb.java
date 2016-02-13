@@ -92,7 +92,15 @@ public class LoadLocalBookDb {
 	private void loadLocalDatabase(Context context) {
 
 		try {
-			File jhPath = new File(filePath);
+			File dir = new File(filePath);
+			if (!dir.exists()) {
+				dir.mkdirs();
+			}
+			// 数据库文件
+			File jhPath = new File(dir, "Book");
+			if (!jhPath.exists()) {
+				jhPath.createNewFile();
+			}
 			// 得到资源
 			AssetManager am = context.getAssets();
 			// 得到数据库的输入流

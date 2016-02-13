@@ -29,6 +29,7 @@ import com.himoo.ydsc.util.AppUtils;
 import com.himoo.ydsc.util.MyLogger;
 import com.lidroid.xutils.ViewUtils;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
+import com.umeng.analytics.MobclickAgent;
 
 /**
  * 该类加入以下功能： 1."再按一次退出程序"提示(只需要调用addFirstToast()方法把activity添加到退出通知提示的集合即可)
@@ -85,7 +86,6 @@ public abstract class BaseActivity extends FragmentActivity implements
 
 		};
 	};
-
 
 	/**
 	 * 　显示 刷新Dialog
@@ -149,7 +149,6 @@ public abstract class BaseActivity extends FragmentActivity implements
 	}
 
 	protected abstract void initEvent();
-
 
 	/**
 	 * 将Activity添加到退出通知
@@ -316,7 +315,6 @@ public abstract class BaseActivity extends FragmentActivity implements
 		overridePendingTransition(enterAnim, exitAnim);
 	}
 
-
 	/**
 	 * Fragment之间的切换方法，加载Fragment方法.<br />
 	 * 重写该方法时要注意的问题：
@@ -364,5 +362,15 @@ public abstract class BaseActivity extends FragmentActivity implements
 
 	@Override
 	public void handlerIntent(File file, int dataInstruction) {
+	}
+
+	protected void onResume() {
+		super.onResume();
+		MobclickAgent.onResume(this);
+	}
+
+	protected void onPause() {
+		super.onPause();
+		MobclickAgent.onPause(this);
 	}
 }

@@ -193,6 +193,26 @@
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="56415050e0f55a042200000c" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="xiaomi" >
+        </meta-data>
+
+        <!-- Update Activitys Start -->
+        <activity
+            android:name="com.umeng.update.UpdateDialogActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
+        <!-- Update Activitys End -->
+
+
+        <!-- Caution! Do not change this app key. It is only for demo usage. -->
+
+        <service
+            android:name="com.umeng.update.net.DownloadingService"
+            android:process=":DownloadingService" >
+        </service>
 
         <activity
             android:name="com.umeng.socialize.view.ShareActivity"

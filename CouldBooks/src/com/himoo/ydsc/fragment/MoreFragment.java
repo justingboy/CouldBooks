@@ -23,14 +23,18 @@ import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.manager.PageManager;
+import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.view.BookTitleBar;
 import com.himoo.ydsc.util.AppUtils;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.ios.radiogroup.SegmentedGroup;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.umeng.onlineconfig.OnlineConfigAgent;
+import com.umeng.update.UmengUpdateAgent;
+import com.umeng.update.UmengUpdateListener;
+import com.umeng.update.UpdateResponse;
 
-public class MoreFragment extends BaseFragment implements
+public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 		RadioGroup.OnCheckedChangeListener,MogoOfferPointCallBack, MogoOfferListCallback {
 	/** 芒果ID */
 	public static String mogoID = "c31290cab9c649b79b9f2751b25e535a";
@@ -85,7 +89,7 @@ public class MoreFragment extends BaseFragment implements
 	/** ids */
 	public int ids[] = { R.id.more_topic, R.id.more_timeUpdate,
 			R.id.more_unlock, R.id.more_statistics, R.id.more_passwordProtect,
-			R.id.more_feedback };
+			R.id.more_feedback ,R.id.more_update};
 
 	private BookTitleBar titleBar;
 
@@ -148,6 +152,7 @@ public class MoreFragment extends BaseFragment implements
 			break;
 		case R.id.more_unlock:
 			MogoOffer.showOffer(getActivity());
+			isClickable = false;
 //			startToActivity(WallActivity.class);
 			break;
 		case R.id.more_statistics:
@@ -158,6 +163,11 @@ public class MoreFragment extends BaseFragment implements
 			break;
 		case R.id.more_feedback:
 			startToActivity(FeedBackActivity.class);
+			break;
+		case R.id.more_update:
+			showRefreshDialog("检查版本更新中");
+			UmengUpdateAgent.forceUpdate(getActivity());
+			UmengUpdateAgent.setUpdateListener(this);
 			break;
 		default:
 			break;
@@ -242,6 +252,31 @@ public class MoreFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		MogoOffer.clear(getActivity());
 		super.onDestroy();
+	}
+
+	@Override
+	public void onUpdateReturned(int code, UpdateResponse arg1) {
+		// TODO Auto-generated method stub
+		dismissRefreshDialog();
+		switch (code) {
+		case 0:
+			
+			break;
+		case 1:
+			Toast.showLong(getActivity(), "已经是最新版本");
+			break;
+		case 2:
+			
+			break;
+		case 3:
+			Toast.showLong(getActivity(), "未连接网络");
+			break;
+
+		default:
+			break;
+		}
+		UmengUpdateAgent.setUpdateListener(null);
+		isClickable = false;
 	}
 
 }

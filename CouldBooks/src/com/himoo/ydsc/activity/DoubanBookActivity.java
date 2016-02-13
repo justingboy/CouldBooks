@@ -7,6 +7,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -217,5 +219,14 @@ public class DoubanBookActivity extends SwipeBackActivity {
 		super.onResume();
 		mCurrentClickPosition = -1;
 	}
+	
+	@Override  
+	public Resources getResources() {  
+	    Resources res = super.getResources();    
+	    Configuration config=new Configuration();    
+	    config.setToDefaults();    
+	    res.updateConfiguration(config,res.getDisplayMetrics() );  
+	    return res;  
+	} 
 
 }

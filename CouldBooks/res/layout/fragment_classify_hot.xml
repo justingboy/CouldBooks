@@ -6,7 +6,7 @@
 
     <LinearLayout
         android:id="@+id/classify_book_list"
-        android:layout_width="108dp"
+        android:layout_width="110dp"
         android:layout_height="match_parent"
         android:orientation="vertical" >
     </LinearLayout>

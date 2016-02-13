@@ -227,7 +227,6 @@ public class PageWidget extends View {
 			}
 			this.postInvalidate();
 		}
-		// return super.onTouchEvent(event);
 		return true;
 	}
 
@@ -253,7 +252,6 @@ public class PageWidget extends View {
 		CrossP.y = a1 * CrossP.x + b1;
 		return CrossP;
 	}
-
 	/**
 	 * 计算个各个点的位置坐标
 	 */
@@ -279,7 +277,7 @@ public class PageWidget extends View {
 		// 当mBezierStart1.x < 0或者mBezierStart1.x > 480时
 		// 如果继续翻页，会出现BUG故在此限制
 		if (mTouch.x > 0 && mTouch.x < mWidth) {
-			// Log.d("msg", "mTouch.x ="+mTouch.x+"mWidth = "+mWidth);
+			
 			if (mBezierStart1.x < 0 || mBezierStart1.x > mWidth) {
 				if (mBezierStart1.x < 0)
 					mBezierStart1.x = mWidth - mBezierStart1.x;
@@ -307,6 +305,7 @@ public class PageWidget extends View {
 						- (mCornerX - mBezierControl1.x) / 2;
 			}
 		}
+		
 		mBezierStart2.x = mCornerX;
 		mBezierStart2.y = mBezierControl2.y - (mCornerY - mBezierControl2.y)
 				/ 2;
@@ -332,6 +331,7 @@ public class PageWidget extends View {
 		mBeziervertex2.x = (mBezierStart2.x + 2 * mBezierControl2.x + mBezierEnd2.x) / 4;
 		mBeziervertex2.y = (2 * mBezierControl2.y + mBezierStart2.y + mBezierEnd2.y) / 4;
 	}
+	
 
 	/**
 	 * 绘制当前页
@@ -353,11 +353,10 @@ public class PageWidget extends View {
 		mPath0.close();
 
 		canvas.save();
-		canvas.clipPath(mPath0, Region.Op.XOR);// 异或
+		canvas.clipPath(path, Region.Op.XOR);// 异或
 		canvas.drawBitmap(bitmap, 0, 0, null);
 		canvas.restore();
 	}
-
 	/**
 	 * 绘制下一页与阴影
 	 * 
@@ -567,7 +566,7 @@ public class PageWidget extends View {
 	 */
 	public void initMode() {
 		int type = SharedPreferences.getInstance().getInt(
-				SpConstant.BOOK_TURNPAGE_TYPE, 1);
+				SpConstant.BOOK_TURNPAGE_TYPE, 3);
 		switch (type) {
 		case 0:
 			mMode = Mode.TURN_LEFT;
@@ -581,11 +580,11 @@ public class PageWidget extends View {
 			break;
 		case 3:
 			mMode = Mode.TURN_MOVE;
-			duration = 600;
+			duration = 800;
 			break;
 		case 4:
 			mMode = Mode.TURN_UPANDDOWN;
-			duration = 600;
+			duration = 800;
 			break;
 
 		default:
@@ -916,7 +915,7 @@ public class PageWidget extends View {
 	 * @return
 	 */
 	public boolean canDragOver() {
-		if (mTouchToCornerDis > mWidth / 40)
+		if (mTouchToCornerDis > mWidth / 100)
 			return true;
 		return false;
 	}
@@ -1000,24 +999,5 @@ public class PageWidget extends View {
 		destroyDrawingCache();
 	}
 
-	/**
-	 * 判断是否可以被点击
-	 * 
-	 * @param event
-	 * @return
-	 */
-	private boolean isClickable(MotionEvent event) {
-		int extraWidth = DeviceUtil.dip2px(mContext, 25);
-		int disWith = (int) Math.abs(event.getX() - mWidth);
-		int disHeight = (int) Math.abs(event.getY() - mHeight);
-		if ((extraWidth + mWidth / 3) < disWith
-				&& disWith < (2 * mWidth / 3 - extraWidth)
-				&& (extraWidth + mHeight / 3) < disHeight
-				&& disHeight < (2 * mHeight / 3 - extraWidth)) {
-			return true;
-		}
-		return false;
-
-	}
 
 }

@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.util.DeviceUtil;
 
 public class RefreshDialog extends Dialog {
 	/** 刷新提示信息 */
@@ -32,10 +33,13 @@ public class RefreshDialog extends Dialog {
 		setContentView(view);
 	}
 
-	@SuppressWarnings("deprecation")
 	public void setBackground() {
-		layout_dialog.setBackgroundDrawable(mContext.getResources()
-				.getDrawable(R.drawable.alert_bg));
+		
+		layout_dialog.setBackgroundResource(R.drawable.alert_bg);
+		int padding = DeviceUtil.dip2px(mContext, 20);
+		layout_dialog.setPaddingRelative(padding, padding,padding, padding);
+//		layout_dialog.setBackgroundDrawable(mContext.getResources()
+//				.getDrawable(R.drawable.alert_bg));
 	}
 
 	public void setTextColor() {

@@ -52,6 +52,7 @@ public class ChangeSourceActivity extends BaseActivity implements
 	private String chapterIndex;
 	private String filePath;
 	private String lastUrl;
+	private String chapterName;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +76,8 @@ public class ChangeSourceActivity extends BaseActivity implements
 		String src = intent.getStringExtra("src");
 		cid = intent.getStringExtra("cid");
 		chapterIndex = intent.getStringExtra("index");
-		
-		
+		chapterName = intent.getStringExtra("chapterName");
+
 		String url = spiltBookSourceUrl(gid, src, cid, chapterIndex);
 		getBookSourceForServe(url);
 
@@ -156,7 +157,7 @@ public class ChangeSourceActivity extends BaseActivity implements
 				String result = null;
 				if (lastUrl != null) {
 					BaiduBookChapter chapter = getNeedChangeChapter(lastUrl,
-							position, chapterIndex);
+							position, chapterIndex, chapterName);
 					String url = spiltBookSourceUrl(gid, chapter.getHref(),
 							cid, chapterIndex);
 					result = BookDetailsTask.getInstance().getStringFormServe(
@@ -178,8 +179,10 @@ public class ChangeSourceActivity extends BaseActivity implements
 					try {
 						json = new JSONObject(result);
 						if (json.getInt("status") == 1) {
-							String str = json.getJSONObject("data").getString("domain");
-							tv_current_booksource.setText("当前："+(TextUtils.isEmpty(str)?"无":str));
+							String str = json.getJSONObject("data").getString(
+									"domain");
+							tv_current_booksource.setText("当前："
+									+ (TextUtils.isEmpty(str) ? "无" : str));
 							JSONArray jsonArray = json.getJSONObject("data")
 									.getJSONArray("replacements");
 							try {
@@ -283,7 +286,8 @@ public class ChangeSourceActivity extends BaseActivity implements
 							chapterUrl);
 			if (isNeedToSdCard) {
 				File file = new File(filePath);
-				if (file != null && file.exists()&&!TextUtils.isEmpty(chapterContent)) {
+				if (file != null && file.exists()
+						&& !TextUtils.isEmpty(chapterContent)) {
 					// 重新写到文件中
 					BufferedWriter bw = null;
 					try {
@@ -355,15 +359,26 @@ public class ChangeSourceActivity extends BaseActivity implements
 	 * @return
 	 */
 	public BaiduBookChapter getNeedChangeChapter(String lastUrl, int position,
-			String index) {
-		String content = BookDetailsTask.getInstance()
-				.geLasttChapterFormService(this, lastUrl);
-		if (content != null) {
-			ArrayList<BaiduBookChapter> list = praseBaiduBookChapter(content);
-			if (list != null && !list.isEmpty()) {
-				// updateNewChapter(bookName, list);
-				return list.get(position);
+			String index, String chapterName) {
+		try {
+
+			String content = BookDetailsTask.getInstance()
+					.geLasttChapterFormService(this, lastUrl);
+			if (content != null) {
+				ArrayList<BaiduBookChapter> list = praseBaiduBookChapter(content);
+				if (list != null && !list.isEmpty()) {
+					// updateNewChapter(bookName, list);
+					int newChapterSize = list.size();
+					if (position >= newChapterSize
+							|| !list.get(position).getText()
+									.equals(chapterName))
+						return getChapter(list, chapterName);
+					else
+						return list.get(position);
+				}
 			}
+		} catch (Exception e) {
+			Log.e(e);
 		}
 		return null;
 	}
@@ -392,6 +407,25 @@ public class ChangeSourceActivity extends BaseActivity implements
 		}
 		return null;
 
+	}
+
+	/**
+	 * 处理本地的章节数大于后台章节数
+	 * 
+	 * @param list
+	 * @param chapterName
+	 * @return
+	 */
+	private BaiduBookChapter getChapter(ArrayList<BaiduBookChapter> list,
+			String chapterName) {
+		BaiduBookChapter chapter = null;
+		for (int i = 0; i < list.size(); i++) {
+			if (chapterName.equals(list.get(i).getText())){
+				chapter = list.get(i);
+				break;
+			}
+		}
+		return chapter;
 	}
 
 }

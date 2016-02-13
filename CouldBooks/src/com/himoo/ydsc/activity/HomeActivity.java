@@ -13,7 +13,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseActivity;
@@ -25,6 +24,7 @@ import com.himoo.ydsc.fragment.ClassifyFragment;
 import com.himoo.ydsc.fragment.MoreFragment;
 import com.himoo.ydsc.fragment.SearchFragment2;
 import com.himoo.ydsc.http.HttpConstant;
+import com.himoo.ydsc.listener.NoDoubleChangeListener;
 import com.himoo.ydsc.reader.config.BitmapConfig;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -32,6 +32,7 @@ import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.umeng.onlineconfig.OnlineConfigAgent;
+import com.umeng.update.UmengUpdateAgent;
 
 public class HomeActivity extends BaseActivity {
 
@@ -84,12 +85,14 @@ public class HomeActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
+		UmengUpdateAgent.update(this);
 		ViewUtils.inject(this);
 		setRadioButtonDrawableSelector();
 		setRadioButtonTextColorSelector();
 		this.fragmentManager = getSupportFragmentManager();
 		initFragmentList();
-		setCurrentClickPoint(SharedPreferences.getInstance().getInt("mCurrentSelected", 3));
+		setCurrentClickPoint(SharedPreferences.getInstance().getInt(
+				"mCurrentSelected", 3));
 		initEvent();
 		addFirstToast(this.getActivityName());
 		OnlineConfigAgent.getInstance().updateOnlineConfig(this);
@@ -131,11 +134,11 @@ public class HomeActivity extends BaseActivity {
 	/**
 	 * RadioGroup点击实现类
 	 */
-	private class OnRadioGroupCheckedChangeListener implements
-			OnCheckedChangeListener {
+	private class OnRadioGroupCheckedChangeListener extends
+			NoDoubleChangeListener {
 
 		@Override
-		public void onCheckedChanged(RadioGroup radiogroup, int i) {
+		public void onNoDoubleCheckedChanged(RadioGroup radiogroup, int i) {
 			// TODO Auto-generated method stub
 			switch (i) {
 			case R.id.main_bottom_choice:

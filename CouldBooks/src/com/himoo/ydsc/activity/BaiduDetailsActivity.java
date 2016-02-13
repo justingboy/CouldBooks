@@ -35,6 +35,7 @@ import com.himoo.ydsc.fragment.BookShelfFragment;
 import com.himoo.ydsc.fragment.BookShelfFragment.BookDownloadReceiver;
 import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.http.HttpConstant;
+import com.himoo.ydsc.listener.NoDoubleClickListener;
 import com.himoo.ydsc.listener.OnParseChapterListener;
 import com.himoo.ydsc.notification.DownlaodNotification;
 import com.himoo.ydsc.reader.ReaderActivity;
@@ -108,7 +109,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_baidu_book_details);
-//		setSwipeBackEnable(false);
+		// setSwipeBackEnable(false);
 		isAutoLoad = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_AUTO_LOAD, false);
 		BookTheme.setChangeTheme(false);
@@ -151,10 +152,22 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	private void initListener() {
 		chapter_count.setOnClickListener(this);
 		bookDownload.setOnClickListener(this);
-		bookEvaluation.setOnClickListener(this);
+		// bookEvaluation.setOnClickListener(this);
+		bookEvaluation.setOnClickListener(oDoubleClickListener);
 		floowView.setOnClickListener(this);
 		listView.setOnScrollListener(this);
 	}
+
+	// 跳转到豆瓣评书中
+	public NoDoubleClickListener oDoubleClickListener = new NoDoubleClickListener() {
+
+		@Override
+		public void onNoDoubleClick(View v) {
+			// TODO Auto-generated method stub
+			UIHelper.startToActivity(BaiduDetailsActivity.this,
+					DoubanBookActivity.class, book.getTitle());
+		}
+	};
 
 	/**
 	 * 初始化ListView
@@ -360,12 +373,6 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				bookDownload.setClickable(false);
 
 			}
-			// 豆瓣评书
-		} else if (v == bookEvaluation) {
-			UIHelper.startToActivity(this, DoubanBookActivity.class,
-					book.getTitle());
-			bookEvaluation.setClickable(false);
-
 		}
 
 	}

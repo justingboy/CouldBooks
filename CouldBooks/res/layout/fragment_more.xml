@@ -50,6 +50,7 @@
                     segmentedgroup:sc_tint_color="@color/status_bar_bg" >
 
                     <RadioButton
+                        android:singleLine="true"
                         android:id="@+id/rb_all_book"
                         style="@style/RadioButton"
                         android:layout_width="0dp"
@@ -59,6 +60,7 @@
                         android:textSize="16sp" />
 
                     <RadioButton
+                        android:singleLine="true"
                         android:id="@+id/rb_last_chapter"
                         style="@style/RadioButton"
                         android:layout_width="0dp"
@@ -121,6 +123,13 @@
                 android:background="@drawable/more_textview_line_selector"
                 android:drawableLeft="@drawable/more_feedback"
                 android:text="@string/more_user_feedback" />
+            
+              <TextView
+                android:id="@+id/more_update"
+                style="@style/Text_more_style"
+                android:background="@drawable/more_textview_line_selector"
+                android:drawableLeft="@drawable/more_guanyu"
+                android:text="@string/more_update" />
 
             <TextView
                 android:id="@+id/more_version_code"
