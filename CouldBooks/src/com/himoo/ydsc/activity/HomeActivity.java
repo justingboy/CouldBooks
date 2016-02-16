@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.adsmogo.offers.MogoOffer;
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseActivity;
 import com.himoo.ydsc.config.BookTheme;
@@ -286,6 +287,7 @@ public class HomeActivity extends BaseActivity {
 		ImageLoader.getInstance().clearMemoryCache();
 		BitmapConfig.getInstace().destory();
 		stopDownloadService();
+		MogoOffer.clear(this);
 		System.gc();
 		super.onDestroy();
 	}

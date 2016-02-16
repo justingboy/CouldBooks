@@ -86,7 +86,7 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 		BookTheme.setReaderBookTextBg(SharedPreferences.getInstance().getInt(
 				SpConstant.BOOK_SETTING_TEXT_BG, 3));
 
-		// 初始化科大讯飞语音功能5638453a 5638453a
+		// 初始化科大讯飞语音功能5638453a 5638453a 	 
 		SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5638453a");
 		// 以下语句用于设置日志开关（默认开启），设置成false时关闭语音云SDK日志打印
 		Setting.setShowLog(true);

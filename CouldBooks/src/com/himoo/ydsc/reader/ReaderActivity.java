@@ -260,10 +260,10 @@ public class ReaderActivity extends BaseReaderActivity implements
 	 */
 	private void initReaderBook(int jumpType) {
 		screenWith = DeviceUtil.getWidth(this);
-		int type = SharedPreferences.getInstance()
-				.getInt("book_update_type", 2);
+		boolean isMogo_show = SharedPreferences.getInstance()
+				.getBoolean(SpConstant.MOGOAD_SHOW, true);
 		boolean isNeedMogoAd = false;
-		if (type == 1) {
+		if (isMogo_show) {
 			if (NetWorkUtils.isNetConnected(this)) {
 				isNeedMogoAd = true;
 			}
@@ -323,9 +323,9 @@ public class ReaderActivity extends BaseReaderActivity implements
 	 * 设置广告是否展示
 	 */
 	private void setMogoAdVisible() {
-		int type = SharedPreferences.getInstance()
-				.getInt("book_update_type", 2);
-		if (type == 2 || !NetWorkUtils.isNetConnected(this)) {
+		boolean isMogo_show = SharedPreferences.getInstance()
+				.getBoolean(SpConstant.MOGOAD_SHOW, true);
+		if (!isMogo_show || !NetWorkUtils.isNetConnected(this)) {
 			layout_mogo.removeAllViews();
 			layout_mogo.setVisibility(View.GONE);
 		}

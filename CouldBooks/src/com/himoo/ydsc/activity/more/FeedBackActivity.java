@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.UIHelper;
@@ -203,7 +204,7 @@ public class FeedBackActivity extends SwipeBackActivity implements
 		feedback_device_system.setText(android.os.Build.VERSION.RELEASE);
 		feedback_app_name.setText(AppUtils.getAppName(this));
 		feedback_app_version.setText(AppUtils.getVersionName(this));
-		feedback_app_build.setText("201602081851");
+		feedback_app_build.setText(SpConstant.BUILD_CODE);
 
 	}
 

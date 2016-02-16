@@ -1,16 +1,20 @@
 package com.himoo.ydsc.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.adsmogo.offers.MogoOffer;
+import com.adsmogo.offers.MogoOfferChooserAdapter;
 import com.adsmogo.offers.MogoOfferListCallback;
 import com.adsmogo.offers.MogoOfferPointCallBack;
 import com.himoo.ydsc.R;
@@ -26,6 +30,7 @@ import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.view.BookTitleBar;
 import com.himoo.ydsc.util.AppUtils;
+import com.himoo.ydsc.util.SP;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.ios.radiogroup.SegmentedGroup;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -35,10 +40,11 @@ import com.umeng.update.UmengUpdateListener;
 import com.umeng.update.UpdateResponse;
 
 public class MoreFragment extends BaseFragment implements UmengUpdateListener,
-		RadioGroup.OnCheckedChangeListener,MogoOfferPointCallBack, MogoOfferListCallback {
+		RadioGroup.OnCheckedChangeListener, MogoOfferPointCallBack,
+		MogoOfferListCallback {
 	/** 芒果ID */
 	public static String mogoID = "c31290cab9c649b79b9f2751b25e535a";
-	
+
 	/** 主题皮肤设置 */
 	@ViewInject(R.id.more_topic)
 	private TextView more_topic;
@@ -89,9 +95,11 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 	/** ids */
 	public int ids[] = { R.id.more_topic, R.id.more_timeUpdate,
 			R.id.more_unlock, R.id.more_statistics, R.id.more_passwordProtect,
-			R.id.more_feedback ,R.id.more_update};
+			R.id.more_feedback, R.id.more_update };
 
 	private BookTitleBar titleBar;
+
+	private int scoreLevel = 1000;
 
 	@Override
 	public void onAttach(Context context) {
@@ -104,7 +112,7 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 		MogoOffer.setMogoOfferScoreVisible(false);
 		MogoOffer.setMogoOfferListCallback(this);
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			SharedPreferences sp, Bundle savedInstanceState,
@@ -123,17 +131,26 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 		// TODO Auto-generated method stub
 		String value = OnlineConfigAgent.getInstance().getConfigParams(
 				getActivity(), "adstatue");
+		try {
+
+			scoreLevel = Integer.valueOf(OnlineConfigAgent.getInstance()
+					.getConfigParams(getActivity(), "scorelevel"));
+		} catch (Exception e) {
+			Log.e(e);
+			scoreLevel = 1000;
+		}
+		
 		if (value != null && value.equals("1"))
-			more_unLock.setText("关于我们");
+			more_unLock.setText("积分商城（获取"+scoreLevel+"去掉广告）");
 		// 设置监听器
 		segment_book_update.setOnCheckedChangeListener(this);
-		//初始化书籍更新类型
+		// 初始化书籍更新类型
 		initBookUpdateType();
 		// 设置版本信息
 		String versionCode = AppUtils.getVersionName(getActivity());
 		more_version.setText(getActivity().getString(
 				R.string.more_bottom_thinks)
-				+ versionCode + " 201601081851");
+				+ versionCode + " " + SpConstant.BUILD_CODE);
 	}
 
 	@Override
@@ -151,9 +168,9 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 			startToActivity(UpdateSettingActivity.class);
 			break;
 		case R.id.more_unlock:
-			MogoOffer.showOffer(getActivity());
+			initMogoWall();
 			isClickable = false;
-//			startToActivity(WallActivity.class);
+			// startToActivity(WallActivity.class);
 			break;
 		case R.id.more_statistics:
 			startToActivity(ReadstatisticsActivity.class);
@@ -197,6 +214,7 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 	public void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		MogoOffer.RefreshPoints(getActivity());
 		if (BookTheme.isThemeChange)
 			titleBar.setBackgroundColor(BookTheme.THEME_COLOR);
 		boolean isOpenUpdate = SharedPreferences.getInstance().getBoolean(
@@ -235,18 +253,63 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 
 	}
 
-	@Override
-	public void showOfferListDialog(Context arg0, String arg1, String[] arg2) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * 初始化Mogo积分墙设置
+	 */
+	private void initMogoWall() {
+		MogoOffer.setOfferListTitle("获取积分");
+		MogoOffer.setOfferEntranceMsg("商城");
+		MogoOffer.setMogoOfferScoreVisible(false);
+		MogoOffer.addPointCallBack(this);
+		MogoOffer.setMogoOfferListCallback(this);
+		MogoOffer.showOffer(getActivity());
 	}
 
 	@Override
-	public void updatePoint(long arg0) {
+	public void showOfferListDialog(final Context context, String dialogTitle,
+			String[] tips) {
 		// TODO Auto-generated method stub
-		
+		final AlertDialog dialog = new AlertDialog.Builder(context).create();
+		MogoOfferChooserAdapter adapter = new MogoOfferChooserAdapter(context,
+				tips);
+		dialog.setTitle(dialogTitle);
+
+		ListView listView = new ListView(context);
+		listView.setBackgroundColor(0xffffffff);
+		listView.setPadding(0, 0, 0, 0);
+		listView.setCacheColorHint(0x00000000);
+		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int which,
+					long arg3) {
+				// TODO Auto-generated method stub
+
+				if (dialog != null) {
+					dialog.dismiss();
+				}
+
+				MogoOffer.showSingleOffer(context, which);
+			}
+		});
+		dialog.setView(listView);
+		dialog.getWindow().setBackgroundDrawableResource(
+				android.R.color.transparent);
+		dialog.show();
 	}
-	
+
+	@Override
+	public void updatePoint(long ponit) {
+		// TODO Auto-generated method stub
+		if (ponit > scoreLevel) {
+			SharedPreferences.getInstance().putBoolean(SpConstant.MOGOAD_SHOW,
+					false);
+		}
+		if(ponit>100)
+		more_unLock.setText("积分商城（当前积分：" + ponit + "分）");
+	}
+
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
@@ -260,13 +323,13 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 		dismissRefreshDialog();
 		switch (code) {
 		case 0:
-			
+
 			break;
 		case 1:
 			Toast.showLong(getActivity(), "已经是最新版本");
 			break;
 		case 2:
-			
+
 			break;
 		case 3:
 			Toast.showLong(getActivity(), "未连接网络");

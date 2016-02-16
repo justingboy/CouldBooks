@@ -285,6 +285,9 @@
             android:name="cn.waps.extend.AppWall"
             android:configChanges="keyboardHidden|orientation" />
         <!-- 万普积分墙 v2.0.7 (结束) -->
+        
+           <!-- 迷迪显示应用列表和详细信息(必须) -->
+        <activity android:name="net.miidiwall.SDK.MyWallActivity" android:configChanges="keyboardHidden|orientation" />    
 
     </application>
 

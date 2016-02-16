@@ -3,7 +3,7 @@ package com.himoo.ydsc.config;
 public interface SpConstant {
 	public static final String CONFIG = "config"; // sp文件名称
 	public static final String AUTO_UPLOAD = "autoupload"; // 自动更新标识
-	public static final String BUILD_CODE = "2016-01-23"; // 自动更新标识
+	public static final String BUILD_CODE = "201602231851"; // 自动更新标识
 
 	/** 精选Fragment界面刷新时间 */
 	public static final String LAST_REF_TIME_SUBCHOICE = "sub_Choice";
@@ -106,4 +106,6 @@ public interface SpConstant {
 	
 	/** 阅读速度 */
 	public static final String BOOK_READER_SPEED= "book_reader_speed";
+	
+	public static final String MOGOAD_SHOW= "mogoad_show";
 }

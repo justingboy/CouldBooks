@@ -64,7 +64,7 @@
 
         <com.adsmogo.adview.AdsMogoLayout
             android:id="@+id/adsMogoView"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             adsmogo:appid="c31290cab9c649b79b9f2751b25e535a" >

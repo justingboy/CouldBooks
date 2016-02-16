@@ -102,6 +102,7 @@ public class BookDialogActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dialog_bookdetails);
+		downloadManager = BookDownloadService.getDownloadManager(this);
 		option = BaseApplication.getInstance().displayImageOptionsBuider(
 				BookTheme.BOOK_COVER);
 		BookTheme.setChangeTheme(false);
@@ -110,7 +111,6 @@ public class BookDialogActivity extends FragmentActivity implements
 		initListener();
 		initData();
 		initOpenView();
-		downloadManager = BookDownloadService.getDownloadManager(this);
 
 	}
 
@@ -180,7 +180,10 @@ public class BookDialogActivity extends FragmentActivity implements
 
 		bookDetails = (BookDetails) getIntent().getExtras().getParcelable(
 				"book");
-
+		if (downloadManager.isDownload(bookDetails)) {
+			dialog_btn_download.setBackground(getResources().getDrawable(
+					R.drawable.dialog_btn_downloaddisable));
+		}
 		setSummaryHeight(dialog_summary_layout, bookDetails.getBook_Summary());
 		// 设置值
 		ImageLoader.getInstance().displayImage(bookDetails.getBook_Image(),
@@ -337,9 +340,13 @@ public class BookDialogActivity extends FragmentActivity implements
 				bookDownlaodCountUpload(bookDetails.getBook_ID());
 			} catch (DbException e) {
 				// TODO Auto-generated catch block
+				dialog_btn_download.setBackground(getResources().getDrawable(
+						R.drawable.btn_download));
 				Toast.showLong(this, "下载失败");
 			}
 			registeBroadcast();
+			dialog_btn_download.setBackground(getResources().getDrawable(
+					R.drawable.dialog_btn_downloaddisable));
 
 			break;
 		case R.id.img_rate_ok:
@@ -480,7 +487,7 @@ public class BookDialogActivity extends FragmentActivity implements
 		String filePath = fileUtils.getStorageDirectory() + bookName + ".zip";
 
 		DownLoaderTask task = new DownLoaderTask(downloadUrl, bookName,
-				filePath, this,null,false);
+				filePath, this, null, false);
 		task.execute();
 	}
 }

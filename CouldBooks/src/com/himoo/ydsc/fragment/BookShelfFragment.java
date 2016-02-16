@@ -684,41 +684,45 @@ public class BookShelfFragment extends BaseFragment implements
 		protected void onPostExecute(final BookMark result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
+			try {
 
-			if (result == null && list == null || list.isEmpty()) {
-				dismissRefreshDialog();
-				mCurrentClickPosition = -1;
-				Toast.showBg(getActivity(), "未下载，'长按'进行重新下载");
-				return;
-			}
-			list.clear();
-			list = null;
-			dismissRefreshDialog();
-			readerBg = getActivity().getResources().getDrawable(
-					BookTheme.READBOOK_BACKGROUND);
-
-			if (isReaderNightMode()) {
-				readerBg = null;
-				readerBg = getActivity().getResources().getDrawable(
-						R.drawable.book_setting_night);
-			} else if (SharedPreferences.getInstance().getBoolean(
-					SpConstant.BOOK_AUTO_COLOR, false)) {
-				int color = SharedPreferences.getInstance().getInt(
-						SpConstant.BOOK_AUTO_COLOR_BG, Color.BLACK);
-				readerBg = null;
-				readerBg = new ColorDrawable(color);
-			}
-			bookView.startOpenBookAnimation(new OpenBookAnimEndListener() {
-
-				@Override
-				public void onOpenBookAnimEnd(BookView bookView) {
-					// TODO Auto-generated method stub
-					startToActivity(bookName, bookType, lastUrl, statue, result);
+				if (result == null && list == null || list.isEmpty()) {
+					dismissRefreshDialog();
+					mCurrentClickPosition = -1;
+					Toast.showBg(getActivity(), "未下载，'长按'进行重新下载");
+					return;
 				}
-			}, bookView.getParent(), readerBg);
+				list.clear();
+				list = null;
+				dismissRefreshDialog();
+				readerBg = getActivity().getResources().getDrawable(
+						BookTheme.READBOOK_BACKGROUND);
 
+				if (isReaderNightMode()) {
+					readerBg = null;
+					readerBg = getActivity().getResources().getDrawable(
+							R.drawable.book_setting_night);
+				} else if (SharedPreferences.getInstance().getBoolean(
+						SpConstant.BOOK_AUTO_COLOR, false)) {
+					int color = SharedPreferences.getInstance().getInt(
+							SpConstant.BOOK_AUTO_COLOR_BG, Color.BLACK);
+					readerBg = null;
+					readerBg = new ColorDrawable(color);
+				}
+				bookView.startOpenBookAnimation(new OpenBookAnimEndListener() {
+
+					@Override
+					public void onOpenBookAnimEnd(BookView bookView) {
+						// TODO Auto-generated method stub
+						startToActivity(bookName, bookType, lastUrl, statue,
+								result);
+					}
+				}, bookView.getParent(), readerBg);
+
+			} catch (Exception e) {
+				Log.e(e);
+			}
 		}
-
 	}
 
 	private void startToActivity(String bookName, int bookType, String lastUrl,
