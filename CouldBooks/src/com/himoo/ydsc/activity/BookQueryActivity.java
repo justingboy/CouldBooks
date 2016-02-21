@@ -25,6 +25,7 @@ import com.himoo.ydsc.reader.dao.BookMarkDb;
 import com.himoo.ydsc.reader.utils.IOHelper;
 import com.himoo.ydsc.reader.utils.LocalReaderUtil;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
+import com.himoo.ydsc.ui.utils.Toast;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
 /**
@@ -34,7 +35,7 @@ public class BookQueryActivity extends SwipeBackActivity {
 
 	@ViewInject(R.id.query_book_list)
 	private PullToRefreshListView mRefrshListView;
-
+	private BookDownloadManager downloadManager;
 	private int mCurrentClickPosition = -1;
 
 	@Override
@@ -42,6 +43,7 @@ public class BookQueryActivity extends SwipeBackActivity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_book_query);
+		downloadManager = BookDownloadService.getDownloadManager(this);
 		initPullToRefrehListView();
 		initData();
 	}
@@ -80,9 +82,14 @@ public class BookQueryActivity extends SwipeBackActivity {
 				mCurrentClickPosition = position;
 				BookDownloadInfo book = (BookDownloadInfo) parent
 						.getItemAtPosition(position);
-				new OpenBookAsyncTask(BookQueryActivity.this, book
-						.getBookName(), book.getBookStatue(), book
-						.getBookSourceType()).execute();
+				if (downloadManager.queryBookDownSuccess(book.getBookName())) {
+					new OpenBookAsyncTask(BookQueryActivity.this, book
+							.getBookName(), book.getBookStatue(), book
+							.getBookSourceType()).execute();
+				}else{
+					Toast.showShort(BookQueryActivity.this, "打开失败，请重新下载");
+					mCurrentClickPosition = -1;
+				}
 
 			}
 		});

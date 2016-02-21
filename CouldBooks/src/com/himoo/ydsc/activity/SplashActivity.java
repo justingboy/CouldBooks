@@ -10,11 +10,13 @@ import com.himoo.ydsc.activity.more.PasswordSettingActivity;
 import com.himoo.ydsc.http.HttpOperator;
 import com.himoo.ydsc.http.LoadLocalBookDb;
 import com.himoo.ydsc.http.LoadLocalBookDb.OnLoadDbSuccessListener;
+import com.himoo.ydsc.service.LockService;
 import com.himoo.ydsc.ui.utils.UIHelper;
+import com.himoo.ydsc.update.BookUpdateUtil;
+import com.himoo.ydsc.update.Constants;
 import com.himoo.ydsc.util.MyLogger;
 import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.SharedPreferences;
-import com.umeng.update.UmengUpdateAgent;
 
 /**
  * 启动Activity 不需要继承
@@ -27,7 +29,6 @@ public class SplashActivity extends Activity implements OnLoadDbSuccessListener 
 		super.onCreate(savedInstanceState);
 		getWindow().setBackgroundDrawableResource(R.drawable.splash_bg);
 		SharedPreferences.getInstance().putInt("mCurrentSelected", 3);
-		
 		// Log.i("msg",
 		// DeviceUtil.getWidth(this) + "*" + DeviceUtil.getHeight(this));
 		// Log.i("msg", "Density = " + DeviceUtil.getDisplayDensity(this));
@@ -49,6 +50,12 @@ public class SplashActivity extends Activity implements OnLoadDbSuccessListener 
 			if (!(SharedPreferences.getInstance().getString("password", null) == null)) {
 				UIHelper.startToActivity(this, PasswordSettingActivity.class,
 						"SplashActivity");
+				if (!BookUpdateUtil.isServiceRunning(this,
+						Constants.LOCK_SERVICE)) {
+					startService(new Intent(SplashActivity.this,
+							LockService.class));
+				}
+
 				finish();
 
 			} else {

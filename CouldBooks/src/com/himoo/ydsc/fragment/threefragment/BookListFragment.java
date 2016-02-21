@@ -74,6 +74,8 @@ public class BookListFragment extends ListFragment {
 	 */
 	private void getBookClassList() {
 		HttpUtils http = new HttpUtils();
+		http.configTimeout(3000);
+		http.configSoTimeout(3000);
 		String url = SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST)
 				+ "getBooksClass.asp";
@@ -108,13 +110,17 @@ public class BookListFragment extends ListFragment {
 	 * @param json
 	 */
 	private void parseJson(String json) {
-		Gson gosn = new Gson();
-		ArrayList<BookClassify> bookList = gosn.fromJson(json,
-				new TypeToken<ArrayList<BookClassify>>() {
-				}.getType());
-		list.addAll(bookList);
-		db.saveBookClassify(list);
-		initAdapter(list);
+		try {
+			Gson gosn = new Gson();
+			ArrayList<BookClassify> bookList = gosn.fromJson(json,
+					new TypeToken<ArrayList<BookClassify>>() {
+					}.getType());
+			list.addAll(bookList);
+			db.saveBookClassify(list);
+			initAdapter(list);
+		} catch (Exception e) {
+			Toast.showLong(getActivity(), "解析书库分类出现错误!");
+		}
 
 	}
 

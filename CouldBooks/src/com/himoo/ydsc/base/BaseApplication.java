@@ -136,7 +136,7 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 		}
 		activitys.clear();
 		SparseArray_flag = 1;
-		// android.os.Process.killProcess(android.os.Process.myPid());
+//		 android.os.Process.killProcess(android.os.Process.myPid());
 	}
 
 	/**

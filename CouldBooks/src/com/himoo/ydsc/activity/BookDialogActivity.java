@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -102,6 +103,7 @@ public class BookDialogActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.dialog_bookdetails);
+		BaseApplication.getInstance().addActivity(this);
 		downloadManager = BookDownloadService.getDownloadManager(this);
 		option = BaseApplication.getInstance().displayImageOptionsBuider(
 				BookTheme.BOOK_COVER);
@@ -322,6 +324,7 @@ public class BookDialogActivity extends FragmentActivity implements
 			break;
 		case R.id.dialog_btn_rate:
 			openFolderUp(ratingBar_layout);
+
 			break;
 		case R.id.dialog_btn_download:
 			// 下载之后不可再点击
@@ -412,7 +415,7 @@ public class BookDialogActivity extends FragmentActivity implements
 	 * @param id
 	 * @param rate
 	 */
-	private void bookRating(int id, int rate) {
+	private void bookRating(int id, final int rate) {
 		HttpUtils http = new HttpUtils();
 		RequestParams params = new RequestParams();
 		NameValuePair nameValuePair1 = new BasicNameValuePair("id",
@@ -431,13 +434,20 @@ public class BookDialogActivity extends FragmentActivity implements
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
 				Toast.showShort(BookDialogActivity.this, "评分成功");
+				refreshRate(rate);
 				mOpenFolder.dismiss();
+				dialog_btn_rate.setEnabled(false);
+				dialog_btn_rate.setClickable(false);
+				dialog_btn_rate.setBackground(getResources().getDrawable(
+						R.drawable.btn_ratedisable));
 			}
 
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
 				Toast.showShort(BookDialogActivity.this, "评分失败");
+				dialog_btn_rate.setEnabled(true);
+				dialog_btn_rate.setClickable(true);
 			}
 		});
 	}
@@ -489,5 +499,39 @@ public class BookDialogActivity extends FragmentActivity implements
 		DownLoaderTask task = new DownLoaderTask(downloadUrl, bookName,
 				filePath, this, null, false);
 		task.execute();
+		refreshDownloadNum();
 	}
+
+	/**
+	 * 刷新评分
+	 */
+	private void refreshRate(int rateNum) {
+		float rate = (float) (bookDetails.getBook_Rate() + rateNum)
+				/ (bookDetails.getBook_RateNum() + 1);
+		setTextRateDrawable(this, book_score, rate);
+		String result = String.valueOf(rate).substring(0, 3);
+		book_score.setText("评分:" + result);
+
+	}
+
+	/**
+	 * 刷新下载次数
+	 */
+	private void refreshDownloadNum() {
+		book_Popularity.setText("人气:" + bookDetails.getBook_Popularity() + 1
+				+ "次下载");
+
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			BaseApplication.getInstance().delActivity(this);
+		}
+		return super.onKeyDown(keyCode, event);
+
+	}
+
 }

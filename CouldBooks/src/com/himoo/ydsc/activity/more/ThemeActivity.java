@@ -175,6 +175,7 @@ public class ThemeActivity extends SwipeBackActivity implements
 						SpConstant.BOOK_COVER_INDEX, position);
 				BookTheme.setBookCover(position);
 				coverAdapter.notifyDataSetChanged();
+				BookTheme.setChangeTheme(true);
 
 			}
 		});

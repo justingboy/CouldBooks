@@ -276,7 +276,7 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 	 */
 	protected void initLastRefreshTime(String saveLastRefreshkey,
 			PullToRefreshGridView mPullRefreshGridView) {
-		String label = "最后更新 ： ";
+		String label = "最后更新：";
 		if (com.himoo.ydsc.util.SharedPreferences.getInstance()
 				.getString(saveLastRefreshkey, "").equals("")) {
 			label += TimestampUtils.getTimeState(saveLastRefreshkey);
@@ -285,7 +285,7 @@ public abstract class BaseFragment extends Fragment implements OnClickListener,
 			label += TimestampUtils.getTimeState(
 					com.himoo.ydsc.util.SharedPreferences.getInstance()
 							.getString(saveLastRefreshkey, ""),
-					"yyyy-MM-dd HH:mm:ss");
+					"yyyy-MM-dd HH:mm");
 			;
 		}
 		// Update the LastUpdatedLabel

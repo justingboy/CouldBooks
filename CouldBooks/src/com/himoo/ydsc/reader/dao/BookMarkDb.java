@@ -61,7 +61,7 @@ public class BookMarkDb {
 	/**
 	 * 保存阅读的位置
 	 */
-	public void saveReaderMark(BookMark mark) {
+	public boolean saveReaderMark(BookMark mark) {
 		try {
 			List<BookMark> list = db.findAll(Selector.from(BookMark.class)
 					.where("bookName", "=", mark.getBookName())
@@ -69,14 +69,15 @@ public class BookMarkDb {
 					.and("type", "=", 2)
 					.and("currentPage", "=", mark.getCurrentPage()));
 			if (list != null && !list.isEmpty()) {
-				return;
+				return false;
 			} else {
 				db.save(mark);
+				return true;
 			}
 
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			return false;
 		}
 
 	}
@@ -151,13 +152,16 @@ public class BookMarkDb {
 	 * 
 	 * @param bookMarko
 	 */
-	public void deletBookMark(BookMark bookMark) {
+	public boolean deletBookMark(BookMark bookMark) {
 		try {
 			db.delete(bookMark);
+			return true;
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
 			MyLogger.kLog().e(e);
+			return false;
 		}
+		
 	}
 
 	/**
@@ -167,8 +171,7 @@ public class BookMarkDb {
 	 */
 	public void deletBookMark(String bookName) {
 		try {
-			db.delete(BookMark.class,
-					WhereBuilder.b("bookName", "=", bookName));
+			db.delete(BookMark.class, WhereBuilder.b("bookName", "=", bookName));
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
 			MyLogger.kLog().e(e);

@@ -155,21 +155,29 @@ public class SubChoiceFragment extends BaseFragment implements
 				+ "getBooksList.asp" + heardParams;
 		Log.i("请求地址：" + url);
 		HttpUtils http = new HttpUtils();
+		http.configTimeout(3000);
+		http.configSoTimeout(3000);
 		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
 
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
-				Gson gson = new Gson();
-				ArrayList<Book> list = gson.fromJson(responseInfo.result,
-						new TypeToken<ArrayList<Book>>() {
-						}.getType());
-				dismissRefreshDialog();
-				mAdapter.addAll(list);
-				mGridView.setAdapter(mAdapter);
-				mAdapter.notifyDataSetChanged();
-				currentPage++;
+				try {
 
+					Gson gson = new Gson();
+					ArrayList<Book> list = gson.fromJson(responseInfo.result,
+							new TypeToken<ArrayList<Book>>() {
+							}.getType());
+					dismissRefreshDialog();
+					mAdapter.addAll(list);
+					mGridView.setAdapter(mAdapter);
+					mAdapter.notifyDataSetChanged();
+					currentPage++;
+				} catch (Exception e) {
+					dismissRefreshDialog();
+					stub = (ViewStub) findViewById(R.id.viewstub);
+					stub.inflate();
+				}
 			}
 
 			@Override
@@ -192,6 +200,8 @@ public class SubChoiceFragment extends BaseFragment implements
 	 */
 	private void getBookDetailsInfo(final Context context, int bookId) {
 		HttpUtils http = new HttpUtils();
+		http.configTimeout(3000);
+		http.configSoTimeout(3000);
 		RequestParams params = new RequestParams();
 		NameValuePair nameValuePair = new BasicNameValuePair("bookID",
 				String.valueOf(bookId));
@@ -204,6 +214,7 @@ public class SubChoiceFragment extends BaseFragment implements
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
+				try {
 				Gson gson = new Gson();
 				BookDetails bookDetalis = gson.fromJson(
 						responseInfo.result.substring(1,
@@ -212,14 +223,21 @@ public class SubChoiceFragment extends BaseFragment implements
 				dismissRefreshDialog();
 				UIHelper.startToActivity(getActivity(), bookDetalis,
 						BookDialogActivity.class);
+				} catch (Exception ex) {
+					Log.e(ex);
+				}
 			}
 
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
+				try {
 				Toast.showLong(context, "获取详情失败：" + msg);
 				dismissRefreshDialog();
 				mCurrentClickPosition = -1;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 			}
 
 		});
@@ -247,7 +265,6 @@ public class SubChoiceFragment extends BaseFragment implements
 				mAdapter.addAll(list);
 		}
 		notifyDataAndRefreshComplete();
-		Log.i("currentPage =" + currentPage);
 
 	}
 
@@ -284,8 +301,10 @@ public class SubChoiceFragment extends BaseFragment implements
 		super.onResume();
 		mCurrentClickPosition = -1;
 		if (BookTheme.isThemeChange)
-			if (mAdapter != null)
+			if (mAdapter != null) {
+				mAdapter.afreshDisplayOption();
 				mAdapter.notifyDataSetChanged();
+			}
 	}
 
 	@Override

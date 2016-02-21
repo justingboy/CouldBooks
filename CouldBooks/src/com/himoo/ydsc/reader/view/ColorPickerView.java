@@ -10,7 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
+//import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -99,10 +99,10 @@ public class ColorPickerView extends View {
 
 		mTextBitmapRadius = mTextBitmap.getWidth() / 2;
 		mLeftBitmapRadius = mLeftBitmap.getWidth() / 2;
-		Log.i("msg", "Text->width=" + mTextBitmap.getWidth());
-		Log.i("msg", "Text->height=" + mTextBitmap.getHeight());
-		Log.i("msg", "Left->width=" + mLeftBitmap.getWidth());
-		Log.i("msg", "Left->height=" + mLeftBitmap.getHeight());
+//		Log.i("msg", "Text->width=" + mTextBitmap.getWidth());
+//		Log.i("msg", "Text->height=" + mTextBitmap.getHeight());
+//		Log.i("msg", "Left->width=" + mLeftBitmap.getWidth());
+//		Log.i("msg", "Left->height=" + mLeftBitmap.getHeight());
 		mLeftSelectPoint = new PointF(0, 0);
 		mTextSelectPoint = new PointF(0, 0);
 
@@ -126,7 +126,7 @@ public class ColorPickerView extends View {
 					mBitmapPaint);
 			canvas.drawBitmap(mTextBitmap, textPoint.x, textPoint.y,
 					mBitmapPaint);
-			Log.i("msg", "----->isFirstCanvas");
+//			Log.i("msg", "----->isFirstCanvas");
 
 		} else {
 			if (!hexColor.equals("ffffff")) {
@@ -347,7 +347,7 @@ public class ColorPickerView extends View {
 		}
 		if (y < 40) {
 			isBottonOrUp = true;
-			Log.i("HH", "y < 0 = " + y + "--" + mTextBitmap.getHeight() / 2);
+//			Log.i("HH", "y < 0 = " + y + "--" + mTextBitmap.getHeight() / 2);
 			mLeftSelectPoint.y = 50;
 			mTextSelectPoint.y = 50;
 			lastPoint.y = 50;
@@ -356,7 +356,7 @@ public class ColorPickerView extends View {
 
 		} else if (y > (mHeight - 40)) {
 			isBottonOrUp = true;
-			Log.i("HH", "y > 0 = " + y);
+//			Log.i("HH", "y > 0 = " + y);
 			mLeftSelectPoint.y = mHeight - 50;
 			mTextSelectPoint.y = mHeight - 50;
 			lastPoint.y = mHeight - 50;

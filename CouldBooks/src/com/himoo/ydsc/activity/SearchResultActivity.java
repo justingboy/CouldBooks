@@ -84,7 +84,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	 * 设置PullToRefeshListView 事件监听
 	 */
 	private void initPullToRefeshListView() {
-		mRefrshListView.setMode(Mode.PULL_FROM_START);
+		mRefrshListView.setMode(Mode.BOTH);
 		// 设置点击事件
 		mRefrshListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -198,29 +198,34 @@ public class SearchResultActivity extends SwipeBackActivity implements
 				firstReSuccess = whoservice;
 
 				if (firstReSuccess == 0) {
-					Gson gosn = new Gson();
-					bookList = gosn.fromJson(json,
-							new TypeToken<ArrayList<BookSearch>>() {
-							}.getType());
-					dismissRefreshDialog();
-					if (bookList != null && !bookList.isEmpty()) {
-						tv_search_empty.setVisibility(View.GONE);
-						mRefrshListView.setVisibility(View.VISIBLE);
-						mTitleBar.setRightLogoGone();
-						mBookAdapter = new SearchBookAdapter(
-								SearchResultActivity.this,
-								R.layout.adapter_search_item, bookList);
-						mRefrshListView.setAdapter(mBookAdapter);
-						mCurrentMePage++;
-						isHasSearchBook = true;
-					} else {
-						tv_search_empty.setVisibility(View.VISIBLE);
-						mRefrshListView.setVisibility(View.GONE);
-						mTitleBar.setRightLogoVisible();
-					}
+					try {
 
+						Gson gosn = new Gson();
+						bookList = gosn.fromJson(json,
+								new TypeToken<ArrayList<BookSearch>>() {
+								}.getType());
+
+						dismissRefreshDialog();
+						if (bookList != null && !bookList.isEmpty()) {
+							tv_search_empty.setVisibility(View.GONE);
+							mRefrshListView.setVisibility(View.VISIBLE);
+							mTitleBar.setRightLogoGone();
+							mBookAdapter = new SearchBookAdapter(
+									SearchResultActivity.this,
+									R.layout.adapter_search_item, bookList);
+							mRefrshListView.setAdapter(mBookAdapter);
+							mCurrentMePage++;
+							isHasSearchBook = true;
+						} else {
+							tv_search_empty.setVisibility(View.VISIBLE);
+							mRefrshListView.setVisibility(View.GONE);
+							mTitleBar.setRightLogoVisible();
+						}
+					} catch (Exception e) {
+						Toast.showLong(SearchResultActivity.this, "加载失败");
+					}
 				} else {
-					mCurrentBaiduPage += 2;
+					mCurrentBaiduPage += 1;
 					baiduBookList = parseBaiduJson(json);
 					dismissRefreshDialog();
 					if (baiduBookList != null && !baiduBookList.isEmpty()) {
@@ -240,33 +245,38 @@ public class SearchResultActivity extends SwipeBackActivity implements
 					}
 				}
 			}
+
 		} else {
+			try {
 
-			Gson gosn = new Gson();
-			ArrayList<BookSearch> bookLists = gosn.fromJson(json,
-					new TypeToken<ArrayList<BookSearch>>() {
-					}.getType());
+				Gson gosn = new Gson();
+				ArrayList<BookSearch> bookLists = gosn.fromJson(json,
+						new TypeToken<ArrayList<BookSearch>>() {
+						}.getType());
 
-			if (refreshType == BookSearchTask.TYPE_PULL_DOWN_UPDATE) {
+				if (refreshType == BookSearchTask.TYPE_PULL_DOWN_UPDATE) {
 
-				if (bookLists != null && bookLists.size() > 0) {
-					AnimationUtils.cancelAnim(imgRefersh);
-					if (mBookAdapter != null) {
-						mBookAdapter.clear();
-						mBookAdapter.addAll(bookLists);
-						mRefrshListView.setAdapter(mBookAdapter);
-						mCurrentMePage = 2;
+					if (bookLists != null && bookLists.size() > 0) {
+						AnimationUtils.cancelAnim(imgRefersh);
+						if (mBookAdapter != null) {
+							mBookAdapter.clear();
+							mBookAdapter.addAll(bookLists);
+							mRefrshListView.setAdapter(mBookAdapter);
+							mCurrentMePage = 2;
+						}
+					}
+
+				} else if (refreshType == BookSearchTask.TYPE_PULL_UP_LOAD) {
+					mCurrentMePage++;
+					if (bookLists != null && bookLists.size() > 0) {
+						if (mBookAdapter != null)
+							mBookAdapter.addAll(bookLists);
 					}
 				}
-
-			} else if (refreshType == BookSearchTask.TYPE_PULL_UP_LOAD) {
-				mCurrentMePage++;
-				if (bookLists != null && bookLists.size() > 0) {
-					if (mBookAdapter != null)
-						mBookAdapter.addAll(bookLists);
-				}
+				notifyDataAndRefreshComplete();
+			} catch (Exception e) {
+				Toast.showLong(SearchResultActivity.this, "加载失败");
 			}
-			notifyDataAndRefreshComplete();
 		}
 	}
 
@@ -275,8 +285,8 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		// TODO Auto-generated method stub
 		dismissRefreshDialog();
 		AnimationUtils.cancelAnim(imgRefersh);
-		if (NetWorkUtils.isNetConnected(SearchResultActivity.this)&&
-				!isHasSearchBook) {
+		if (NetWorkUtils.isNetConnected(SearchResultActivity.this)
+				&& !isHasSearchBook) {
 			Toast.showBg(SearchResultActivity.this, "对不起,无收录此书!");
 		} else {
 			Toast.showBg(SearchResultActivity.this, "未连接网络");
@@ -319,7 +329,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		if (list != null && list.size() > 0) {
 			if (mBaiduAdapter != null) {
 				mBaiduAdapter.addAll(list);
-				mCurrentBaiduPage += 2;
+				mCurrentBaiduPage += 1;
 			}
 
 		}
@@ -335,7 +345,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 				mBaiduAdapter.clear();
 				mBaiduAdapter.addAll(list);
 				mRefrshListView.setAdapter(mBaiduAdapter);
-				mCurrentBaiduPage = 2;
+				mCurrentBaiduPage = 1;
 			}
 		}
 		notifyDataAndRefreshComplete();

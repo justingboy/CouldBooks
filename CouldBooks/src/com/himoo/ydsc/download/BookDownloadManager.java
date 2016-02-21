@@ -143,6 +143,19 @@ public class BookDownloadManager {
 	}
 
 	/**
+	 * 刷新数据库
+	 */
+	public void refreshBookList() {
+		try {
+			downloadInfoList = (ArrayList<BookDownloadInfo>) db
+					.findAll(BookDownloadInfo.class);
+		} catch (DbException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * 查询数据库中最新插入一条数据
 	 * 
 	 * @return

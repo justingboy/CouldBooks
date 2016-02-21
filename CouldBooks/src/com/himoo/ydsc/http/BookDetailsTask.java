@@ -116,6 +116,8 @@ public class BookDetailsTask {
 	public void executeBaidu(final Context context, String gid) {
 		if (http == null) {
 			http = new HttpUtils();
+			http.configTimeout(3000);
+			http.configSoTimeout(3000);
 		}
 
 		String url = HttpConstant.BAIDU_BOOK_DETAILS_URL + "appui=alaxs&gid="

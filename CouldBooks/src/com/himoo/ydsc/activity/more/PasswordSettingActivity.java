@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,11 +17,15 @@ import android.widget.TextView;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.activity.HomeActivity;
+import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.bean.KeyboardEnum;
 import com.himoo.ydsc.bean.KeyboardEnum.ActionEnum;
 import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.service.LockService;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.UIHelper;
+import com.himoo.ydsc.update.BookUpdateUtil;
+import com.himoo.ydsc.update.Constants;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.view.annotation.ViewInject;
 import com.lidroid.xutils.view.annotation.event.OnClick;
@@ -82,14 +88,17 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 
 	private boolean isUnlock;
 
+	private boolean isLock;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_password_setting);
 		isUnlock = getIntent().getBooleanExtra("unlock", false);
-		if (isUnlock)
+		if (isUnlock) {
 			setSwipeBackEnable(false);
+		}
 		drawable_Oval = getResources().getDrawable(
 				R.drawable.shape_password_oval);
 		drawable_Line = getResources().getDrawable(
@@ -105,6 +114,7 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 		mTitleBar.setLeftTitle("更多");
 		mTitleBar.setRightLogoGone();
 		value = getIntent().getStringExtra("key");
+		isLock = getIntent().getBooleanExtra("lockService", false);
 		if (value != null && value.equals("SplashActivity")) {
 			mTitleBar.setVisibility(View.GONE);
 			password_title_line.setVisibility(View.GONE);
@@ -177,10 +187,11 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 							@Override
 							public void run() {
 								// TODO Auto-generated method stub
-
-								UIHelper.startToActivity(
-										PasswordSettingActivity.this,
-										HomeActivity.class);
+								if (!isLock) {
+									UIHelper.startToActivity(
+											PasswordSettingActivity.this,
+											HomeActivity.class);
+								}
 								finish();
 							}
 						}, 100);
@@ -189,6 +200,8 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 						if (inputCount == 0) {
 							com.himoo.ydsc.ui.utils.Toast.showLong(this,
 									"密码输入不正确，应用程序退出");
+							BaseApplication.getInstance().exit();
+							stopLockService();
 							finish();
 						}
 						password_error_toast.setBackgroundColor(Color.RED);
@@ -206,7 +219,9 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 							if (!isChangePassword) {
 								SharedPreferences.getInstance().remove(
 										"password");
+								stopLockService();
 								setResult(Activity.RESULT_OK);
+
 								finish();
 							} else {
 								// 修改密码
@@ -364,10 +379,28 @@ public class PasswordSettingActivity extends SwipeBackActivity {
 				com.himoo.ydsc.ui.utils.Toast.showShort(
 						PasswordSettingActivity.this,
 						isChangePassword ? "密码修改成功" : "密码设置成功");
+				if (!BookUpdateUtil.isServiceRunning(
+						PasswordSettingActivity.this, Constants.LOCK_SERVICE)) {
+					startService(new Intent(PasswordSettingActivity.this,
+							LockService.class));
+				}
 				setResult(Activity.RESULT_OK);
 				finish();
 			}
 		}, 250);
 	}
 
+	/**
+	 * 停止密码锁服务
+	 */
+	private void stopLockService() {
+		stopService(new Intent(this, LockService.class));
+	}
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+	
 }

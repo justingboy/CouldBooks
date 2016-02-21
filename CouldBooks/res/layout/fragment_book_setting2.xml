@@ -5,10 +5,10 @@
     android:orientation="vertical" >
 
     <RelativeLayout
+        android:id="@+id/fragennt_top"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:paddingLeft="10dp"
         android:paddingRight="5dp" >
 
         <ImageView
@@ -17,6 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:contentDescription="@string/app_name"
+            android:paddingLeft="10dp"
+            android:paddingRight="5dp"
             android:src="@drawable/read_brightness_down" />
 
         <TextView
@@ -45,10 +47,9 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
             android:layout_toLeftOf="@id/brightness_up"
-            android:layout_toRightOf="@id/brightness_down" />
+            android:layout_toRightOf="@id/brightness_down"
+            android:paddingLeft="5dp" />
     </RelativeLayout>
 
     <View

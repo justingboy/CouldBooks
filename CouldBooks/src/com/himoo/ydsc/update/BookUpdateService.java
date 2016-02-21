@@ -83,7 +83,7 @@ public class BookUpdateService extends Service {
 		// Creates an explicit intent for an Activity in your app
 		Intent resultIntent = new Intent(this, HomeActivity.class);
 		// The stack builder object will contain an artificial back stack for
-		// the
+		// the 
 		// started Activity.
 		// This ensures that navigating backward from the Activity leads out of
 		// your application to the Home screen.

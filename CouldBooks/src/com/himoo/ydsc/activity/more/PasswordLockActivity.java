@@ -69,7 +69,7 @@ public class PasswordLockActivity extends SwipeBackActivity implements
 					PasswordSettingActivity.class);
 			break;
 		case R.id.password_close:
-			
+
 			Intent intent = new Intent(this, PasswordSettingActivity.class);
 			intent.putExtra("fixPw", true);
 			startActivity(intent);
@@ -93,4 +93,6 @@ public class PasswordLockActivity extends SwipeBackActivity implements
 		}
 
 	}
+
+
 }

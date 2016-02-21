@@ -46,4 +46,12 @@ public class BaiduBookAdapter extends QuickAdapter<BaiduBook> {
 
 	}
 
+	/**
+	 * 刷新 配置
+	 */
+	public void afreshDisplayOption() {
+		this.option = BaseApplication.getInstance().displayImageOptionsBuider(
+				BookTheme.BOOK_COVER);
+	}
+
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,9 +20,7 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.activity.BookMarkActivity;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
-import com.himoo.ydsc.reader.dao.BookMark;
-import com.himoo.ydsc.reader.dao.BookMarkDb;
-import com.himoo.ydsc.ui.utils.Toast;
+import com.himoo.ydsc.reader.view.PageSeekBar;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
@@ -35,6 +34,10 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 		OnSeekBarChangeListener {
 
 	private OnFragment1Listener mListener;
+
+	public int chapterPageCount;
+	public int currentPage;
+	public int currentPosition;
 
 	@ViewInject(R.id.booksetting_traditional)
 	private TextView booksetting_traditional;
@@ -58,7 +61,7 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	private TextView tv_next_chapter;
 
 	@ViewInject(R.id.seekBar_chapter)
-	private SeekBar seekBar_chapter;
+	public PageSeekBar seekBar_chapter;
 
 	@ViewInject(R.id.booksetting_textface_1)
 	private TextView booksetting_textface_1;
@@ -78,8 +81,6 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	private boolean isNightMode = false;
 	private int position;
 	private boolean isNigthModeHand;
-	// 是否是第一次展示
-	private boolean isFirstShow = true;
 
 	public static BookSettingFragment1 newInstance(String bookName,
 			int chapterSize, int type, int bookType, String statue, String gid,
@@ -117,7 +118,6 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.fragment_book_setting1, null);
-
 		return view;
 	}
 
@@ -126,21 +126,22 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 		// TODO Auto-generated method stub
 		super.onActivityCreated(savedInstanceState);
 		ViewUtils.inject(this);
+		initPageSeekBar();
 		initTextTypeSeleted();
 		initTextTypeChildrenSeleted();
-		int chapterSize = getArguments().getInt("chapterSize");
-		seekBar_chapter.setMax(chapterSize);
+		// int chapterSize = getArguments().getInt("chapterSize");
+		// seekBar_chapter.setMax(chapterSize);
 		if (SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_NIGHT_MODE, false)
 				|| SharedPreferences.getInstance().getBoolean(
 						SpConstant.BOOK_SETTING_AUTO_NIGHT_MODE_YES, false)) {
 			setNightModeImg(true);
 		}
-		BookMark bookMark = BookMarkDb.getInstance(getActivity(), "book")
-				.querryReaderPos(getArguments().getString("bookName"));
-		if (bookMark != null)
-			position = bookMark.getPosition();
-		seekBar_chapter.setProgress(position);
+		// BookMark bookMark = BookMarkDb.getInstance(getActivity(), "book")
+		// .querryReaderPos(getArguments().getString("bookName"));
+		// if (bookMark != null)
+		// position = bookMark.getPosition();
+		// seekBar_chapter.setProgress(position);
 		isNigthModeHand = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
 		setListener();
@@ -224,6 +225,7 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 
 			Intent intent = new Intent(getActivity(), BookMarkActivity.class);
 			intent.putExtra("bookName", getArguments().getString("bookName"));
+			intent.putExtra("position", currentPosition);
 			intent.putExtra("lastUrl", getArguments().getString("lastUrl"));
 			intent.putExtra("type", getArguments().getInt("type"));
 			intent.putExtra("bookType", getArguments().getInt("bookType"));
@@ -398,15 +400,9 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	public void onProgressChanged(SeekBar seekBar, int progress,
 			boolean fromUser) {
 		// TODO Auto-generated method stub
-		// changeNightMode();
-		if (jumpType == 1 && !isAutoLoad) {
-			if (isFirstShow) {
-				Toast.show(getActivity(), "在线看书，不可以自由拖动！");
-				isFirstShow = false;
-			}
-		} else {
-			mListener.onSeekBarChapter(progress);
-		}
+		int max = seekBar_chapter.getMax()+1;
+		seekBar_chapter.setSeekBarText((progress + 1) + "页 / "
+				+ max + "页");
 
 	}
 
@@ -419,7 +415,8 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
 		// TODO Auto-generated method stub
-
+		Log.i("msg", "seekBar.getProgress() = "+seekBar.getProgress());
+		mListener.onSeekBarChapter(seekBar.getProgress());
 	}
 
 	/**
@@ -462,6 +459,17 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 					booksetting_simplified, BookTheme.BOOK_SETTING_PRESS_BG,
 					BookTheme.BOOK_SETTING_BG);
 		}
+
+	}
+
+	/**
+	 * 初始化拖动控件
+	 */
+	private void initPageSeekBar() {
+		seekBar_chapter.setMax(chapterPageCount);
+		seekBar_chapter.setProgress(currentPage);
+		seekBar_chapter.setSeekBarText((currentPage+1) + "页 / " + (chapterPageCount+1)
+				+ "页");
 
 	}
 

@@ -35,6 +35,7 @@
             </com.himoo.ydsc.animation.BookView>
 
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/shelf_book_undown"
                 android:layout_width="@dimen/bookCover_width"
                 android:layout_height="@dimen/bookCover_Height"

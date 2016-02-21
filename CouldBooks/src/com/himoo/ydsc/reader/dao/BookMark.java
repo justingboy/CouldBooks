@@ -73,6 +73,51 @@ public class BookMark extends EntityBase{
 	public void setType(int type) {
 		this.type = type;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((bookName == null) ? 0 : bookName.hashCode());
+		result = prime * result
+				+ ((chapterName == null) ? 0 : chapterName.hashCode());
+		result = prime * result + currentPage;
+		result = prime * result + pageCount;
+		result = prime * result + position;
+		result = prime * result + type;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BookMark other = (BookMark) obj;
+		if (bookName == null) {
+			if (other.bookName != null)
+				return false;
+		} else if (!bookName.equals(other.bookName))
+			return false;
+		if (chapterName == null) {
+			if (other.chapterName != null)
+				return false;
+		} else if (!chapterName.equals(other.chapterName))
+			return false;
+		if (currentPage != other.currentPage)
+			return false;
+		if (pageCount != other.pageCount)
+			return false;
+		if (position != other.position)
+			return false;
+		if (type != other.type)
+			return false;
+		return true;
+	}
 	
 	
 

@@ -174,15 +174,22 @@ public class BookClassFragment extends BaseFragment implements
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
-				Gson gson = new Gson();
-				ArrayList<Book> list = gson.fromJson(responseInfo.result,
-						new TypeToken<ArrayList<Book>>() {
-						}.getType());
-				dismissRefreshDialog();
-				mAdapter.addAll(list);
-				mGridView.setAdapter(mAdapter);
-				mAdapter.notifyDataSetChanged();
-				currentPage++;
+				try {
+
+					Gson gson = new Gson();
+					ArrayList<Book> list = gson.fromJson(responseInfo.result,
+							new TypeToken<ArrayList<Book>>() {
+							}.getType());
+					dismissRefreshDialog();
+					mAdapter.addAll(list);
+					mGridView.setAdapter(mAdapter);
+					mAdapter.notifyDataSetChanged();
+					currentPage++;
+				} catch (Exception e) {
+					dismissRefreshDialog();
+					stub = (ViewStub) findViewById(R.id.viewstub);
+					stub.inflate();
+				}
 
 			}
 
@@ -206,6 +213,8 @@ public class BookClassFragment extends BaseFragment implements
 	 */
 	private void getBookDetailsInfo(final Context context, int bookId) {
 		HttpUtils http = new HttpUtils();
+		http.configTimeout(3000);
+		http.configSoTimeout(3000);
 		RequestParams params = new RequestParams();
 		NameValuePair nameValuePair = new BasicNameValuePair("bookID",
 				String.valueOf(bookId));
@@ -218,23 +227,32 @@ public class BookClassFragment extends BaseFragment implements
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
-				Gson gson = new Gson();
-				BookDetails bookDetalis = gson.fromJson(
-						responseInfo.result.substring(1,
-								responseInfo.result.length() - 1),
-						BookDetails.class);
-				dismissRefreshDialog();
-				mCurrentClickPosition = -1;
-				UIHelper.startToActivity(getActivity(), bookDetalis,
-						BookDialogActivity.class);
+				try {
+
+					Gson gson = new Gson();
+					BookDetails bookDetalis = gson.fromJson(responseInfo.result
+							.substring(1, responseInfo.result.length() - 1),
+							BookDetails.class);
+					dismissRefreshDialog();
+					mCurrentClickPosition = -1;
+					UIHelper.startToActivity(getActivity(), bookDetalis,
+							BookDialogActivity.class);
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 			}
 
 			@Override
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
-				Toast.showLong(context, "获取详情失败：" + msg);
-				dismissRefreshDialog();
-				mCurrentClickPosition = -1;
+				try {
+
+					Toast.showLong(context, "获取详情失败：" + msg);
+					dismissRefreshDialog();
+					mCurrentClickPosition = -1;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 			}
 
 		});
@@ -303,6 +321,7 @@ public class BookClassFragment extends BaseFragment implements
 		mCurrentClickPosition = -1;
 		if (BookTheme.isThemeChange)
 			if (mAdapter != null) {
+				mAdapter.afreshDisplayOption();
 				mAdapter.notifyDataSetChanged();
 			}
 		super.onResume();

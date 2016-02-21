@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -15,8 +16,10 @@ import com.gitonway.lee.niftynotification.lib.Configuration;
 import com.gitonway.lee.niftynotification.lib.Effects;
 import com.gitonway.lee.niftynotification.lib.NiftyNotificationView;
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.dialog.RefreshDialog;
+import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.view.BookTitleBar;
 import com.himoo.ydsc.util.MyLogger;
 import com.lidroid.xutils.ViewUtils;
@@ -28,7 +31,6 @@ public abstract class SwipeBackActivity extends FragmentActivity implements
 	public MyLogger Log;
 	protected BookTitleBar mTitleBar;
 	protected SystemBarTintManager tintManager;
-
 	/** 展示 刷新Dialog */
 	private static final int REFRESH_DIALOG_SHOW = 0;
 	/** 关闭 刷新Dialog */
@@ -87,6 +89,7 @@ public abstract class SwipeBackActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		BaseApplication.getInstance().addActivity(this);
 		mHelper = new SwipeBackActivityHelper(this);
 		mHelper.onActivityCreate();
 		Log = MyLogger.kLog();
@@ -129,6 +132,7 @@ public abstract class SwipeBackActivity extends FragmentActivity implements
 	@Override
 	public SwipeBackLayout getSwipeBackLayout() {
 		return mHelper.getSwipeBackLayout();
+
 	}
 
 	@Override
@@ -156,24 +160,25 @@ public abstract class SwipeBackActivity extends FragmentActivity implements
 
 	/**
 	 * 展示自定义的通知
+	 * 
 	 * @param msg
 	 * @param viewId
 	 */
 	protected void showNiftyNotification(String msg, int viewId) {
-		
-		Configuration cfg=new Configuration.Builder()
-	      .setAnimDuration(700)
-	      .setDispalyDuration(2500)
-	      .setBackgroundColor("#FFBDC3C7")
-	      .setTextColor("#FF444444")
-	      .setIconBackgroundColor("#FFFFFFFF")
-	      .setTextPadding(5)                      //dp
-	      .setViewHeight(48)                      //dp
-	      .setTextLines(2)                        //You had better use setViewHeight and setTextLines together
-	      .setTextGravity(Gravity.CENTER)         //only text def  Gravity.CENTER,contain icon Gravity.CENTER_VERTICAL
-	      .build();
-		
-		NiftyNotificationView.build(this, msg, Effects.standard, viewId,cfg)
+
+		Configuration cfg = new Configuration.Builder().setAnimDuration(700)
+				.setDispalyDuration(2500).setBackgroundColor("#FFBDC3C7")
+				.setTextColor("#FF444444").setIconBackgroundColor("#FFFFFFFF")
+				.setTextPadding(5) // dp
+				.setViewHeight(48) // dp
+				.setTextLines(2) // You had better use setViewHeight and
+									// setTextLines together
+				.setTextGravity(Gravity.CENTER) // only text def
+												// Gravity.CENTER,contain icon
+												// Gravity.CENTER_VERTICAL
+				.build();
+
+		NiftyNotificationView.build(this, msg, Effects.standard, viewId, cfg)
 				.setIcon(R.drawable.icon).show();
 	}
 
@@ -181,5 +186,14 @@ public abstract class SwipeBackActivity extends FragmentActivity implements
 	 * 对标题栏进行设置
 	 */
 	protected abstract void initTitleBar();
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			BaseApplication.getInstance().delActivity(this);
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 
 }

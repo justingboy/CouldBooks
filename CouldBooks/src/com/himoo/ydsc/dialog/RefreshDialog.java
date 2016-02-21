@@ -29,7 +29,8 @@ public class RefreshDialog extends Dialog {
 		layout_dialog = (LinearLayout) view.findViewById(R.id.layout_dialog);
 		progressBar = (ProgressBar) view.findViewById(R.id.refresh_progressBar);
 		refresh_msg = (TextView) view.findViewById(R.id.book_refresh_msg);
-		setCancelable(true);
+		setCancelable(false);
+		setCanceledOnTouchOutside(false);
 		setContentView(view);
 	}
 
@@ -77,7 +78,7 @@ public class RefreshDialog extends Dialog {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		// TODO Auto-generated method stub
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			this.dismiss();
+//			this.dismiss();
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);

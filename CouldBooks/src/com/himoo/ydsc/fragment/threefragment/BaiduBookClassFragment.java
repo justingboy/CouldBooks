@@ -159,6 +159,8 @@ public class BaiduBookClassFragment extends BaseFragment implements
 				currentPage, cateid);
 		String url = HttpConstant.BAIDU_BOOK_CATE_URL + heardParams;
 		HttpUtils http = new HttpUtils();
+		http.configTimeout(3000);
+		http.configSoTimeout(3000);
 		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
 
 			@Override
@@ -271,7 +273,10 @@ public class BaiduBookClassFragment extends BaseFragment implements
 		mCurrentClickPosition = -1;
 		if (BookTheme.isThemeChange)
 			if (mAdapter != null)
+			{
+				mAdapter.afreshDisplayOption();
 				mAdapter.notifyDataSetChanged();
+			}
 		super.onResume();
 	}
 

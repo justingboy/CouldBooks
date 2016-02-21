@@ -27,6 +27,7 @@ import com.himoo.ydsc.fragment.SearchFragment2;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.listener.NoDoubleChangeListener;
 import com.himoo.ydsc.reader.config.BitmapConfig;
+import com.himoo.ydsc.service.LockService;
 import com.himoo.ydsc.ui.utils.ViewSelector;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.ViewUtils;
@@ -287,9 +288,17 @@ public class HomeActivity extends BaseActivity {
 		ImageLoader.getInstance().clearMemoryCache();
 		BitmapConfig.getInstace().destory();
 		stopDownloadService();
+		stopLockService();
 		MogoOffer.clear(this);
 		System.gc();
 		super.onDestroy();
+	}
+
+	/**
+	 * 停止密码锁服务
+	 */
+	private void stopLockService() {
+		stopService(new Intent(this, LockService.class));
 	}
 
 	/**

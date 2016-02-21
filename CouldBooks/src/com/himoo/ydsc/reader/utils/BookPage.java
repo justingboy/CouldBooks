@@ -17,6 +17,8 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.reader.bean.Chapter;
+import com.himoo.ydsc.reader.dao.BookMark;
+import com.himoo.ydsc.reader.dao.BookMarkDb;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.JccUtil;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -71,6 +73,11 @@ public class BookPage {
 	private int typefaceIndex;
 	private int mogoAdHeight = 0;
 
+	Bitmap bookMarktBitmap = null;
+	Paint mBitmapPaint = new Paint();
+
+	private int mTextOffWidth = 1;
+
 	/**
 	 * 在新建一个BookPage对象时，需要向其提供数据，以支持屏幕翻页功能。
 	 * 
@@ -85,6 +92,9 @@ public class BookPage {
 			Chapter chapter, int currentPage, int pageCount, int bookType,
 			boolean isNeedMogoAd) {
 		mContext = context;
+		mTextOffWidth = DeviceUtil.dip2px(context, 2);
+		bookMarktBitmap = BitmapFactory.decodeResource(mContext.getResources(),
+				R.drawable.iphone_bookmark);
 		this.bookType = bookType;
 		this.screenHeight = screenHeight;
 		this.screenWidth = screenWidth;
@@ -98,7 +108,8 @@ public class BookPage {
 		setTextTypeChildren(true);
 		setTextLineSpace(true);
 		init(context);
-		if (currentPage != -1 && pageCount != -1&&pagesVe!=null&&!pagesVe.isEmpty())
+		if (currentPage != -1 && pageCount != -1 && pagesVe != null
+				&& !pagesVe.isEmpty())
 			pageNum = (currentPage * (pagesVe.size())) / pageCount;
 	}
 
@@ -110,7 +121,8 @@ public class BookPage {
 		setTextTypeChildren(true);
 		setTextLineSpace(true);
 		init(mContext);
-		if (currentPage != -1 && pageCount != -1&&pagesVe!=null&&!pagesVe.isEmpty())
+		if (currentPage != -1 && pageCount != -1 && pagesVe != null
+				&& !pagesVe.isEmpty())
 			pageNum = ((currentPage * (pagesVe.size())) / pageCount);
 
 	}
@@ -125,6 +137,7 @@ public class BookPage {
 	public BookPage(Context context, int screenWidth, int screenHeight,
 			boolean isNeedMogoAd) {
 		mContext = context;
+		mTextOffWidth = DeviceUtil.dip2px(context, 2);
 		this.screenHeight = screenHeight;
 		this.screenWidth = screenWidth;
 		if (isNeedMogoAd)
@@ -144,72 +157,75 @@ public class BookPage {
 	 * 初始最好按照定义变量的顺序来初始化，统一。在将来需要修改某个变量的时候，容易找到。 对代码维护应该也很有用吧。
 	 */
 	protected void init(Context context) {
-		// bgBitmap = null;
-		boolean isNightMode = SharedPreferences.getInstance().getBoolean(
-				SpConstant.BOOK_SETTING_NIGHT_MODE, false);
-		boolean isAutoNightMode = SharedPreferences.getInstance().getBoolean(
-				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
-		textColor = isNightMode ? BookTheme.BOOK_TEXT_WHITE : Color.BLACK;
-		if (!isNightMode && isAutoNightMode) {
-			int hour = TimestampUtils.getCurrentHour();
-			if (hour >= 19 || hour <= 7) {
-				textColor = BookTheme.BOOK_TEXT_WHITE;
+		try {
+			// bgBitmap = null;
+			boolean isNightMode = SharedPreferences.getInstance().getBoolean(
+					SpConstant.BOOK_SETTING_NIGHT_MODE, false);
+			boolean isAutoNightMode = SharedPreferences.getInstance()
+					.getBoolean(SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
+			textColor = isNightMode ? BookTheme.BOOK_TEXT_WHITE : Color.BLACK;
+			if (!isNightMode && isAutoNightMode) {
+				int hour = TimestampUtils.getCurrentHour();
+				if (hour >= 19 || hour <= 7) {
+					textColor = BookTheme.BOOK_TEXT_WHITE;
+				}
 			}
+
+			bgColor = 0xffff9e85;
+			if (chapter == null)
+				return;
+			content = textType == 1 ? JccUtil.changeToSimplified(chapter
+					.getContent()) : JccUtil.changeToTraditional(chapter
+					.getContent());
+			if (typefaceIndex == 3)
+				content = content.replaceAll("        ", "    ");
+			chapterLen = content.length();
+			// curCharPos = 0;
+			charBegin = 0;
+			charEnd = 0;
+			marginWidth = DeviceUtil.dip2px(context, 20);
+			marginHeight = DeviceUtil.dip2px(context, 20);
+			fontSize = SharedPreferences.getInstance().getInt(
+					SpConstant.BOOK_SETTING_TEXT_SIZE,
+					DeviceUtil.dip2px(context, 22));
+			// lineHgight = fontSize + DeviceUtil.dip2px(context, 4);
+			linesVe = new Vector<String>();
+
+			paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			paint.setTextAlign(Align.LEFT);
+			paint.setTextSize(fontSize);
+
+			if (typeface != null)
+				paint.setTypeface(typeface);
+
+			paintBottom = new Paint(Paint.ANTI_ALIAS_FLAG);
+			paintBottom.setTextAlign(Align.LEFT);
+			paintBottom.setTextSize(fontSize > 84 ? 42 : fontSize / 2);
+			if (SharedPreferences.getInstance().getBoolean(
+					SpConstant.BOOK_AUTO_COLOR, false)) {
+				int color = SharedPreferences.getInstance().getInt(
+						SpConstant.BOOK_AUTO_COLOR_TEXT, Color.BLACK);
+				paint.setColor(color);
+				paintBottom.setColor(color);
+			} else {
+				paint.setColor(textColor);
+				paintBottom.setColor(textColor);
+			}
+
+			if (typeface != null)
+				paintBottom.setTypeface(typeface);
+
+			visibleWidth = screenWidth - marginWidth * 2;
+			visibleHeight = screenHeight - marginHeight * 2 - mogoAdHeight;
+			lineCount = visibleHeight / lineHgight - 2;
+			isfirstPage = true;
+			islastPage = false;
+			pagesVe = new Vector<Vector<String>>();
+			pageNum = -1;
+			slicePage();
+		} catch (Exception e) {
+			Log.e("msg", e.getMessage());
 		}
-
-		bgColor = 0xffff9e85;
-		if (chapter == null)
-			return;
-		content = textType == 1 ? JccUtil.changeToSimplified(chapter
-				.getContent()) : JccUtil.changeToTraditional(chapter
-				.getContent());
-		if (typefaceIndex == 3)
-			content = content.replaceAll("        ", "    ");
-		chapterLen = content.length();
-		// curCharPos = 0;
-		charBegin = 0;
-		charEnd = 0;
-		marginWidth = DeviceUtil.dip2px(context, 20);
-		marginHeight = DeviceUtil.dip2px(context, 20);
-		fontSize = SharedPreferences.getInstance().getInt(
-				SpConstant.BOOK_SETTING_TEXT_SIZE,
-				DeviceUtil.dip2px(context, 22));
-		// lineHgight = fontSize + DeviceUtil.dip2px(context, 4);
-		linesVe = new Vector<String>();
-
-		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		paint.setTextAlign(Align.LEFT);
-		paint.setTextSize(fontSize);
-
-		if (typeface != null)
-			paint.setTypeface(typeface);
-
-		paintBottom = new Paint(Paint.ANTI_ALIAS_FLAG);
-		paintBottom.setTextAlign(Align.LEFT);
-		paintBottom.setTextSize(fontSize / 2);
-		if (SharedPreferences.getInstance().getBoolean(
-				SpConstant.BOOK_AUTO_COLOR, false)) {
-			int color = SharedPreferences.getInstance().getInt(
-					SpConstant.BOOK_AUTO_COLOR_TEXT, Color.BLACK);
-			paint.setColor(color);
-			paintBottom.setColor(color);
-		} else {
-			paint.setColor(textColor);
-			paintBottom.setColor(textColor);
-		}
-
-		if (typeface != null)
-			paintBottom.setTypeface(typeface);
-
-		visibleWidth = screenWidth - marginWidth * 2;
-		visibleHeight = screenHeight - marginHeight * 2 - mogoAdHeight;
-		lineCount = visibleHeight / lineHgight - 2;
-		isfirstPage = true;
-		islastPage = false;
-		pagesVe = new Vector<Vector<String>>();
-		pageNum = -1;
-
-		slicePage();
 	}
 
 	/**
@@ -235,7 +251,6 @@ public class BookPage {
 	 */
 	protected void slicePage() {
 		try {
-
 			pagesVe.clear();
 			int curPos = 0;
 			while (curPos < chapterLen) {
@@ -477,8 +492,13 @@ public class BookPage {
 			int y = marginHeight;
 			for (String line : linesVe) {
 				y += lineHgight;
-				c.drawText(line, marginWidth, y, paint);
+				c.drawText(line, marginWidth + mTextOffWidth, y, paint);
 			}
+		}
+
+		// 表示有书签了
+		if (isHasBookMark(context)) {
+			drawBookMark(context, c,true,false);
 		}
 		String percetStr = "第" + (pageNum + 1) + "/" + pagesVe.size() + "页";
 		Time time = new Time();
@@ -507,6 +527,36 @@ public class BookPage {
 	}
 
 	/**
+	 * 是否存在该书签
+	 * 
+	 * @param context
+	 * @return
+	 */
+	private boolean isHasBookMark(Context context) {
+		BookMark mark = new BookMark();
+		mark.setBookName(chapter.getBookName());
+		mark.setChapterName(chapter.getChapterName());
+		mark.setPosition(chapter.getPosition());
+		mark.setCurrentPage(pageNum - 1);
+		mark.setPageCount(pagesVe.size());
+		mark.setType(2);
+		return BookMarkUtils.getInstance().isExistBookMark(mark);
+	}
+
+	/**
+	 * 绘制书签
+	 * 
+	 * @param context
+	 * @param c
+	 */
+	public void drawBookMark(Context context, Canvas c, boolean isAdd,boolean isCurrentAdd) {
+		if (isAdd)
+			c.drawBitmap(bookMarktBitmap,
+					screenWidth - DeviceUtil.dip2px(context, 40),isCurrentAdd?DeviceUtil.dip2px(context, 28):0,
+					mBitmapPaint);
+	}
+
+	/**
 	 * 设置小说的阅读背景图片
 	 * 
 	 * @param context
@@ -527,6 +577,7 @@ public class BookPage {
 	 */
 	public void setTextSzie(int textSize) {
 		fontSize = textSize;
+		setTextLineSpace(true);
 		init(mContext);
 	}
 
@@ -622,15 +673,14 @@ public class BookPage {
 
 	}
 
-	public void initSeekBarChapter(int position) {
-		chapter = IOHelper.getChapter(2, "1", position, bookType);
-		if (currentSeekBarPos < position) {
-			nextChapter();
-		} else {
-			preChapter();
-		}
+	/**
+	 * 拖动改变页数
+	 * 
+	 * @param position
+	 */
+	public void initSeekBarPage(int position) {
 		init(mContext);
-		currentSeekBarPos = position;
+		pageNum = position - 1;
 	}
 
 	/**
@@ -697,6 +747,7 @@ public class BookPage {
 	public void setCurrentPageNum() {
 		this.pageNum = pagesVe.size() - 1;
 	}
+
 	/**
 	 * 设置当前页
 	 */
@@ -741,7 +792,7 @@ public class BookPage {
 	 * 更新当前的页数
 	 */
 	public void updateCurrentpageNum(int currentPage, int pageCount) {
-		pageNum = ((currentPage * (pagesVe.size())) / pageCount)-1;
+		pageNum = ((currentPage * (pagesVe.size())) / pageCount) - 1;
 	}
 
 	/**

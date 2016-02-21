@@ -98,9 +98,13 @@ public class SubHotSearchFragment extends BaseFragment implements
 				if (mCurrentClickPosition != -1)
 					return;
 				mCurrentClickPosition = position;
+				try {
 				BaiduBook book = (BaiduBook) parent.getItemAtPosition(position);
 				UIHelper.startToActivity(getActivity(), book,
 						BaiduDetailsActivity.class);
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 			}
 		});
 
@@ -148,6 +152,8 @@ public class SubHotSearchFragment extends BaseFragment implements
 				+ HttpOperator.getBaiduRequestHeard(0,
 						HttpConstant.BAIDU_HOTSEARCH_URL);
 		HttpUtils http = new HttpUtils();
+		http.configTimeout(3000);
+		http.configSoTimeout(3000);
 		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
 
 			@Override
@@ -203,7 +209,6 @@ public class SubHotSearchFragment extends BaseFragment implements
 				mAdapter.addAll(list);
 		}
 		notifyDataAndRefreshComplete();
-		Log.i("currentPage =" + currentPage);
 
 	}
 
@@ -250,13 +255,15 @@ public class SubHotSearchFragment extends BaseFragment implements
 		super.onResume();
 		mCurrentClickPosition = -1;
 		if (BookTheme.isThemeChange)
-			if (mAdapter != null)
+			if (mAdapter != null) {
+				mAdapter.afreshDisplayOption();
 				mAdapter.notifyDataSetChanged();
+			}
 	}
-	
+
 	@Override
 	public void onDestroy() {
-		if(mAdapter!=null)
+		if (mAdapter != null)
 			mAdapter.destory();
 		super.onDestroy();
 	}

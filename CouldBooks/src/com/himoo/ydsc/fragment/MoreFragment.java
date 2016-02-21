@@ -30,7 +30,6 @@ import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.view.BookTitleBar;
 import com.himoo.ydsc.util.AppUtils;
-import com.himoo.ydsc.util.SP;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.ios.radiogroup.SegmentedGroup;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -302,7 +301,7 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 	@Override
 	public void updatePoint(long ponit) {
 		// TODO Auto-generated method stub
-		if (ponit > scoreLevel) {
+		if (ponit >=scoreLevel) {
 			SharedPreferences.getInstance().putBoolean(SpConstant.MOGOAD_SHOW,
 					false);
 		}

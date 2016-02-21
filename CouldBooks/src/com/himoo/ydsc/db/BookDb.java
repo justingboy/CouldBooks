@@ -60,6 +60,10 @@ public class BookDb {
 					book.getRecord()));
 			if (list == null || list.isEmpty())
 				db.save(book);
+			else {
+				db.delete(list.get(0));
+				db.save(book);
+			}
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -142,9 +146,9 @@ public class BookDb {
 		}
 	}
 
-	
 	/**
 	 * 查询的书的分类
+	 * 
 	 * @param entityType
 	 * @return
 	 */

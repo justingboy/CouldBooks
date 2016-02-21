@@ -139,10 +139,10 @@ public class SearchFragment2 extends BaseFragment implements
 
 	@Override
 	public void initData() {
-//		getKeyWordRequest((int) (Math.random() * 30), 9);
+		// getKeyWordRequest((int) (Math.random() * 30), 9);
 		getKeyWordRequest(1, 9);
 		initSpeech(getActivity());
-		
+
 		loadHistoryData();
 		layout_search_bg.setBackgroundColor(BookTheme.THEME_COLOR);
 		bookSearch.setTextColor(BookTheme.THEME_COLOR);
@@ -162,12 +162,13 @@ public class SearchFragment2 extends BaseFragment implements
 		bookTagView.setOnTagClickListener(this);
 		tv_hotwords.setOnClickListener(this);
 		tv_hotwords.setOnClickListener(new NoDoubleClickListener() {
-			
+
 			@Override
 			public void onNoDoubleClick(View v) {
 				// TODO Auto-generated method stub
 				isAfresh = true;
-				Intent intent = new Intent(getActivity(), HotwordsActivity.class);
+				Intent intent = new Intent(getActivity(),
+						HotwordsActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -193,12 +194,12 @@ public class SearchFragment2 extends BaseFragment implements
 		super.onClick(v);
 
 		switch (v.getId()) {
-//		case R.id.tv_hotwords:
-//			isAfresh = true;
-//			Intent intent = new Intent(getActivity(), HotwordsActivity.class);
-//			startActivity(intent);
-//
-//			break;
+		// case R.id.tv_hotwords:
+		// isAfresh = true;
+		// Intent intent = new Intent(getActivity(), HotwordsActivity.class);
+		// startActivity(intent);
+		//
+		// break;
 		case R.id.tv_delete:
 
 			new AlertDialog(getActivity()).builder().setTitle("删除")
@@ -251,8 +252,7 @@ public class SearchFragment2 extends BaseFragment implements
 	 * @param size
 	 */
 	private void getKeyWordRequest(int page, int size) {
-		if (http == null)
-		{
+		if (http == null) {
 			http = new HttpUtils();
 			http.configTimeout(3000);
 			http.configSoTimeout(3000);
@@ -264,22 +264,26 @@ public class SearchFragment2 extends BaseFragment implements
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
-				dismissRefreshDialog();
-				Gson gson = new Gson();
-				ArrayList<BookKeyWord> list = gson.fromJson(
-						responseInfo.result,
-						new TypeToken<ArrayList<BookKeyWord>>() {
-						}.getType());
-				if (list != null && !list.isEmpty()) {
-					for (int i = 0; i < list.size(); i++) {
-						keywords[i] = list.get(i).getKeyword();
-					}
-					initKeyWordFlow(keywords);
+				try {
 
-				} else {
+					dismissRefreshDialog();
+					Gson gson = new Gson();
+					ArrayList<BookKeyWord> list = gson.fromJson(
+							responseInfo.result,
+							new TypeToken<ArrayList<BookKeyWord>>() {
+							}.getType());
+					if (list != null && !list.isEmpty()) {
+						for (int i = 0; i < list.size(); i++) {
+							keywords[i] = list.get(i).getKeyword();
+						}
+						initKeyWordFlow(keywords);
+
+					} else {
+						initKeyWordFlow(null);
+					}
+				} catch (Exception e) {
 					initKeyWordFlow(null);
 				}
-				
 
 			}
 
@@ -292,7 +296,7 @@ public class SearchFragment2 extends BaseFragment implements
 				}
 				initKeyWordFlow(null);
 			}
-			
+
 		});
 	}
 
@@ -502,9 +506,9 @@ public class SearchFragment2 extends BaseFragment implements
 		if (mCurrentPosition != -1)
 			return;
 		mCurrentPosition = position;
-
 		String keyWord = ((BookSearchRecords) parent
 				.getItemAtPosition(position)).getRecord();
+		save(keyWord);
 		startToActivity(keyWord);
 	}
 

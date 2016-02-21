@@ -157,7 +157,7 @@ public class TimestampUtils {
 					sdf = new SimpleDateFormat(format);
 
 				} else {
-					sdf = new SimpleDateFormat("M月d日 HH:mm:ss");
+					sdf = new SimpleDateFormat("M月d日 HH:mm");
 				}
 
 				return sdf.format(c.getTime());
@@ -167,7 +167,7 @@ public class TimestampUtils {
 					sdf = new SimpleDateFormat(format);
 
 				} else {
-					sdf = new SimpleDateFormat("yyyy年M月d日 HH:mm:ss");
+					sdf = new SimpleDateFormat("M月d日 HH:mm");
 				}
 				return sdf.format(c.getTime());
 			}
@@ -189,7 +189,7 @@ public class TimestampUtils {
 		SharedPreferences.getInstance().putString(key,
 				TimestampUtils.getTimestamp());
 		return getTimeState(TimestampUtils.getTimestamp(),
-				"yyyy-MM-dd HH:mm:ss");
+				"yyyy-MM-dd HH:mm");
 
 	}
 

@@ -45,15 +45,14 @@
             android:layout_toLeftOf="@id/tv_next_chapter"
             android:background="#DCD8D5" />
 
-        <SeekBar
+        <com.himoo.ydsc.reader.view.PageSeekBar
             android:id="@+id/seekBar_chapter"
             style="@style/Widget.SeekBar.Normal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/tv_next_chapter"
-            android:layout_toRightOf="@id/tv_pre_chapter"
-            android:max="200" />
+            android:layout_toRightOf="@id/tv_pre_chapter" />
     </RelativeLayout>
 
     <View

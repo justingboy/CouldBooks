@@ -18,6 +18,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -47,6 +48,15 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 	private OnFragment2Listener mListener;
 
 	private Context mContext;
+	
+	@ViewInject(R.id.fragennt_top)
+	private RelativeLayout fragennt_top;
+	
+	@ViewInject(R.id.brightness_down)
+	private ImageView brightness_down;
+
+	@ViewInject(R.id.brightness_up)
+	private ImageView brightness_up;
 
 	@ViewInject(R.id.seekBar_light)
 	private SeekBar seekBar_light;
@@ -121,7 +131,6 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		View view = inflater.inflate(R.layout.fragment_book_setting2, null);
-
 		return view;
 	}
 
@@ -136,6 +145,7 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 		setBookImageSeleted();
 		setImageLineSeleted();
 		setListener();
+		forbidDrag();
 		isNigthModeHand = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_AUTO_NIGHT, false);
 		if (!SharedPreferences.getInstance().getBoolean(
@@ -207,6 +217,8 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 		public void onTextLineSpaceChange();
 
 		public void onTextColorBgChange();
+		
+		public void onFrideDrag(RelativeLayout view);
 	}
 
 	@Override
@@ -215,15 +227,17 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 		// changeNightMode();
 		switch (v.getId()) {
 		case R.id.textsiz_reduce:
-			if (textSize < 20)
+			if (textSize < 30)
 				return;
-			mListener.onTextSizChange(--textSize);
+			textSize-=2;
+			mListener.onTextSizChange(textSize);
 
 			break;
 		case R.id.textsiz_increase:
 			if (textSize > 120)
 				return;
-			mListener.onTextSizChange(++textSize);
+			textSize+=2;
+			mListener.onTextSizChange(textSize);
 
 			break;
 		case R.id.light_xitong:
@@ -602,6 +616,15 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 			ViewSelector.setImageSelector(getActivity(), textsiz_increase,
 					BookTheme.BOOK_SETTING_PRESS_BG, BookTheme.BOOK_SETTING_BG);
 		}
+
+	}
+
+	/**
+	 * 禁止滑动
+	 */
+	private void forbidDrag() {
+		if(mListener!=null)
+		mListener.onFrideDrag(fragennt_top);
 
 	}
 }

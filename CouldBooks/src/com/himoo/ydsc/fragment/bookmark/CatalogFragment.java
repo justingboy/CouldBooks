@@ -40,14 +40,17 @@ public class CatalogFragment extends BaseFragment {
 	private static final String ACTION = "com.himoo.ydsc.catalog.receiver";
 	private boolean isDownloading;
 	private BookCatalogdapter mAdapter;
+	private int position;
+	private int type;
 
 	public static CatalogFragment newInstance(String bookName, int type,
-			int bookType) {
+			int bookType, int position) {
 		CatalogFragment fragment = new CatalogFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString("bookName", bookName);
 		bundle.putInt("type", type);
 		bundle.putInt("bookType", bookType);
+		bundle.putInt("position", position);
 		fragment.setArguments(bundle);
 		return fragment;
 	}
@@ -67,6 +70,7 @@ public class CatalogFragment extends BaseFragment {
 		// TODO Auto-generated method stub
 		List<BaiduBookChapter> list = IOHelper.getBookChapter();
 		bookName = getArguments().getString("bookName");
+
 		bookMark = BookMarkDb.getInstance(getActivity(), "book")
 				.querryReaderPos(bookName);
 		mAdapter = new BookCatalogdapter(getActivity(),
@@ -75,6 +79,12 @@ public class CatalogFragment extends BaseFragment {
 		if (bookMark != null) {
 			int pos = bookMark.getPosition();
 			listView.setSelection(pos > 10 ? pos - 5 : 0);
+		} else {
+			type = getArguments().getInt("type", 1);
+			position = getArguments().getInt("position", 0);
+			if (type == 1) {
+				listView.setSelection(position > 10 ? position - 5 : 0);
+			}
 		}
 		listView.setOnItemClickListener(this);
 	}
@@ -109,8 +119,7 @@ public class CatalogFragment extends BaseFragment {
 			helper.setText(R.id.tv_bookCatalog, item.getText().trim());
 
 			if (bookMark != null
-					&& bookMark.getChapterName().equals(item.getText().trim())) {
-				Log.i(item.getText().trim());
+					&& bookMark.getChapterName().equals(item.getText().trim())||(type==1&&position==helper.getPosition())) {
 				helper.setTextRightDrawable(R.id.tv_bookCatalog,
 						R.drawable.book_mark);
 				helper.setTextColor(R.id.tv_bookCatalog, Color.RED);
@@ -164,15 +173,13 @@ public class CatalogFragment extends BaseFragment {
 		mCurrentClickPosition = -1;
 	}
 
-	
 	@Override
 	public void onDestroy() {
-		if(mAdapter!=null)
+		if (mAdapter != null)
 			mAdapter.destory();
 		super.onDestroy();
 	}
-	
-	
+
 	public class BookUpdateReceiver extends BroadcastReceiver {
 
 		@Override

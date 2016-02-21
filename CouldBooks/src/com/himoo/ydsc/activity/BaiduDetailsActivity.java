@@ -168,6 +168,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 					DoubanBookActivity.class, book.getTitle());
 		}
 	};
+	private Intent intent;
 
 	/**
 	 * 初始化ListView
@@ -193,7 +194,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				.findViewById(R.id.baidu_book_download);
 		bookEvaluation = (Button) headerView
 				.findViewById(R.id.baidu_book_evaluation);
-		initDownlaodButtonStatue();
+//		initDownlaodButtonStatue();
 		ViewSelector.setButtonSelector(this, bookDownload);
 		ViewSelector.setButtonSelector(this, bookEvaluation);
 		Log.i("CoverImage1 = " + book.getCoverImage());
@@ -390,9 +391,10 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
-		super.onResume();
+		initDownlaodButtonStatue();
 		mCurrentClickPosition = -1;
 		bookEvaluation.setClickable(true);
+		super.onResume();
 	}
 
 	/**
@@ -517,6 +519,13 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 			try {
 				SP.getInstance().putBoolean(book.getTitle(), true);
 				bookDownload.setText("完成");
+//				if(intent!=null)
+//				{
+//					intent.putExtra("DownloadSuccess", true);
+//					sendBroadcast(intent);
+////					if (receiver != null)
+////						unregisterReceiver(receiver);
+//				}
 				BaiduBookDownload.getInstance(BaiduDetailsActivity.this)
 						.updateDownSuccess(book.getTitle());
 				Toast.showLong(BaiduDetailsActivity.this, "《" + book.getTitle()
@@ -633,7 +642,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(ACTION);
 		registerReceiver(receiver, filter);
-		Intent intent = new Intent(ACTION);
+		intent = new Intent(ACTION);
 		intent.putExtra("bookName", book.getTitle());
 		String url = HttpConstant.BAIDU_BOOK_DETAILS_URL + "appui=alaxs&gid="
 				+ book.getGid() + "&dir=1&ajax=1";

@@ -41,14 +41,6 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 		downloadManager = BookDownloadService.getDownloadManager(mContext);
 	}
 
-	/*
-	 * public DisplayImageOptions displayImageOptionsBuider(int resId) {
-	 * DisplayImageOptions options = new DisplayImageOptions.Builder()
-	 * .showImageOnLoading(resId).showImageForEmptyUri(resId)
-	 * .showImageOnFail(resId).cacheInMemory(true).cacheOnDisk(true)
-	 * .considerExifParams(true).bitmapConfig(Bitmap.Config.ARGB_8888) .build();
-	 * return options; }
-	 */
 	@Override
 	protected void convert(BaseAdapterHelper helper, BookDownloadInfo item) {
 		// TODO Auto-generated method stub
@@ -56,13 +48,12 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 				SpConstant.BOOK_SHELF_DIRECTION, true);
 		String imageUrl = RegularUtil.converUrl(item.getBookCoverImageUrl());
 		helper.setImageUrl(R.id.shelf_book_image, imageUrl, option);
-		boolean isSuccess = downloadManager.queryBookDownSuccess(item
-				.getBookName());
-		if (isSuccess) {
-			helper.setVisible(R.id.shelf_book_undown, false);
-		} else {
-			helper.setVisible(R.id.shelf_book_undown, true);
-		}
+//		boolean isSuccess = item.isAutoResume();
+//		if (!isSuccess) {
+//			helper.setVisible(R.id.shelf_book_undown, false);
+//		} else {
+//			helper.setVisible(R.id.shelf_book_undown, true);
+//		}
 
 		helper.setVisible(R.id.book_new_label, item.getBookIsRead() ? false
 				: true);
@@ -114,6 +105,13 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 
 		}
 
+	}
+	/**
+	 * 刷新 配置
+	 */
+	public void afreshDisplayOption() {
+		this.option = BaseApplication.getInstance().displayImageOptionsBuider(
+				BookTheme.BOOK_COVER);
 	}
 
 }

@@ -22,6 +22,7 @@ public class BookSortUtil {
 	private static final String REGULAR = "[0-9《`~!@#$%^&*()+=|{}':;',\\[\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
 	/** 　判断字符串是不是英文的 */
 	private static final String regex = "^[a-zA-Z]*";
+	private static final String eng_regex = "[a-zA-Z]";
 	private static HanyuPinyinOutputFormat format;
 
 	public static void initHanyuPinyin() {
@@ -57,8 +58,8 @@ public class BookSortUtil {
 		// char ch[] = new char[value.trim().length()];
 		// for (int i = 0; i < ch.length; i++) {
 		// ch[i] = value.charAt(i);
-		if (value != null && value.matches(regex)) {
-			return value;
+		if (value != null && (value.charAt(0)+"").matches(regex)) {
+			return value.valueOf(0);
 		}
 		try {
 			String[] pinyin = PinyinHelper.toHanyuPinyinStringArray(value

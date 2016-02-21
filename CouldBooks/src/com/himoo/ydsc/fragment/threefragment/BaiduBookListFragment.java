@@ -77,6 +77,8 @@ public class BaiduBookListFragment extends ListFragment {
 	 */
 	private void getBookClassList() {
 		HttpUtils http = new HttpUtils();
+		http.configTimeout(3000);
+		http.configSoTimeout(3000);
 		String url = HttpConstant.BAIDU_BOOK_CLASSIFY_URL;
 		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
 

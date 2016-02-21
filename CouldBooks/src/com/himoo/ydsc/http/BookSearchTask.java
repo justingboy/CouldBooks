@@ -68,6 +68,8 @@ public class BookSearchTask {
 			final PullToRefreshListView listView,final boolean isFirst) {
 		if (http == null) {
 			http = new HttpUtils();
+			http.configTimeout(3000);
+			http.configSoTimeout(3000);
 		}
 
 		String url = SharedPreferences.getInstance().getString("host",
@@ -111,6 +113,8 @@ public class BookSearchTask {
 	public void executeBaidu(String keyWord, String page) {
 		if (http == null) {
 			http = new HttpUtils();
+			http.configTimeout(3000);
+			http.configSoTimeout(3000);
 		}
 
 		String url = null;

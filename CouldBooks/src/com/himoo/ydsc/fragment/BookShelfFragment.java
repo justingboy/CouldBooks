@@ -56,6 +56,7 @@ import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.reader.ReaderActivity;
 import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.reader.dao.BookMarkDb;
+import com.himoo.ydsc.reader.utils.BookMarkUtils;
 import com.himoo.ydsc.reader.utils.IOHelper;
 import com.himoo.ydsc.reader.utils.LocalReaderUtil;
 import com.himoo.ydsc.share.UmengShare;
@@ -100,7 +101,7 @@ public class BookShelfFragment extends BaseFragment implements
 	private static BookDownloadManager downloadManager;
 	private static BookDownloadAdapter mAdapter;
 
-	private ArrayList<BookDownloadInfo> mDownloadList;
+	private static ArrayList<BookDownloadInfo> mDownloadList;
 	private static ImageView shelf_empty_image;
 
 	private SearchEditText searchText;
@@ -318,8 +319,7 @@ public class BookShelfFragment extends BaseFragment implements
 			switch (which) {
 			case 1:
 				bookSort.setText("默认排序");
-				mDefaultSortList.removeAll(deletedList);
-				mAdapter.addAll(mDefaultSortList);
+				mAdapter.addAll(mDownloadList);
 				break;
 			case 2:
 				bookSort.setText("更新时间");
@@ -332,7 +332,6 @@ public class BookShelfFragment extends BaseFragment implements
 			case 4:
 				bookSort.setText("作者排序");
 				mAdapter.addAll(BookSortUtil.sortByBookAuthor(mDownloadList));
-				Log.d("更新时间：" + mDownloadList.get(0).getBookLastUpdateTime());
 				break;
 
 			default:
@@ -353,22 +352,30 @@ public class BookShelfFragment extends BaseFragment implements
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
-			String bookName = intent.getStringExtra("bookName");
-			// 保存下载状态，false表示正在下载
-			SP.getInstance().putBoolean(bookName, false);
-			downlaodBookName = bookName;
-			String dowloadUrl = intent.getStringExtra("dowloadUrl");
-			List<BookDownloadInfo> list = downloadManager.findLastBookInfo(
-					bookName, dowloadUrl);
-			if (list != null && list.size() > 0) {
-				isLastDownload = true;
-				if (shelf_empty_image != null)
-					shelf_empty_image.setVisibility(View.GONE);
-				mAdapter.addFirstN(list.get(0));
-				mGridView.setSelection(0);
-				mAdapter.notifyDataSetChanged();
+			boolean downloadSuccess = intent.getBooleanExtra("DownloadSuccess",
+					false);
+			if (downloadSuccess) {
+				
+				android.util.Log.i("msg", "---downloadSuccess");
+			} else {
+				String bookName = intent.getStringExtra("bookName");
+				// 保存下载状态，false表示正在下载
+				SP.getInstance().putBoolean(bookName, false);
+				downlaodBookName = bookName;
+				String dowloadUrl = intent.getStringExtra("dowloadUrl");
+				List<BookDownloadInfo> list = downloadManager.findLastBookInfo(
+						bookName, dowloadUrl);
+				if (list != null && list.size() > 0) {
+					isLastDownload = true;
+					if (shelf_empty_image != null)
+						shelf_empty_image.setVisibility(View.GONE);
+					mAdapter.addFirstN(list.get(0));
+					mDownloadList.add(mDownloadList.size() == 0 ? 0
+							: mDownloadList.size(), list.get(0));
+					mGridView.setSelection(0);
+					mAdapter.notifyDataSetChanged();
+				}
 			}
-
 		}
 	}
 
@@ -581,6 +588,7 @@ public class BookShelfFragment extends BaseFragment implements
 			ViewSelector.setButtonStrokeSelector(getActivity(), bookSort);
 			bookSort.setTextColor(BookTheme.THEME_COLOR);
 			searchText.setTextColor(BookTheme.THEME_COLOR);
+			mAdapter.afreshDisplayOption();
 			mAdapter.notifyDataSetChanged();
 		}
 		if (!SharedPreferences.getInstance().getBoolean(
@@ -639,6 +647,7 @@ public class BookShelfFragment extends BaseFragment implements
 	 * 
 	 */
 	public class OpenBookAsyncTask extends AsyncTask<Void, Void, BookMark> {
+		public int position;
 		public Context mContext;
 		public String bookName;
 		// 表示书的状态是连载还是完结
@@ -647,9 +656,11 @@ public class BookShelfFragment extends BaseFragment implements
 		public String lastUrl;
 		ArrayList<BaiduBookChapter> list;
 
-		public OpenBookAsyncTask(Context context, String bookName,
-				String statue, int bookType, String lastUrl, BookView bookView) {
+		public OpenBookAsyncTask(Context context, int position,
+				String bookName, String statue, int bookType, String lastUrl,
+				BookView bookView) {
 			this.mContext = context;
+			this.position = position;
 			this.bookName = bookName;
 			this.statue = statue;
 			this.bookType = bookType;
@@ -668,6 +679,7 @@ public class BookShelfFragment extends BaseFragment implements
 		@Override
 		protected BookMark doInBackground(Void... params) {
 			// TODO Auto-generated method stub
+			BookMarkUtils.getInstance().getBookMark(mContext, bookName, "");
 			list = LocalReaderUtil.getInstance().parseLocalBook(bookName,
 					bookType);
 			if (list == null || list.isEmpty()) {
@@ -714,6 +726,10 @@ public class BookShelfFragment extends BaseFragment implements
 					@Override
 					public void onOpenBookAnimEnd(BookView bookView) {
 						// TODO Auto-generated method stub
+						int index = mDownloadList.indexOf(book);
+						book.setBookIsRead(true);
+						book.setAutoResume(true);
+						mDownloadList.set(index, book);
 						startToActivity(bookName, bookType, lastUrl, statue,
 								result);
 					}
@@ -839,9 +855,10 @@ public class BookShelfFragment extends BaseFragment implements
 
 				if (SP.getInstance().getBoolean(book.getBookName(), true)
 						&& !isRefresh) {
-					new OpenBookAsyncTask(getActivity(), book.getBookName(),
-							book.getBookStatue(), book.getBookSourceType(),
-							book.getLastUrl(), bookView).execute();
+					new OpenBookAsyncTask(getActivity(), position,
+							book.getBookName(), book.getBookStatue(),
+							book.getBookSourceType(), book.getLastUrl(),
+							bookView).execute();
 				} else {
 					Toast.showBg(getActivity(), isRefresh ? "更新中,请稍后打开"
 							: "下载中,请稍后打开");
@@ -851,7 +868,7 @@ public class BookShelfFragment extends BaseFragment implements
 				if (book.getBookSourceType() == 2) {
 					Toast.showBg(getActivity(), "下载中,请稍后打开");
 				} else {
-					Toast.showBg(getActivity(), "未下载完成,可长按重新下载!");
+					Toast.showBg(getActivity(), "未下载完成,'长按'重新下载!");
 				}
 				mCurrentClickPosition = -1;
 			}
@@ -878,7 +895,6 @@ public class BookShelfFragment extends BaseFragment implements
 	@Override
 	public void onUpdateProgress(final String bookName) {
 		// TODO Auto-generated method stub
-		Log.i("onUpdateProgress" + Thread.currentThread().getName());
 		if (bookName.contains("本")) {
 			getActivity().runOnUiThread(new Runnable() {
 

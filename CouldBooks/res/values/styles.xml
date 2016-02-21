@@ -4,7 +4,7 @@
         <!--
 			Theme customizations available in newer API levels can go in
 			res/values-vXX/styles.xml, while customizations related to
-			backward-compatibility can go here.
+			backward-compatibility can go here.
         -->
     </style>
 
@@ -20,7 +20,7 @@
         translucent system bars
 		<item name="android:windowTranslucentStatus">true</item>
 		<item name="android:windowTranslucentNavigation">true</item>
-		<item name="android:fitsSystemWindows">true</item>
+		<item name="android:fitsSystemWindows">true</item>
         -->
     </style>
 
@@ -274,7 +274,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:scaleType">center</item>
     </style>
-    <!-- 阅读界面字体设置 -->  
+    <!-- 阅读界面字体设置 -->
     <style name="book_setting_text_style">
         <item name="android:layout_weight">1</item>
         <item name="android:paddingBottom">10dp</item>
@@ -307,6 +307,23 @@
         <item name="android:background">@color/divider_line</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
+    </style>
+
+    <!-- animation 样式  锁界面动画，暂无无效，可能与Swip有冲突-->
+    <style name="LockAnimation">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/AnimTop2</item>
+    </style>
+    <!--
+        <item name="android:activityOpenEnterAnimation">@anim/lock_slide_right_in</item>  
+        <item name="android:activityCloseEnterAnimation">@anim/lock_slide_left_in</item>  
+        <item name="android:activityCloseExitAnimation">@anim/lock_slide_right_out</item>  
+        <item name="android:activityOpenExitAnimation">@anim/lock_slide_left_out</item>  
+    -->
+
+    <style name="AnimTop2" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/lock_slide_right_in</item>
+        <item name="android:windowExitAnimation">@anim/lock_slide_right_out</item>
     </style>
 
 </resources>
