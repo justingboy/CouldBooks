@@ -22,7 +22,7 @@ public class DownlaodNotification {
 	private Notification notification;
 	private RemoteViews remoteViews;
 	private int progress = 0;
-	private int NOTIFI_ID = (int) (Math.random()*65535);
+	public int NOTIFI_ID = (int) (Math.random()*65535);
 	private String bookName = "凡人修仙传";
 
 	public DownlaodNotification(Context context) {
@@ -49,7 +49,7 @@ public class DownlaodNotification {
 			notification.flags = Notification.FLAG_AUTO_CANCEL;
 			notifiManger.notify(NOTIFI_ID, notification);
 		}
-		remoteViews.setTextViewText(R.id.download_notication_title, bookName
+		remoteViews.setTextViewText(R.id.download_notication_title, bookName.length()>8?bookName.substring(0, 7)+"...":bookName
 				+ "   " + progress + "%");
 		// 在sdk版本0之前的背景是白色的，使得白色的字体无法显示
 		if (android.os.Build.VERSION.SDK_INT <= 9) {
@@ -88,7 +88,7 @@ public class DownlaodNotification {
 	 * @param netSpeed
 	 */
 	public void setProgressAndNetSpeed(int progress, long netSpeed) {
-		remoteViews.setTextViewText(R.id.download_notication_title, bookName
+		remoteViews.setTextViewText(R.id.download_notication_title, (bookName.length()>8?bookName.substring(0, 7)+"...":bookName)
 				+ "   " + progress + "%");
 		remoteViews.setProgressBar(R.id.progress, 100, progress, false);
 		remoteViews.setTextViewText(R.id.tv_progress, netSpeed + "kb/s");

@@ -41,9 +41,9 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	/** 最先返回的服务器 0 表示自己的 1表示百度的 */
 	public int firstReSuccess = -1;
 
-	/** 百度的页数 0,2,4,6 */
-	public int mCurrentBaiduPage = 0;
-	/** 自己服务器的页数 1,2,3,4,5 */
+	/** 百度的页数 20,40,60 */
+	public int mCurrentBaiduPage = 1;
+	/** 自己服务器的页数 （1,2,3,4,5 ）*20 */
 	public int mCurrentMePage = 1;
 
 	@ViewInject(R.id.tv_search_empty)
@@ -69,6 +69,8 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	private ImageView imgRefersh;
 	/** 表示是否搜索到了书 */
 	private boolean isHasSearchBook = false;
+	/** 　返回的总的数 */
+	private int bookTotal;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +122,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 					public void onPullDownToRefresh(
 							PullToRefreshBase<ListView> refreshView) {
 						// TODO Auto-generated method stub
+						isHasSearchBook = false;
 						if (firstReSuccess == 0) {
 							BookSearchTask.getInstance().executeMe(title, "1",
 									mRefrshListView, false);
@@ -127,7 +130,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 							BookRefreshTask<BaiduBook> task = new BookRefreshTask<BaiduBook>(
 									mRefrshListView);
 							task.setOnRefreshListener(SearchResultActivity.this);
-							task.execute(title, 0,
+							task.execute(title, 20,
 									HttpConstant.BOOK_REQUEST_TYPE_BAIDU_SEARCH);
 						}
 
@@ -141,7 +144,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 							BookRefreshTask<BaiduBook> task = new BookRefreshTask<BaiduBook>(
 									mRefrshListView);
 							task.setOnRefreshListener(SearchResultActivity.this);
-							task.execute(title, mCurrentBaiduPage,
+							task.execute(title, mCurrentBaiduPage * 20,
 									HttpConstant.BOOK_REQUEST_TYPE_BAIDU_SEARCH);
 							// 去自己服务器搜索数据
 						} else if (firstReSuccess == 0) {
@@ -162,7 +165,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	 */
 	private void exeTask() {
 		BookSearchTask.getInstance().setonSearchListener(this);
-		BookSearchTask.getInstance().executeBaidu(title, "0");
+		BookSearchTask.getInstance().executeBaidu(title, "1");
 		BookSearchTask.getInstance().executeMe(title, "1", mRefrshListView,
 				true);
 	}
@@ -182,7 +185,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 				showRefreshDialog("正在加载中");
 				AnimationUtils.setViewRotating(SearchResultActivity.this,
 						imgRefersh);
-				BookSearchTask.getInstance().executeBaidu(title, "0");
+				BookSearchTask.getInstance().executeBaidu(title, "1");
 
 			}
 		});
@@ -196,10 +199,8 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		if (isFirst) {
 			if (firstReSuccess == -1) {
 				firstReSuccess = whoservice;
-
 				if (firstReSuccess == 0) {
 					try {
-
 						Gson gosn = new Gson();
 						bookList = gosn.fromJson(json,
 								new TypeToken<ArrayList<BookSearch>>() {
@@ -217,6 +218,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 							mCurrentMePage++;
 							isHasSearchBook = true;
 						} else {
+							Toast.showBg(SearchResultActivity.this, "没找到该书");
 							tv_search_empty.setVisibility(View.VISIBLE);
 							mRefrshListView.setVisibility(View.GONE);
 							mTitleBar.setRightLogoVisible();
@@ -238,7 +240,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 						mRefrshListView.setAdapter(mBaiduAdapter);
 						isHasSearchBook = true;
 					} else {
-						Toast.showBg(SearchResultActivity.this, "对不起,无收录此书!");
+						Toast.showBg(SearchResultActivity.this, "没找到该书");
 						tv_search_empty.setVisibility(View.VISIBLE);
 						mRefrshListView.setVisibility(View.GONE);
 						mTitleBar.setRightLogoVisible();
@@ -267,10 +269,12 @@ public class SearchResultActivity extends SwipeBackActivity implements
 					}
 
 				} else if (refreshType == BookSearchTask.TYPE_PULL_UP_LOAD) {
-					mCurrentMePage++;
 					if (bookLists != null && bookLists.size() > 0) {
+						mCurrentMePage++;
 						if (mBookAdapter != null)
 							mBookAdapter.addAll(bookLists);
+					} else {
+						Toast.showShort(SearchResultActivity.this, "已加载完毕");
 					}
 				}
 				notifyDataAndRefreshComplete();
@@ -283,16 +287,17 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	@Override
 	public void onSearcFailure(Exception error, String msg, int whoservice) {
 		// TODO Auto-generated method stub
-		dismissRefreshDialog();
-		AnimationUtils.cancelAnim(imgRefersh);
-		if (NetWorkUtils.isNetConnected(SearchResultActivity.this)
-				&& !isHasSearchBook) {
-			Toast.showBg(SearchResultActivity.this, "对不起,无收录此书!");
-		} else {
-			Toast.showBg(SearchResultActivity.this, "未连接网络");
+		if (isHasSearchBook) {
+			dismissRefreshDialog();
+			AnimationUtils.cancelAnim(imgRefersh);
+			mRefrshListView.onRefreshComplete();
+			if (!NetWorkUtils.isNetConnected(this)) {
+				Toast.showBg(this, "未连接网络");
+			} else {
+				Toast.showBg(this, "获取数据失败");
+			}
+			firstReSuccess = whoservice;
 		}
-
-		firstReSuccess = whoservice;
 	}
 
 	/**
@@ -309,6 +314,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 			Gson gson = new Gson();
 			if (jsonObject.getInt("errno") == 0
 					&& jsonObject.get("errmsg").equals("ok")) {
+				bookTotal = Integer.valueOf(jsonObject.getString("total"));
 				JSONObject subJsonObject = jsonObject.getJSONObject("result");
 				String result = subJsonObject.getString("search");
 				list = gson.fromJson(result,
@@ -328,8 +334,13 @@ public class SearchResultActivity extends SwipeBackActivity implements
 
 		if (list != null && list.size() > 0) {
 			if (mBaiduAdapter != null) {
-				mBaiduAdapter.addAll(list);
-				mCurrentBaiduPage += 1;
+				if (mBaiduAdapter.getCount() < bookTotal) {
+					mBaiduAdapter.addAll(list);
+					mCurrentBaiduPage += 1;
+				} else {
+					Toast.showShort(this, "已加载完毕");
+					notifyDataAndRefreshComplete();
+				}
 			}
 
 		}
@@ -354,7 +365,11 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	@Override
 	public void onPullToRefreshFailure(Exception error, String msg) {
 		// TODO Auto-generated method stub
-		Toast.showBg(this, "获取数据失败");
+		if (!NetWorkUtils.isNetConnected(this)) {
+			Toast.showBg(this, "未连接网络");
+		} else {
+			Toast.showBg(this, "获取数据失败");
+		}
 		AnimationUtils.cancelAnim(imgRefersh);
 		notifyDataAndRefreshComplete();
 	}

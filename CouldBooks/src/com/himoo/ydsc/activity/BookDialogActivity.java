@@ -7,10 +7,10 @@ import org.apache.http.message.BasicNameValuePair;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -33,12 +33,11 @@ import com.himoo.ydsc.animation.OpenFolder;
 import com.himoo.ydsc.animation.mesh.BitmapMesh;
 import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.bean.BookDetails;
+import com.himoo.ydsc.bookdl.DownLoaderTask2;
+import com.himoo.ydsc.bookdl.DownloadManager;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.download.BookDownloadManager;
 import com.himoo.ydsc.download.BookDownloadService;
-import com.himoo.ydsc.download.DownLoaderTask;
-import com.himoo.ydsc.fragment.BookShelfFragment;
-import com.himoo.ydsc.fragment.BookShelfFragment.BookDownloadReceiver;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.share.UmengShare;
 import com.himoo.ydsc.ui.utils.Toast;
@@ -84,7 +83,7 @@ public class BookDialogActivity extends FragmentActivity implements
 	private FrameLayout ani_mesh_layout;
 	private BitmapMesh.SampleView mSampleView;
 	private BookDownloadManager downloadManager;
-	private BookDownloadReceiver receiver;
+	// private BookDownloadReceiver receiver;
 	// private LinearLayout ratingBar_layout, dialog_btn_layout;
 	// private LinearLayout dialog_layout_rating;
 	private LinearLayout ratingBar_layout;
@@ -97,6 +96,7 @@ public class BookDialogActivity extends FragmentActivity implements
 	/** 评分 */
 	private int rate;
 	private FileUtils fileUtils;
+	private Intent intent;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -336,10 +336,10 @@ public class BookDialogActivity extends FragmentActivity implements
 			}
 			try {
 				downloadManager.addNewBookDownload(bookDetails,
-						bookDetails.getBook_Name() + ".zip", true, true, null);
+						bookDetails.getBook_Name()+"_"+bookDetails.getBook_ID() + ".zip", true, true, null);
 				doDownLoadWork(bookDetails.getBook_Download(),
-						bookDetails.getBook_Name());
-				SP.getInstance().putBoolean(bookDetails.getBook_Name(), false);
+						bookDetails.getBook_Name(),bookDetails.getBook_ID()+"");
+				SP.getInstance().putBookDownSuccess(bookDetails.getBook_Name()+bookDetails.getBook_ID(), false);
 				bookDownlaodCountUpload(bookDetails.getBook_ID());
 			} catch (DbException e) {
 				// TODO Auto-generated catch block
@@ -384,22 +384,21 @@ public class BookDialogActivity extends FragmentActivity implements
 	 * 注册广播
 	 */
 	private void registeBroadcast() {
-		receiver = new BookShelfFragment.BookDownloadReceiver();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(ACTION);
-		registerReceiver(receiver, filter);
-		Intent intent = new Intent(ACTION);
+		intent = new Intent(ACTION);
 		intent.putExtra("bookName", bookDetails.getBook_Name());
+		intent.putExtra("bookId", bookDetails.getBook_ID()+"");
 		intent.putExtra("dowloadUrl", bookDetails.getBook_Download());
 		sendBroadcast(intent);
 	}
+
+
 
 	@Override
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		if (receiver != null)
-			unregisterReceiver(receiver);
+		// if (receiver != null)
+		// unregisterReceiver(receiver);
 	}
 
 	@Override
@@ -489,16 +488,17 @@ public class BookDialogActivity extends FragmentActivity implements
 	 * @param downloadUrl
 	 * @param bookName
 	 */
-	private void doDownLoadWork(String downloadUrl, String bookName) {
+	private void doDownLoadWork(String downloadUrl, String bookName,String bookId) {
 
 		File file = new File(fileUtils.getStorageDirectory());
 		if (file != null && !file.exists())
 			file.mkdirs();
-		String filePath = fileUtils.getStorageDirectory() + bookName + ".zip";
+		String filePath = fileUtils.getStorageDirectory() + bookName+"_"+bookId + ".zip";
 
-		DownLoaderTask task = new DownLoaderTask(downloadUrl, bookName,
-				filePath, this, null, false);
-		task.execute();
+		DownLoaderTask2 task = new DownLoaderTask2(downloadUrl, bookName,bookId,
+				filePath, this,true, null);
+		DownloadManager.getInstance().addTask(bookName, bookId,task);
+		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		refreshDownloadNum();
 	}
 
@@ -518,7 +518,8 @@ public class BookDialogActivity extends FragmentActivity implements
 	 * 刷新下载次数
 	 */
 	private void refreshDownloadNum() {
-		book_Popularity.setText("人气:" + bookDetails.getBook_Popularity() + 1
+		book_Popularity.setText("人气:"
+				+ (Integer.valueOf(bookDetails.getBook_Popularity()) + 1)
 				+ "次下载");
 
 	}

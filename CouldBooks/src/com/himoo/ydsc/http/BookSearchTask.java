@@ -37,8 +37,9 @@ public class BookSearchTask {
 	private static BookSearchTask mInstance = null;
 
 	/** 　xutils 网络请求工具类 */
-	public HttpUtils http;
+	public HttpUtils httpBaidu;
 
+	HttpUtils httpMe;
 	private OnSearchListener mSearchListener;
 
 	private BookSearchTask() {
@@ -65,13 +66,9 @@ public class BookSearchTask {
 	 * @param bookId
 	 */
 	public void executeMe(String keyWord, String page,
-			final PullToRefreshListView listView,final boolean isFirst) {
-		if (http == null) {
-			http = new HttpUtils();
-			http.configTimeout(3000);
-			http.configSoTimeout(3000);
-		}
-
+			final PullToRefreshListView listView, final boolean isFirst) {
+		if (httpMe == null)
+			httpMe = new HttpUtils(5000);
 		String url = SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST)
 				+ "getBooksSearch.asp";
@@ -79,30 +76,34 @@ public class BookSearchTask {
 		// post的键值对
 		RequestParams params = createNameValuePair(keyWord, page);
 
-		http.send(HttpMethod.POST, url, params, new RequestCallBack<String>() {
+		httpBaidu.send(HttpMethod.POST, url, params,
+				new RequestCallBack<String>() {
 
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
+					@Override
+					public void onSuccess(ResponseInfo<String> responseInfo) {
+						// TODO Auto-generated method stub
 
-				if (mSearchListener != null)
-					
-					if (listView.getCurrentMode() == Mode.PULL_FROM_START||isFirst)
-						mSearchListener.onSearchSucess(responseInfo.result,
-								OWN, TYPE_PULL_DOWN_UPDATE,isFirst);
-					else if (listView.getCurrentMode() == Mode.PULL_FROM_END)
-						mSearchListener.onSearchSucess(responseInfo.result,
-								OWN, TYPE_PULL_UP_LOAD,isFirst);
+						if (mSearchListener != null)
 
-			}
+							if (listView.getCurrentMode() == Mode.PULL_FROM_START
+									|| isFirst)
+								mSearchListener.onSearchSucess(
+										responseInfo.result, OWN,
+										TYPE_PULL_DOWN_UPDATE, isFirst);
+							else if (listView.getCurrentMode() == Mode.PULL_FROM_END)
+								mSearchListener.onSearchSucess(
+										responseInfo.result, OWN,
+										TYPE_PULL_UP_LOAD, isFirst);
 
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				if (mSearchListener != null)
-					mSearchListener.onSearcFailure(error, msg, BAIDU);
-			}
+					}
 
-		});
+					@Override
+					public void onFailure(HttpException error, String msg) {
+						if (mSearchListener != null)
+							mSearchListener.onSearcFailure(error, msg, BAIDU);
+					}
+
+				});
 	}
 
 	/**
@@ -111,30 +112,28 @@ public class BookSearchTask {
 	 * @param bookId
 	 */
 	public void executeBaidu(String keyWord, String page) {
-		if (http == null) {
-			http = new HttpUtils();
-			http.configTimeout(3000);
-			http.configSoTimeout(3000);
-		}
+		if (httpBaidu == null)
+			httpBaidu = new HttpUtils(5000);
 
 		String url = null;
 		try {
-			url = HttpConstant.BAIDU_BOOK_SEARCH_URL + "pageno=" + page
-					+ "&keyword=" + URLEncoder.encode(keyWord, "utf-8");
+			url = HttpConstant.BAIDU_BOOK_SEARCH_URL + "pageno="
+					+ (20 * Integer.valueOf(page)) + "&keyword="
+					+ URLEncoder.encode(keyWord, "utf-8");
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			if (mSearchListener != null)
 				mSearchListener.onSearcFailure(e, "转码错误", BAIDU);
 		}
-		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
+		httpBaidu.send(HttpMethod.GET, url, new RequestCallBack<String>() {
 
 			@Override
 			public void onSuccess(ResponseInfo<String> responseInfo) {
 				// TODO Auto-generated method stub
 				if (mSearchListener != null)
 					mSearchListener.onSearchSucess(responseInfo.result, BAIDU,
-							TYPE_PULL_DOWN_UPDATE,true);
+							TYPE_PULL_DOWN_UPDATE, true);
 			}
 
 			@Override
@@ -176,7 +175,8 @@ public class BookSearchTask {
 
 	public interface OnSearchListener {
 
-		public void onSearchSucess(String json, int whoservice, int refreshType,boolean isFirst);
+		public void onSearchSucess(String json, int whoservice,
+				int refreshType, boolean isFirst);
 
 		public void onSearcFailure(Exception error, String msg, int whoservice);
 

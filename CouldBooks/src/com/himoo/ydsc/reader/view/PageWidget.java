@@ -171,7 +171,7 @@ public class PageWidget extends View {
 			mCornerX = 0;
 		else
 			mCornerX = mWidth;
-		if (y <= mHeight / 2)
+		if (y <= mHeight )
 			mCornerY = 0;
 		else
 			mCornerY = mHeight;
@@ -222,8 +222,8 @@ public class PageWidget extends View {
 					startAnimation(duration);
 				}
 			} else {
-				mTouch.x = mCornerX - 0.09f;
-				mTouch.y = mCornerY - 0.09f;
+				mTouch.x = mCornerX - 0.009f;
+				mTouch.y = mCornerY - 0.009f;
 			}
 			this.postInvalidate();
 		}

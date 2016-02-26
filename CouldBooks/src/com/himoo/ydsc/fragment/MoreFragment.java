@@ -1,6 +1,5 @@
 package com.himoo.ydsc.fragment;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,6 +25,7 @@ import com.himoo.ydsc.activity.more.UpdateSettingActivity;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
+import com.himoo.ydsc.dialog.ShopDialog;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.view.BookTitleBar;
@@ -128,19 +128,7 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 	@Override
 	public void initData() {
 		// TODO Auto-generated method stub
-		String value = OnlineConfigAgent.getInstance().getConfigParams(
-				getActivity(), "adstatue");
-		try {
-
-			scoreLevel = Integer.valueOf(OnlineConfigAgent.getInstance()
-					.getConfigParams(getActivity(), "scorelevel"));
-		} catch (Exception e) {
-			Log.e(e);
-			scoreLevel = 1000;
-		}
-		
-		if (value != null && value.equals("1"))
-			more_unLock.setText("积分商城（获取"+scoreLevel+"去掉广告）");
+		afreshUmengWallParams();
 		// 设置监听器
 		segment_book_update.setOnCheckedChangeListener(this);
 		// 初始化书籍更新类型
@@ -267,17 +255,22 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 	@Override
 	public void showOfferListDialog(final Context context, String dialogTitle,
 			String[] tips) {
-		// TODO Auto-generated method stub
-		final AlertDialog dialog = new AlertDialog.Builder(context).create();
+		ShopDialog.Builder buidler = new ShopDialog.Builder(context);
+		buidler.setTitle(dialogTitle);
 		MogoOfferChooserAdapter adapter = new MogoOfferChooserAdapter(context,
 				tips);
-		dialog.setTitle(dialogTitle);
-
 		ListView listView = new ListView(context);
-		listView.setBackgroundColor(0xffffffff);
+		listView.setBackgroundColor(0xfff6f6f6);
 		listView.setPadding(0, 0, 0, 0);
 		listView.setCacheColorHint(0x00000000);
+		listView.setSelector(getActivity().getResources().getDrawable(
+				R.drawable.listview_selector));
 		listView.setAdapter(adapter);
+		buidler.setContentView(listView);
+		final ShopDialog dialog = buidler.creat();
+		
+		dialog.getWindow().setBackgroundDrawableResource(
+				android.R.color.transparent);
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			@Override
@@ -292,21 +285,21 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 				MogoOffer.showSingleOffer(context, which);
 			}
 		});
-		dialog.setView(listView);
-		dialog.getWindow().setBackgroundDrawableResource(
-				android.R.color.transparent);
 		dialog.show();
+//		WindowManager.LayoutParams params = dialog.getWindow().getAttributes();    
+//		params.width = DeviceUtil.dip2px(context, 280);    
+//		dialog.getWindow().setAttributes(params); 
 	}
 
 	@Override
 	public void updatePoint(long ponit) {
 		// TODO Auto-generated method stub
-		if (ponit >=scoreLevel) {
+		if (ponit >= scoreLevel) {
 			SharedPreferences.getInstance().putBoolean(SpConstant.MOGOAD_SHOW,
 					false);
 		}
-		if(ponit>100)
-		more_unLock.setText("积分商城（当前积分：" + ponit + "分）");
+		if (ponit > 100)
+			more_unLock.setText("积分商城（当前积分：" + ponit + "分）");
 	}
 
 	@Override
@@ -339,6 +332,26 @@ public class MoreFragment extends BaseFragment implements UmengUpdateListener,
 		}
 		UmengUpdateAgent.setUpdateListener(null);
 		isClickable = false;
+	}
+
+	/**
+	 * 刷新在线参数和积分
+	 */
+	private void afreshUmengWallParams() {
+		String value = OnlineConfigAgent.getInstance().getConfigParams(
+				getActivity(), "adstatue");
+		try {
+			scoreLevel = Integer
+					.valueOf(OnlineConfigAgent.getInstance()
+							.getConfigParams(getActivity(), "scorelevel")
+							.equals("") ? "0" : OnlineConfigAgent.getInstance()
+							.getConfigParams(getActivity(), "scorelevel"));
+		} catch (Exception e) {
+			Log.e(e);
+			scoreLevel = 1000;
+		}
+		if (value != null && value.equals("1"))
+			more_unLock.setText("积分商城（获取" + scoreLevel + "去掉广告）");
 	}
 
 }

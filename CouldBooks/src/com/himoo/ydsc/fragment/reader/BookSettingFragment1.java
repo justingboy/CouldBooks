@@ -82,13 +82,14 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	private int position;
 	private boolean isNigthModeHand;
 
-	public static BookSettingFragment1 newInstance(String bookName,
+	public static BookSettingFragment1 newInstance(String bookName,String bookId,
 			int chapterSize, int type, int bookType, String statue, String gid,
 			String lastUrl, boolean isNightMode) {
 		BookSettingFragment1 fragment = new BookSettingFragment1();
 		Bundle bundle = new Bundle();
 		bundle.putInt("chapterSize", chapterSize);
 		bundle.putString("bookName", bookName);
+		bundle.putString("bookId", bookId);
 		bundle.putString("gid", gid);
 		bundle.putString("lastUrl", lastUrl);
 		bundle.putInt("type", type);
@@ -147,6 +148,7 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 		setListener();
 		setBooksettingNight();
 		jumpType = getArguments().getInt("type", 1);
+		bookId = getArguments().getString("bookId");
 		isAutoLoad = SharedPreferences.getInstance().getBoolean(
 				SpConstant.BOOK_SETTING_AUTO_LOAD, false);
 
@@ -225,6 +227,7 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 
 			Intent intent = new Intent(getActivity(), BookMarkActivity.class);
 			intent.putExtra("bookName", getArguments().getString("bookName"));
+			intent.putExtra("bookId", bookId);
 			intent.putExtra("position", currentPosition);
 			intent.putExtra("lastUrl", getArguments().getString("lastUrl"));
 			intent.putExtra("type", getArguments().getInt("type"));
@@ -304,6 +307,8 @@ public class BookSettingFragment1 extends Fragment implements OnClickListener,
 	private int jumpType;
 
 	private boolean isAutoLoad;
+
+	private String bookId;
 
 	/**
 	 * 改变图片选中时的图片

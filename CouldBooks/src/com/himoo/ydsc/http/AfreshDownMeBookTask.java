@@ -7,7 +7,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 
-import com.himoo.ydsc.download.DownLoaderTask;
+import com.himoo.ydsc.bookdl.DownLoaderTask2;
+import com.himoo.ydsc.bookdl.DownloadManager;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.FileUtils;
 
@@ -15,18 +16,23 @@ public class AfreshDownMeBookTask extends AsyncTask<Void, Void, Void> {
 
 	private Context context;
 	private String bookName;
+	private String bookId;
 	private String dowmloadUrl;
 	private FileUtils fileUtils;
 	private File dirFile;
 	private File zipFile;
 	private OnAfreshDownloadListener mListener;
 	private boolean isBookFileExist = false;
-
+	private boolean isNeedSendReceiver = false;
+	
+	
 	public AfreshDownMeBookTask(Context context, String bookName,
-			String dowmloadUrl, OnAfreshDownloadListener listner) {
+			String bookId, String dowmloadUrl,boolean isNeedSendReceiver, OnAfreshDownloadListener listner) {
 		this.context = context;
 		this.bookName = bookName;
+		this.bookId = bookId;
 		this.dowmloadUrl = dowmloadUrl;
+		this.isNeedSendReceiver = isNeedSendReceiver;
 		this.mListener = listner;
 
 	}
@@ -36,16 +42,16 @@ public class AfreshDownMeBookTask extends AsyncTask<Void, Void, Void> {
 		// TODO Auto-generated method stub
 		super.onPreExecute();
 		if (mListener != null)
-			mListener.onPreDeleted(bookName);
+			mListener.onPreDeleted(bookName,bookId);
 		fileUtils = new FileUtils(context);
 		dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/download"
-				+ File.separator + bookName + File.separator);
+				+ File.separator + bookName + "_" + bookId + File.separator);
 		if (dirFile.exists()) {
 			isBookFileExist = true;
 			Toast.show(context, "正在删除《" + bookName + "》");
 		}
 		zipFile = new File(FileUtils.mSdRootPath + "/CouldBook/download"
-				+ File.separator + bookName + ".zip");
+				+ File.separator + bookName + "_" + bookId + ".zip");
 	}
 
 	@Override
@@ -66,7 +72,7 @@ public class AfreshDownMeBookTask extends AsyncTask<Void, Void, Void> {
 		// TODO Auto-generated method stub
 		super.onPostExecute(result);
 		if (mListener != null)
-			mListener.onPreDeleted(bookName);
+			mListener.onPreDeleted(bookName,bookId);
 		if (isBookFileExist)
 			Toast.show(context, "删除《" + bookName + "》成功");
 		new Handler().postDelayed(new Runnable() {
@@ -76,24 +82,30 @@ public class AfreshDownMeBookTask extends AsyncTask<Void, Void, Void> {
 				// TODO Auto-generated method stub
 				if (isBookFileExist)
 					Toast.show(context, "重新下载《" + bookName + "》");
-				doDownLoadWork(dowmloadUrl, bookName, mListener);
+				doDownLoadWork(dowmloadUrl, bookName, bookId,context,isNeedSendReceiver, mListener);
 			}
 		}, 2000);
 
 	}
 
 	/**
-	 * 下载书籍,自己服务器中的书籍
+	 * 下载书籍
 	 * 
 	 * @param downloadUrl
 	 * @param bookName
 	 */
 	private void doDownLoadWork(String downloadUrl, String bookName,
-			OnAfreshDownloadListener listener) {
+			String bookId, Context context,boolean isNeedSendReceiver,OnAfreshDownloadListener listener) {
 
-		String filePath = fileUtils.getStorageDirectory() + bookName + ".zip";
-		DownLoaderTask task = new DownLoaderTask(downloadUrl, bookName,
-				filePath, (Activity) context, listener, true);
-		task.execute();
+		File file = new File(fileUtils.getStorageDirectory());
+		if (file != null && !file.exists())
+			file.mkdirs();
+		String filePath = fileUtils.getStorageDirectory() + bookName + "_"
+				+ bookId + ".zip";
+		DownLoaderTask2 task = new DownLoaderTask2(downloadUrl, bookName,
+				bookId, filePath, (Activity) context,false, listener);
+		DownloadManager.getInstance().addTask(bookName, bookId, task);
+		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
+
 }

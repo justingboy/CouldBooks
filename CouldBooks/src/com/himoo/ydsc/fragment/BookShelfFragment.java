@@ -3,6 +3,7 @@ package com.himoo.ydsc.fragment;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.content.BroadcastReceiver;
@@ -22,6 +23,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -42,6 +45,7 @@ import com.himoo.ydsc.animation.BookView;
 import com.himoo.ydsc.animation.BookView.OpenBookAnimEndListener;
 import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.bookdl.DownloadManager;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.dialog.BookDeletePopupWindow;
@@ -88,14 +92,19 @@ public class BookShelfFragment extends BaseFragment implements
 		OnPopupClickListener, OnSearchClickListener,
 		OnEditTextFocuseChangListener, OnCheckedChangeListener,
 		OnNewChapterUpdateListener, OnItemClickListener,
-		OnAfreshDownloadListener {
+		OnAfreshDownloadListener, OnScrollListener {
 
+	private HashMap<String, String> haskMap = new HashMap<String, String>();
+	/**  */
+	private boolean isScrollStateFling = false;
 	/** 标题栏 */
 	private BookTitleBar titleBar;
 	/** 判断是否处于删除状态 */
 	private boolean isDelectStute = false;
 	private Button bookSort;
-
+	/*** 在返回书架界面是否需要刷新adapter */
+	private boolean isNeedRefreshAdapter = false;
+	private int mCurrentScrollPosition;
 	private PullToRefreshGridView mPullToGridView;
 	private static GridView mGridView;
 	private static BookDownloadManager downloadManager;
@@ -123,14 +132,8 @@ public class BookShelfFragment extends BaseFragment implements
 	private static List<BookDownloadInfo> mDefaultSortList = new ArrayList<BookDownloadInfo>();
 	/** 记录打开书的位置 */
 	private int mCurrentClickPosition = -1;
-	/** 判断是否是最新下载 */
-	private static boolean isLastDownload = false;
-
 	private BookDownloadInfo book;
-
 	public BookView bookView;
-	/** 　正在下载的书名　 */
-	private static String downlaodBookName = "";
 	/** 　是否正在下载，下载中不可点击 */
 	public static boolean isDownloading = false;
 	/** 是否正在刷新中，刷新中不可点击　 */
@@ -211,6 +214,7 @@ public class BookShelfFragment extends BaseFragment implements
 			shelf_empty_image.setVisibility(View.GONE);
 		}
 		mGridView = mPullToGridView.getRefreshableView();
+		mGridView.setOnScrollListener(this);
 		mGridView.setOnItemClickListener(this);
 		mGridView.setOnItemLongClickListener(this);
 		mAdapter = new BookDownloadAdapter(getActivity(),
@@ -228,8 +232,10 @@ public class BookShelfFragment extends BaseFragment implements
 		case R.id.titlebar_left_title:
 			if (deletedList != null)
 				deletedList.clear();
+
 			if (!isDelectStute) {
 				if (mAdapter != null) {
+					mAdapter.isChoice = false;
 					mAdapter.isSelectedState = true;
 					mAdapter.notifyDataSetChanged();
 				}
@@ -248,6 +254,7 @@ public class BookShelfFragment extends BaseFragment implements
 			} else {
 
 				if (mAdapter != null) {
+					mAdapter.isChoice = false;
 					mAdapter.isSelectedState = false;
 					mAdapter.notifyDataSetChanged();
 				}
@@ -260,13 +267,14 @@ public class BookShelfFragment extends BaseFragment implements
 			break;
 
 		case R.id.titlebar_refresh:
+			if (isRefresh)
+				return;
 			if (NetWorkUtils.isNetConnected(getActivity())) {
-				if (SP.getInstance().getBoolean(downlaodBookName, true)) {
-
+				if (!DownloadManager.getInstance().isExistTask()) {
 					AnimationUtils.setViewRotating(getActivity(), imgRefresh);
 					isRefresh = true;
 					BookUpdateTask task = new BookUpdateTask(getActivity(),
-							null, 2);
+							null, null, 2);
 					task.setOnNewChapterListener(BookShelfFragment.this);
 					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				} else {
@@ -275,7 +283,6 @@ public class BookShelfFragment extends BaseFragment implements
 			} else {
 				Toast.show(getActivity(), "未连接网络!");
 			}
-			// }
 			break;
 
 		case R.id.btn_book_name_sort:
@@ -315,7 +322,6 @@ public class BookShelfFragment extends BaseFragment implements
 			// TODO Auto-generated method stub
 			SharedPreferences.getInstance().putInt("book_sort", which);
 			mAdapter.clear();
-			isLastDownload = false;
 			switch (which) {
 			case 1:
 				bookSort.setText("默认排序");
@@ -350,23 +356,23 @@ public class BookShelfFragment extends BaseFragment implements
 	public static class BookDownloadReceiver extends BroadcastReceiver {
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public synchronized void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
-			boolean downloadSuccess = intent.getBooleanExtra("DownloadSuccess",
-					false);
+			boolean downloadSuccess = intent.getBooleanExtra("success", false);
+			String bookName = intent.getStringExtra("bookName");
+			String bookId = intent.getStringExtra("bookId");
 			if (downloadSuccess) {
-				
-				android.util.Log.i("msg", "---downloadSuccess");
+				DownloadManager.getInstance().deleteTask(bookName, bookId);
+				SP.getInstance().putBookDownSuccess(bookName + bookId, false);
+				updateBookAuResume(bookName, bookId);
+				mAdapter.notifyDataSetChanged();
 			} else {
-				String bookName = intent.getStringExtra("bookName");
 				// 保存下载状态，false表示正在下载
-				SP.getInstance().putBoolean(bookName, false);
-				downlaodBookName = bookName;
+				SP.getInstance().putBookDownSuccess(bookName + bookId, false);
 				String dowloadUrl = intent.getStringExtra("dowloadUrl");
 				List<BookDownloadInfo> list = downloadManager.findLastBookInfo(
-						bookName, dowloadUrl);
+						bookName, bookId, dowloadUrl);
 				if (list != null && list.size() > 0) {
-					isLastDownload = true;
 					if (shelf_empty_image != null)
 						shelf_empty_image.setVisibility(View.GONE);
 					mAdapter.addFirstN(list.get(0));
@@ -411,8 +417,15 @@ public class BookShelfFragment extends BaseFragment implements
 
 			downloadManager.deletedBookList(deletedList);
 			for (int i = 0; i < deletedList.size(); i++) {
+				String bookName = deletedList.get(i).getBookName();
+				String bookId = deletedList.get(i).getBookId();
+				if (haskMap.containsKey(bookId)) {
+					haskMap.remove(bookId);
+					AnimationUtils.cancelAnim(imgRefresh);
+				}
 				BookMarkDb.getInstance(getActivity(), "book").deletBookMark(
-						deletedList.get(i).getBookName());
+						bookName, bookId);
+
 			}
 			if (popupWindow != null)
 				popupWindow.dismiss();
@@ -433,6 +446,8 @@ public class BookShelfFragment extends BaseFragment implements
 			isDelectStute = false;
 			if (mAdapter != null) {
 				mAdapter.isSelectedState = false;
+				mAdapter.isChoice = false;
+				deletedList.removeAll(mDownloadList);
 				mAdapter.notifyDataSetChanged();
 			}
 			if (deletedList != null && !deletedList.isEmpty())
@@ -543,14 +558,18 @@ public class BookShelfFragment extends BaseFragment implements
 					if (book.getBookSourceType() == 1) {
 						AfreshDownMeBookTask task = new AfreshDownMeBookTask(
 								getActivity(), book.getBookName(),
-								book.getDownloadUrl(), BookShelfFragment.this);
+								book.getBookId(), book.getDownloadUrl(), false,
+								BookShelfFragment.this);
 						task.execute();
 
 					} else if (book.getBookSourceType() == 2) {
+						DownloadManager.getInstance().deleteTask(
+								book.getBookName(), book.getBookId());
 						// 重新下载这本书,书是百度服务器上的
 						AfreshDownloadTask task = new AfreshDownloadTask(
 								getActivity(), book.getDownloadUrl(),
-								book.getBookName(), BookShelfFragment.this);
+								book.getBookName(), book.getBookId(),
+								BookShelfFragment.this);
 						task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 					}
 				} else {
@@ -566,6 +585,8 @@ public class BookShelfFragment extends BaseFragment implements
 				UmengShare.getInstance().addCustomPlatforms(getActivity());
 				break;
 			case 3:
+				DownloadManager.getInstance().deleteTask(book.getBookName(),
+						book.getBookId());
 				new DeleteBookTask(book, book.getBookName(),
 						book.getBookSourceType(), false).execute();
 
@@ -591,55 +612,15 @@ public class BookShelfFragment extends BaseFragment implements
 			mAdapter.afreshDisplayOption();
 			mAdapter.notifyDataSetChanged();
 		}
-		if (!SharedPreferences.getInstance().getBoolean(
-				SpConstant.BOOK_SHELF_DIRECTION, true)) {
-			if (mAdapter != null) {
-				if (mCurrentClickPosition != -1) {
-					BookDownloadInfo oldBook = null;
-					if (isLastDownload) {
-						if (isLastDownload) {
-							oldBook = mAdapter.getFirst();
-							isLastDownload = false;
-						}
-					} else {
-						// sortBookList(mDownloadList);
-						oldBook = book;
-					}
-					if (oldBook != null) {
-						BookDownloadInfo newBook = downloadManager
-								.querryByBookName(oldBook.getBookName());
-						mAdapter.set(oldBook, newBook);
-						mGridView.setSelection(mCurrentClickPosition);
-						mAdapter.notifyDataSetChanged();
-					}
-				}
-			}
-		} else if (SharedPreferences.getInstance().getBoolean(
-				SpConstant.BOOK_SHELF_DIRECTION, true)) {
-			if (mAdapter != null) {
-				if (mCurrentClickPosition != -1) {
-					BookDownloadInfo oldBook = null;
-					if (isLastDownload) {
-						oldBook = mAdapter.getFirst();
-						isLastDownload = false;
-					} else {
-						oldBook = book;
-					}
-					if (oldBook != null) {
-						BookDownloadInfo newBook = downloadManager
-								.querryByBookName(oldBook.getBookName());
-						mAdapter.set(oldBook, newBook);
-						mGridView.setSelection(mCurrentClickPosition);
-						mAdapter.notifyDataSetChanged();
-					}
-				}
-			}
-		}
-		mCurrentClickPosition = -1;
-		if (null != bookView) {
+		if (null != bookView && isNeedRefreshAdapter) {
 			bookView.startCloseBookAnimation(null);
 			bookView = null;
 		}
+		if (isNeedRefreshAdapter) {
+			updateReadProgress();
+		}
+		mCurrentClickPosition = -1;
+		isNeedRefreshAdapter = false;
 	}
 
 	/**
@@ -650,6 +631,7 @@ public class BookShelfFragment extends BaseFragment implements
 		public int position;
 		public Context mContext;
 		public String bookName;
+		public String bookId;
 		// 表示书的状态是连载还是完结
 		public String statue;
 		public int bookType;
@@ -657,11 +639,12 @@ public class BookShelfFragment extends BaseFragment implements
 		ArrayList<BaiduBookChapter> list;
 
 		public OpenBookAsyncTask(Context context, int position,
-				String bookName, String statue, int bookType, String lastUrl,
-				BookView bookView) {
+				String bookName, String bookId, String statue, int bookType,
+				String lastUrl, BookView bookView) {
 			this.mContext = context;
 			this.position = position;
 			this.bookName = bookName;
+			this.bookId = bookId;
 			this.statue = statue;
 			this.bookType = bookType;
 			this.lastUrl = lastUrl;
@@ -679,15 +662,15 @@ public class BookShelfFragment extends BaseFragment implements
 		@Override
 		protected BookMark doInBackground(Void... params) {
 			// TODO Auto-generated method stub
-			BookMarkUtils.getInstance().getBookMark(mContext, bookName, "");
+			BookMarkUtils.getInstance().getBookMark(mContext, bookName, bookId);
 			list = LocalReaderUtil.getInstance().parseLocalBook(bookName,
-					bookType);
+					bookId, bookType);
 			if (list == null || list.isEmpty()) {
 				return null;
 			} else {
-				IOHelper.getBook(mContext, bookName, list);
+				IOHelper.getBook(mContext, bookName, bookId, list);
 				BookMark bookMark = BookMarkDb.getInstance(mContext, "book")
-						.querryReaderPos(bookName);
+						.querryReaderPos(bookName, bookId);
 				return bookMark;
 			}
 		}
@@ -726,14 +709,19 @@ public class BookShelfFragment extends BaseFragment implements
 					@Override
 					public void onOpenBookAnimEnd(BookView bookView) {
 						// TODO Auto-generated method stub
-						int index = mDownloadList.indexOf(book);
-						book.setBookIsRead(true);
-						book.setAutoResume(true);
-						mDownloadList.set(index, book);
-						startToActivity(bookName, bookType, lastUrl, statue,
-								result);
+						if (!book.getBookIsRead()) {
+							int index = mDownloadList.indexOf(book);
+							book.setBookIsRead(true);
+							book.setAutoResume(true);
+							mDownloadList.set(index, book);
+							downloadManager.setBookReader(bookName, bookId);
+							mAdapter.notifyDataSetChanged();
+						}
+						startToActivity(bookName, bookId, bookType, lastUrl,
+								statue, result);
+						isNeedRefreshAdapter = true;
 					}
-				}, bookView.getParent(), readerBg);
+				}, bookView.getParent(), readerBg, R.id.shelf_book_image);
 
 			} catch (Exception e) {
 				Log.e(e);
@@ -741,11 +729,12 @@ public class BookShelfFragment extends BaseFragment implements
 		}
 	}
 
-	private void startToActivity(String bookName, int bookType, String lastUrl,
-			String statue, BookMark result) {
+	private void startToActivity(String bookName, String bookId, int bookType,
+			String lastUrl, String statue, BookMark result) {
 
 		Intent intent = new Intent(getActivity(), ReaderActivity.class);
 		intent.putExtra("bookName", bookName);
+		intent.putExtra("bookId", bookId);
 		// 该Type表示从哪里跳转到阅读界面 */
 		intent.putExtra("type", 2);
 		intent.putExtra("bookType", bookType);
@@ -787,13 +776,17 @@ public class BookShelfFragment extends BaseFragment implements
 			SharedPreferences.getInstance().putBoolean(
 					SpConstant.BOOK_SHELF_DIRECTION, true);
 			mGridView.setNumColumns(3);
+			mGridView.setSelection(mCurrentScrollPosition);
 			mAdapter.notifyDataSetChanged();
+			afreshAgain();
 			break;
 		case R.id.book_sort_vertial:
 			SharedPreferences.getInstance().putBoolean(
 					SpConstant.BOOK_SHELF_DIRECTION, false);
 			mGridView.setNumColumns(1);
+			mGridView.setSelection(mCurrentScrollPosition);
 			mAdapter.notifyDataSetChanged();
+			afreshAgain();
 			break;
 
 		default:
@@ -806,9 +799,13 @@ public class BookShelfFragment extends BaseFragment implements
 	public boolean onItemLongClick(AdapterView<?> parent, View view,
 			int position, long id) {
 		// TODO Auto-generated method stub
-		BookDownloadInfo book = (BookDownloadInfo) parent
-				.getItemAtPosition(position);
-		showBookShareDialog(book);
+		if (!haskMap.isEmpty()) {
+			Toast.showLong("有书下载中，请稍后...");
+		} else {
+			BookDownloadInfo book = (BookDownloadInfo) parent
+					.getItemAtPosition(position);
+			showBookShareDialog(book);
+		}
 		return true;
 
 	}
@@ -851,24 +848,28 @@ public class BookShelfFragment extends BaseFragment implements
 				return;
 			mCurrentClickPosition = position;
 			// 已经下载完成
-			if (downloadManager.queryBookDownSuccess(book.getBookName())) {
+			if (book.isAutoResume()) {
+				if (DownloadManager.getInstance().isExistTask(
+						book.getBookName(), book.getBookId())) {
+					Toast.showBg(getActivity(), "整本更新中,请稍后打开");
+					return;
+				}
 
-				if (SP.getInstance().getBoolean(book.getBookName(), true)
-						&& !isRefresh) {
+				if (!isRefresh) {
 					new OpenBookAsyncTask(getActivity(), position,
-							book.getBookName(), book.getBookStatue(),
-							book.getBookSourceType(), book.getLastUrl(),
-							bookView).execute();
+							book.getBookName(), book.getBookId(),
+							book.getBookStatue(), book.getBookSourceType(),
+							book.getLastUrl(), bookView).execute();
 				} else {
-					Toast.showBg(getActivity(), isRefresh ? "更新中,请稍后打开"
-							: "下载中,请稍后打开");
+					Toast.showBg(getActivity(), "更新中,请稍后打开");
 					mCurrentClickPosition = -1;
 				}
 			} else {
-				if (book.getBookSourceType() == 2) {
-					Toast.showBg(getActivity(), "下载中,请稍后打开");
+				if (DownloadManager.getInstance().isExistTask(
+						book.getBookName(), book.getBookId())) {
+					Toast.showBg(getActivity(), "正在下载,请稍后打开");
 				} else {
-					Toast.showBg(getActivity(), "未下载完成,'长按'重新下载!");
+					Toast.showBg(getActivity(), "未完成下载,'长按'重新下载!");
 				}
 				mCurrentClickPosition = -1;
 			}
@@ -948,10 +949,9 @@ public class BookShelfFragment extends BaseFragment implements
 	}
 
 	@Override
-	public void onPreDeleted(String bookName) {
+	public void onPreDeleted(String bookName, String bookId) {
 		// TODO Auto-generated method stub
-		downlaodBookName = bookName;
-		SP.getInstance().putBoolean(bookName, false);
+		haskMap.put(bookId, bookId);
 		AnimationUtils.setViewRotating(getActivity(), imgRefresh);
 	}
 
@@ -968,13 +968,10 @@ public class BookShelfFragment extends BaseFragment implements
 	}
 
 	@Override
-	public void onPostDownloadSuccess(String bookName) {
+	public void onPostDownloadSuccess(String bookName, String bookId) {
 		// TODO Auto-generated method stub
 		AnimationUtils.cancelAnim(imgRefresh);
-		SP.getInstance().putBoolean(bookName, true);
-		if (mAdapter != null)
-			mAdapter.notifyDataSetChanged();
-
+		haskMap.remove(bookId);
 	}
 
 	@Override
@@ -1027,17 +1024,19 @@ public class BookShelfFragment extends BaseFragment implements
 				for (int i = 0; i < deletedList.size(); i++) {
 					// 删除标签
 					String bookName = deletedList.get(i).getBookName();
+					String bookId = deletedList.get(i).getBookId();
+					DownloadManager.getInstance().deleteTask(bookName, bookId);
 					downloadType = deletedList.get(i).getBookSourceType();
 					BookMarkDb.getInstance(getActivity(), "book")
-							.deletBookMark(bookName);
+							.deletBookMark(bookName, bookId);
 
 					if (downloadType == 1) {
-						fileUtils.deleteMeBook(bookName);
+						fileUtils.deleteMeBook(bookName, bookId);
 
 					} else if (downloadType == 2) {
 						// 删除百度的书籍本地数据，主要保存了用于查找换源
 						fileUtils.deleteChapterDbByName(bookName);
-						fileUtils.deleteBaiduBook(bookName);
+						fileUtils.deleteBaiduBook(bookName, bookId);
 					}
 
 				}
@@ -1045,12 +1044,12 @@ public class BookShelfFragment extends BaseFragment implements
 			} else {
 
 				if (downloadType == 1) {
-					fileUtils.deleteMeBook(bookName);
+					fileUtils.deleteMeBook(bookName, book.getBookId());
 
 				} else if (downloadType == 2) {
 					// 删除百度的书籍本地数据，主要保存了用于查找换源
 					fileUtils.deleteChapterDbByName(bookName);
-					fileUtils.deleteBaiduBook(bookName);
+					fileUtils.deleteBaiduBook(bookName, book.getBookId());
 				}
 			}
 
@@ -1069,7 +1068,8 @@ public class BookShelfFragment extends BaseFragment implements
 				downloadManager.deletedBookList(deletedList);
 				for (int i = 0; i < deletedList.size(); i++) {
 					BookMarkDb.getInstance(getActivity(), "book")
-							.deletBookMark(deletedList.get(i).getBookName());
+							.deletBookMark(deletedList.get(i).getBookName(),
+									deletedList.get(i).getBookId());
 				}
 				mDownloadList.remove(book);
 				mAdapter.remove(deletedList);
@@ -1095,6 +1095,88 @@ public class BookShelfFragment extends BaseFragment implements
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return null;
+		}
+	}
+
+	/**
+	 * 查找需要更新的Book
+	 * 
+	 * @param bookName
+	 * @return
+	 */
+	private static BookDownloadInfo getNeedUpateBook(String bookName,
+			String bookId) {
+		for (BookDownloadInfo book : mDownloadList) {
+			if (book.getBookName().equals(bookName)
+					&& book.getBookId().equals(bookId))
+				return book;
+		}
+		return null;
+	}
+
+	/**
+	 * 更新下载完成的状态
+	 * 
+	 * @param bookName
+	 */
+	private static void updateBookAuResume(String bookName, String bookId) {
+		BookDownloadInfo book = getNeedUpateBook(bookName, bookId);
+		int index = mDownloadList.indexOf(book);
+		book.setBookIsRead(false);
+		book.setAutoResume(true);
+		mDownloadList.set(index, book);
+	}
+
+	/**
+	 * 更新阅读进度
+	 */
+	private void updateReadProgress() {
+		BookDownloadInfo oldBook = mAdapter.getItem(mCurrentClickPosition);
+		BookDownloadInfo newBook = downloadManager.querryByBookName(
+				oldBook.getBookName(), oldBook.getBookId());
+		mAdapter.set(oldBook, newBook);
+		mGridView.setSelection(mCurrentClickPosition);
+		mAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		// TODO Auto-generated method stub
+		switch (scrollState) {
+		// 空闲状态
+		case OnScrollListener.SCROLL_STATE_IDLE:
+			isScrollStateFling = false;
+			break;
+		// 滚动状态
+		case OnScrollListener.SCROLL_STATE_FLING:
+			isScrollStateFling = true;
+			break;
+		// 触摸后滚动
+		case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+			isScrollStateFling = false;
+			break;
+		}
+	}
+
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		mCurrentScrollPosition = firstVisibleItem;
+	}
+
+	/**
+	 * 再次刷新列表
+	 */
+	private void afreshAgain() {
+		if (isScrollStateFling) {
+			new Handler().postDelayed(new Runnable() {
+
+				@Override
+				public void run() {
+					// TODO Auto-generated method stub
+					mAdapter.notifyDataSetChanged();
+				}
+			}, 100);
 		}
 	}
 

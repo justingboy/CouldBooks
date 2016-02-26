@@ -11,7 +11,6 @@ import android.database.Cursor;
 import android.util.Log;
 
 import com.himoo.ydsc.base.BaseApplication;
-import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BookDetails;
 import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.util.FileUtils;
@@ -157,17 +156,19 @@ public class BookDownloadManager {
 
 	/**
 	 * 查询数据库中最新插入一条数据
-	 * 
+	 * @param bookName
+	 * @param bookId
+	 * @param dowloadUrl
 	 * @return
 	 */
 	public List<BookDownloadInfo> findLastBookInfo(String bookName,
-			String dowloadUrl) {
+			String bookId, String dowloadUrl) {
 
 		try {
 			List<BookDownloadInfo> list = db.findAll(Selector
 					.from(BookDownloadInfo.class)
 					.where("downloadUrl", "=", dowloadUrl)
-					.and("bookName", "=", bookName));
+					.and("bookName", "=", bookName).and("bookId", "=", bookId));
 			return list;
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
@@ -186,6 +187,7 @@ public class BookDownloadManager {
 			List<BookDownloadInfo> list = db.findAll(Selector
 					.from(BookDownloadInfo.class)
 					.where("downloadUrl", "=", book.getBook_Download())
+					.and("bookId", "=", book.getBook_ID()+"")
 					.and("bookName", "=", book.getBook_Name()));
 			if (list == null || list.isEmpty())
 				return false;
@@ -200,14 +202,16 @@ public class BookDownloadManager {
 
 	/**
 	 * 判断数据库中是否已经下载过
-	 * 
-	 * @param book
+	 * @param bookName
+	 * @param bookId
 	 * @return
 	 */
-	public BookDownloadInfo querryByBookName(String bookName) {
+	public BookDownloadInfo querryByBookName(String bookName, String bookId) {
 		try {
-			List<BookDownloadInfo> list = db.findAll(Selector.from(
-					BookDownloadInfo.class).where("bookName", "=", bookName));
+			List<BookDownloadInfo> list = db.findAll(Selector
+					.from(BookDownloadInfo.class)
+					.where("bookName", "=", bookName)
+					.and("bookId", "=", bookId));
 			if (list != null && !list.isEmpty())
 
 				return list.get(0);
@@ -222,14 +226,16 @@ public class BookDownloadManager {
 
 	/**
 	 * 根据书名判断该书是否下载过
-	 * 
 	 * @param bookName
+	 * @param bookId
 	 * @return
 	 */
-	public boolean isDownload(String bookName) {
+	public boolean isDownload(String bookName, String bookId) {
 		try {
-			List<BookDownloadInfo> list = db.findAll(Selector.from(
-					BookDownloadInfo.class).where("bookName", "=", bookName));
+			List<BookDownloadInfo> list = db.findAll(Selector
+					.from(BookDownloadInfo.class)
+					.where("bookName", "=", bookName)
+					.and("bookId", "=", bookId));
 			if (list == null || list.isEmpty())
 				return false;
 			else
@@ -289,6 +295,7 @@ public class BookDownloadManager {
 			String saveFileName, boolean autoResume, boolean autoRename,
 			final RequestCallBack<File> callback) throws DbException {
 		final BaiduInfo bookDownloadInfo = new BaiduInfo();
+		bookDownloadInfo.setBookId(bookDetails.getBook_ID() + "");
 		bookDownloadInfo.setDownloadUrl(bookDetails.getBook_Download());
 		bookDownloadInfo.setAutoRename(autoRename);
 		bookDownloadInfo.setAutoResume(false);
@@ -312,41 +319,18 @@ public class BookDownloadManager {
 
 	}
 
-	/**
-	 * 下载百度书籍
-	 * 
-	 * @param book
-	 * @throws DbException
-	 */
-	public void addBaiduBookDownload(BaiduBook book) throws DbException {
-		BookDownloadInfo bookDownloadInfo = new BookDownloadInfo();
-		bookDownloadInfo.setSerialize(book.getStatus().equals("完结"));
-		bookDownloadInfo.setBookSourceType(2);
-		bookDownloadInfo.setBookName(book.getTitle());
-		bookDownloadInfo.setBookAuthor(book.getAuthor());
-		bookDownloadInfo.setBookLastUpdateTime(System.currentTimeMillis() + "");
-		bookDownloadInfo.setBookCoverImageUrl(book.getCoverImage());
-		bookDownloadInfo.setBookIsRead(false);
-		bookDownloadInfo.setBookReadHository("您还没阅读这本书呢");
-		bookDownloadInfo.setBookReadProgress(100L);
-		bookDownloadInfo.setLastReaderProgress("0%");
-		bookDownloadInfo.setLastChapterName(book.getLastChapter().getText());
-		bookDownloadInfo.setLastChapterName(book.getListurl());
-		downloadInfoList.add(bookDownloadInfo);
-		db.saveBindingId(bookDownloadInfo);
-
-	}
-
+	
 	/**
 	 * 保存阅读进度
-	 * 
-	 * @param bookName
+	 * @param bookMark
+	 * @param chapterNum
 	 */
 	public void updateReaderProgress(BookMark bookMark, int chapterNum) {
 		List<BaiduInfo> list;
 		try {
-			list = db.findAll(Selector.from(BaiduInfo.class).where("bookName",
-					"=", bookMark.getBookName()));
+			list = db.findAll(Selector.from(BaiduInfo.class)
+					.where("bookName", "=", bookMark.getBookName())
+					.and("bookId", "=", bookMark.getBookId()));
 			if (list != null && !list.isEmpty()) {
 				BaiduInfo bookinfo = list.get(0);
 				bookinfo.setBookReadHository(bookMark.getChapterName());
@@ -382,16 +366,18 @@ public class BookDownloadManager {
 
 	}
 
+
 	/**
-	 * 设置阅读
-	 * 
+	 * 设置阅读状态
 	 * @param bookName
+	 * @param bookId
 	 */
-	public void setBookReader(String bookName) {
+	public void setBookReader(String bookName, String bookId) {
 		List<BaiduInfo> list;
 		try {
-			list = db.findAll(Selector.from(BaiduInfo.class).where("bookName",
-					"=", bookName));
+			list = db.findAll(Selector.from(BaiduInfo.class)
+					.where("bookName", "=", bookName)
+					.and("bookId", "=", bookId));
 			if (list != null && !list.isEmpty()) {
 				BaiduInfo bookinfo = list.get(0);
 				bookinfo.setBookIsRead(true);
@@ -464,16 +450,20 @@ public class BookDownloadManager {
 		db.delete(BookDownloadInfo);
 	}
 
+
 	/**
 	 * 设置下载完成
-	 * 
 	 * @param bookName
+	 * @param bookId
+	 * @param isSuccess
 	 */
-	public void updateDownSuccess(String bookName, boolean isSuccess) {
+	public void updateDownSuccess(String bookName, String bookId,
+			boolean isSuccess) {
 		List<BaiduInfo> list;
 		try {
-			list = db.findAll(Selector.from(BaiduInfo.class).where("bookName",
-					"=", bookName));
+			list = db.findAll(Selector.from(BaiduInfo.class)
+					.where("bookName", "=", bookName)
+					.and("bookId", "=", bookId));
 			if (list != null && !list.isEmpty()) {
 				BaiduInfo bookinfo = list.get(0);
 				bookinfo.setAutoResume(isSuccess);
@@ -485,17 +475,20 @@ public class BookDownloadManager {
 		}
 	}
 
+
 	/**
-	 * 查询状态
-	 * 
+	 * 查询状态 下载是否完成
+	 * @param bookName
+	 * @param bookId
 	 * @return
 	 */
-	public boolean queryBookDownSuccess(String bookName) {
+	public boolean queryBookDownSuccess(String bookName, String bookId) {
 
 		List<BaiduInfo> list;
 		try {
-			list = db.findAll(Selector.from(BaiduInfo.class).where("bookName",
-					"=", bookName));
+			list = db.findAll(Selector.from(BaiduInfo.class)
+					.where("bookName", "=", bookName)
+					.and("bookId", "=", bookId));
 			if (list != null && !list.isEmpty()) {
 				BaiduInfo bookinfo = list.get(0);
 				return bookinfo.isAutoResume();

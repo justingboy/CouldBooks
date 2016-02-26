@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,11 +27,10 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.bookdl.DownloadManager;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.download.BaiduBookDownload;
-import com.himoo.ydsc.fragment.BookShelfFragment;
-import com.himoo.ydsc.fragment.BookShelfFragment.BookDownloadReceiver;
 import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.listener.NoDoubleClickListener;
@@ -99,7 +97,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	/** 当前点击的Item位置 */
 	private int mCurrentClickPosition = -1;
 	/** 广播通知已经下载了 */
-	private BookDownloadReceiver receiver;
+	// private BookDownloadReceiver receiver;
 	/** 判断该书是否已经下载 */
 	private boolean isDownload;
 	private boolean isAutoLoad;
@@ -194,7 +192,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				.findViewById(R.id.baidu_book_download);
 		bookEvaluation = (Button) headerView
 				.findViewById(R.id.baidu_book_evaluation);
-//		initDownlaodButtonStatue();
+		// initDownlaodButtonStatue();
 		ViewSelector.setButtonSelector(this, bookDownload);
 		ViewSelector.setButtonSelector(this, bookEvaluation);
 		Log.i("CoverImage1 = " + book.getCoverImage());
@@ -227,12 +225,13 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	 */
 	private void initDownlaodButtonStatue() {
 		isDownload = BaiduBookDownload.getInstance(this).isDownload(
-				book.getTitle());
+				book.getTitle(), book.getGid());
 		String statue = book.getStatus();
 		bookDownload.setText(isDownload ? statue.equals("完结") ? "完结" : "更新"
 				: "下载");
 		// 设置下载控件的状态
-		if (!SP.getInstance().getBoolean(book.getTitle(), true)) {
+		if (DownloadManager.getInstance().isExistTask(book.getTitle(),
+				book.getGid())) {
 			bookDownload.setText("正在下载");
 			bookDownload.setAlpha(0.5f);
 			bookDownload.setEnabled(false);
@@ -297,7 +296,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	public void onParseSuccess(ArrayList<BaiduBookChapter> list) {
 		// TODO Auto-generated method stub
 		dismissRefreshDialog();
-		IOHelper.getBook(this, book.getTitle(), list, book);
+		IOHelper.getBook(this, book.getTitle(), book.getGid(), list, book);
 		initData(list);
 
 	}
@@ -349,7 +348,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 					return;
 				} else {
 					BookUpdateTask task = new BookUpdateTask(this,
-							book.getTitle(), 1);
+							book.getTitle(), book.getGid(), 1);
 					task.setOnNewChapterListener(this);
 					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				}
@@ -359,13 +358,16 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				try {
 					BaiduBookDownload.getInstance(this).addBaiduBookDownload(
 							book);
-					SP.getInstance().putBoolean(book.getTitle(), false);
+					SP.getInstance().putBookDownSuccess(
+							book.getTitle() + book.getGid(), false);
 				} catch (DbException e) {
 					// TODO Auto-generated catch block
 					Log.e("插入数据库失败" + e.getMessage());
 				}
-				new SaveAsyncTask(bookList)
-						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+				SaveAsyncTask downloadTask = new SaveAsyncTask(bookList);
+				DownloadManager.getInstance().addTask(book.getTitle(),
+						book.getGid(), downloadTask);
+				downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				registeBroadcast();
 				// 设置下载控件的状态
 				bookDownload.setText("正在下载");
@@ -419,7 +421,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		@Override
 		protected void onPreExecute() {
 			dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-					+ File.separator + book.getTitle() + File.separator);
+					+ File.separator + book.getTitle() + "_" + book.getGid()
+					+ File.separator);
 			if (!dirFile.exists())
 				dirFile.mkdirs();
 		}
@@ -428,7 +431,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		protected String doInBackground(Void... params) {
 			// TODO Auto-generated method stub
 			try {
-
+				//
 				// ChapterDb.getInstance().createDb(BaiduDetailsActivity.this,
 				// book.getTitle());
 				// ChapterDb.getInstance().saveBookChapter(list);
@@ -443,6 +446,13 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 							downNotification.getNetSpeed());
 				}
 				for (int i = 0; i < allChapterLength; i++) {
+					if (isCancelled()) {
+						downNotification.notifiManger
+								.cancel(downNotification.NOTIFI_ID);
+						SP.getInstance().remove(bookName, book.getGid());
+						return null;
+					}
+
 					BaiduBookChapter chapter = list.get(i);
 					String url = getChapterUrl(chapter);
 					String chapterName = chapter.getText().trim()
@@ -505,7 +515,8 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				}
 			} catch (Exception e) {
 				MyLogger.kLog().e(e);
-				SP.getInstance().putBoolean(book.getTitle(), true);
+				SP.getInstance().putBookDownSuccess(
+						book.getTitle() + book.getGid(), true);
 			}
 			return null;
 		}
@@ -517,25 +528,21 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 			// BaiduBookDownload.getInstance(BaiduDetailsActivity.this)
 			// .updateDownlaodstatue(book.getTitle());
 			try {
-				SP.getInstance().putBoolean(book.getTitle(), true);
+				SP.getInstance().putBookDownSuccess(
+						book.getTitle() + book.getGid(), true);
 				bookDownload.setText("完成");
-//				if(intent!=null)
-//				{
-//					intent.putExtra("DownloadSuccess", true);
-//					sendBroadcast(intent);
-////					if (receiver != null)
-////						unregisterReceiver(receiver);
-//				}
 				BaiduBookDownload.getInstance(BaiduDetailsActivity.this)
-						.updateDownSuccess(book.getTitle());
+						.updateDownSuccess(book.getTitle(), book.getGid());
 				Toast.showLong(BaiduDetailsActivity.this, "《" + book.getTitle()
 						+ "》下载完成");
+				sendDownloadSuccessReceiver();
 				new Handler().postDelayed(new Runnable() {
 
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						downNotification.notifiManger.cancelAll();
+						downNotification.notifiManger
+								.cancel(downNotification.NOTIFI_ID);
 					}
 				}, 3000);
 			} catch (Exception e) {
@@ -597,6 +604,7 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 				+ "appui=alaxs&gid=" + book.getGid() + "&dir=1&ajax=1";
 		intent.putExtra("lastUrl", lastUrl);
 		intent.putExtra("gid", book.getGid());
+		intent.putExtra("bookId", book.getGid());
 		intent.putExtra("chapterName", chapter.getText().trim());
 		intent.putExtra("chapterUrl", getChapterUrl(chapter));
 		intent.putExtra("index", chapter.getIndex());
@@ -630,23 +638,28 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 	protected void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		if (receiver != null)
-			unregisterReceiver(receiver);
+		// if (receiver != null)
+		// unregisterReceiver(receiver);
 	}
 
 	/**
 	 * 注册广播
 	 */
 	private void registeBroadcast() {
-		receiver = new BookShelfFragment.BookDownloadReceiver();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(ACTION);
-		registerReceiver(receiver, filter);
 		intent = new Intent(ACTION);
 		intent.putExtra("bookName", book.getTitle());
+		intent.putExtra("bookId", book.getGid());
 		String url = HttpConstant.BAIDU_BOOK_DETAILS_URL + "appui=alaxs&gid="
 				+ book.getGid() + "&dir=1&ajax=1";
 		intent.putExtra("dowloadUrl", url);
+		sendBroadcast(intent);
+	}
+
+	private void sendDownloadSuccessReceiver() {
+		intent = new Intent(ACTION);
+		intent.putExtra("success", true);
+		intent.putExtra("bookName", book.getTitle());
+		intent.putExtra("bookId", book.getGid());
 		sendBroadcast(intent);
 	}
 

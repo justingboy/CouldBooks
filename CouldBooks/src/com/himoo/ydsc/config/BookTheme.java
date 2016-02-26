@@ -266,6 +266,7 @@ public class BookTheme {
 		coverErrorList.add("回到三国变成蟒");
 		coverErrorList.add("最后一个阴阳师");
 		coverErrorList.add("史上最强内线");
+		coverErrorList.add("医手遮天");
 		coverErrorList.add("爱劫难桃总裁独家盛宠");
 		coverErrorList.add("龙帝的萌狐妖妻");
 		coverErrorList.add("御兽女少主逆世小王妃");

@@ -18,6 +18,9 @@ import com.adsmogo.offers.MogoOffer;
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseActivity;
 import com.himoo.ydsc.config.BookTheme;
+import com.himoo.ydsc.config.SpConstant;
+import com.himoo.ydsc.dialog.IndicateDialog;
+import com.himoo.ydsc.dialog.IndicateDialog.OnDialogDismissListener;
 import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.fragment.BookShelfFragment;
 import com.himoo.ydsc.fragment.ChoiceFragment;
@@ -36,7 +39,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.umeng.onlineconfig.OnlineConfigAgent;
 import com.umeng.update.UmengUpdateAgent;
 
-public class HomeActivity extends BaseActivity {
+public class HomeActivity extends BaseActivity implements
+		OnDialogDismissListener {
 
 	/** RadioGroup */
 	@ViewInject(R.id.main_bottom_group)
@@ -101,6 +105,14 @@ public class HomeActivity extends BaseActivity {
 
 		Log.d(SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST));
+		if (!SharedPreferences.getInstance().getBoolean(
+				SpConstant.DIALOG_INDICATE_SHELF, false)) {
+			
+			IndicateDialog dialog = new IndicateDialog(this, this);
+			dialog.create();
+			dialog.setIndicateDrawable(R.drawable.book_shelf_indicate);
+			dialog.show();
+		}
 
 	}
 
@@ -336,6 +348,13 @@ public class HomeActivity extends BaseActivity {
 				mCurrentSelected);
 		// super.onSaveInstanceState(outState);
 
+	}
+
+	@Override
+	public void onDialogDismiss() {
+		// TODO Auto-generated method stub
+		SharedPreferences.getInstance().putBoolean(
+				SpConstant.DIALOG_INDICATE_SHELF, true);
 	}
 
 }

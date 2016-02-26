@@ -18,7 +18,6 @@ import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.reader.bean.Chapter;
 import com.himoo.ydsc.reader.dao.BookMark;
-import com.himoo.ydsc.reader.dao.BookMarkDb;
 import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.JccUtil;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -72,11 +71,17 @@ public class BookPage {
 	private Typeface typeface;
 	private int typefaceIndex;
 	private int mogoAdHeight = 0;
+	private String bookId;
 
 	Bitmap bookMarktBitmap = null;
 	Paint mBitmapPaint = new Paint();
 
 	private int mTextOffWidth = 1;
+
+	/**
+	 * 表示从哪跳转的 1：详情界面，2:书架
+	 */
+	private int jumpType = 1;
 
 	/**
 	 * 在新建一个BookPage对象时，需要向其提供数据，以支持屏幕翻页功能。
@@ -90,8 +95,10 @@ public class BookPage {
 	 */
 	public BookPage(Context context, int screenWidth, int screenHeight,
 			Chapter chapter, int currentPage, int pageCount, int bookType,
-			boolean isNeedMogoAd) {
+			boolean isNeedMogoAd, int jumpType,String bookId) {
 		mContext = context;
+		this.bookId = bookId;
+		this.jumpType = jumpType;
 		mTextOffWidth = DeviceUtil.dip2px(context, 2);
 		bookMarktBitmap = BitmapFactory.decodeResource(mContext.getResources(),
 				R.drawable.iphone_bookmark);
@@ -135,8 +142,9 @@ public class BookPage {
 	 * @param screenHeight
 	 */
 	public BookPage(Context context, int screenWidth, int screenHeight,
-			boolean isNeedMogoAd) {
+			boolean isNeedMogoAd, int jumpType) {
 		mContext = context;
+		this.jumpType = jumpType;
 		mTextOffWidth = DeviceUtil.dip2px(context, 2);
 		this.screenHeight = screenHeight;
 		this.screenWidth = screenWidth;
@@ -475,55 +483,64 @@ public class BookPage {
 	 * @param c
 	 */
 	public void draw(Context context, Canvas c) {
-		if (linesVe.size() == 0)
-			nextPage();
-		if (linesVe.size() > 0) {
-			if (SharedPreferences.getInstance().getBoolean(
-					SpConstant.BOOK_AUTO_COLOR, false)) {
-				c.drawColor(SharedPreferences.getInstance().getInt(
-						SpConstant.BOOK_AUTO_COLOR_BG, Color.CYAN));
-			} else {
-				// if (bgBitmap == null)
-				// c.drawColor(bgColor);
-				// else
-				c.drawBitmap(bgBitmap, 0, 0, null);
+		try {
+
+			if (linesVe.size() == 0)
+				nextPage();
+			if (linesVe.size() > 0) {
+				if (SharedPreferences.getInstance().getBoolean(
+						SpConstant.BOOK_AUTO_COLOR, false)) {
+					c.drawColor(SharedPreferences.getInstance().getInt(
+							SpConstant.BOOK_AUTO_COLOR_BG, Color.CYAN));
+				} else {
+					// if (bgBitmap == null)
+					// c.drawColor(bgColor);
+					// else
+					c.drawBitmap(bgBitmap, 0, 0, null);
+				}
+
+				int y = marginHeight;
+				for (String line : linesVe) {
+					y += lineHgight;
+					c.drawText(line, marginWidth + mTextOffWidth, y, paint);
+				}
 			}
-
-			int y = marginHeight;
-			for (String line : linesVe) {
-				y += lineHgight;
-				c.drawText(line, marginWidth + mTextOffWidth, y, paint);
+			if (jumpType == 2) {
+				// 表示有书签了
+				if (isHasBookMark(context)) {
+					drawBookMark(context, c, true, false);
+				}
 			}
+			String percetStr = "第" + (pageNum + 1) + "/" + pagesVe.size() + "页";
+			Time time = new Time();
+			time.setToNow();
+			String timeStr;
+			if (time.minute < 10)
+				timeStr = "" + time.hour
+						+ ((typefaceIndex == 3) ? ":0" : " : 0") + time.minute;
+			else
+				timeStr = "" + time.hour
+						+ ((typefaceIndex == 3) ? " :" : " : ") + time.minute;
+
+			int pSWidth = (int) paintBottom.measureText("第12/10页")
+					+ DeviceUtil.dip2px(context, 3);
+			int titWidth = (int) paintBottom.measureText(chapter.getBookName());
+
+			c.drawText(timeStr, marginWidth / 2, screenHeight - mogoAdHeight
+					- 5, paintBottom);
+			c.drawText(
+					chapter.getBookName(),
+					screenWidth / 2 - titWidth / 2,
+					screenHeight - mogoAdHeight - DeviceUtil.dip2px(context, 4),
+					paintBottom);
+			c.drawText(chapter.getChapterName(),
+					DeviceUtil.dip2px(context, 20),
+					DeviceUtil.dip2px(context, 15), paintBottom);
+			c.drawText(percetStr, screenWidth - pSWidth, screenHeight
+					- mogoAdHeight - DeviceUtil.dip2px(context, 4), paintBottom);
+		} catch (Exception e) {
+			Log.e("msg", e.getMessage());
 		}
-
-		// 表示有书签了
-		if (isHasBookMark(context)) {
-			drawBookMark(context, c,true,false);
-		}
-		String percetStr = "第" + (pageNum + 1) + "/" + pagesVe.size() + "页";
-		Time time = new Time();
-		time.setToNow();
-		String timeStr;
-		if (time.minute < 10)
-			timeStr = "" + time.hour + ((typefaceIndex == 3) ? ":0" : " : 0")
-					+ time.minute;
-		else
-			timeStr = "" + time.hour + ((typefaceIndex == 3) ? " :" : " : ")
-					+ time.minute;
-
-		int pSWidth = (int) paintBottom.measureText("第12/10页")
-				+ DeviceUtil.dip2px(context, 3);
-		int titWidth = (int) paintBottom.measureText(chapter.getBookName());
-
-		c.drawText(timeStr, marginWidth / 2, screenHeight - mogoAdHeight - 5,
-				paintBottom);
-		c.drawText(chapter.getBookName(), screenWidth / 2 - titWidth / 2,
-				screenHeight - mogoAdHeight - DeviceUtil.dip2px(context, 4),
-				paintBottom);
-		c.drawText(chapter.getChapterName(), DeviceUtil.dip2px(context, 20),
-				DeviceUtil.dip2px(context, 15), paintBottom);
-		c.drawText(percetStr, screenWidth - pSWidth, screenHeight
-				- mogoAdHeight - DeviceUtil.dip2px(context, 4), paintBottom);
 	}
 
 	/**
@@ -535,6 +552,7 @@ public class BookPage {
 	private boolean isHasBookMark(Context context) {
 		BookMark mark = new BookMark();
 		mark.setBookName(chapter.getBookName());
+		mark.setBookId(bookId);
 		mark.setChapterName(chapter.getChapterName());
 		mark.setPosition(chapter.getPosition());
 		mark.setCurrentPage(pageNum - 1);
@@ -549,10 +567,12 @@ public class BookPage {
 	 * @param context
 	 * @param c
 	 */
-	public void drawBookMark(Context context, Canvas c, boolean isAdd,boolean isCurrentAdd) {
+	public void drawBookMark(Context context, Canvas c, boolean isAdd,
+			boolean isCurrentAdd) {
 		if (isAdd)
 			c.drawBitmap(bookMarktBitmap,
-					screenWidth - DeviceUtil.dip2px(context, 40),isCurrentAdd?DeviceUtil.dip2px(context, 28):0,
+					screenWidth - DeviceUtil.dip2px(context, 40),
+					isCurrentAdd ? DeviceUtil.dip2px(context, 28) : 0,
 					mBitmapPaint);
 	}
 

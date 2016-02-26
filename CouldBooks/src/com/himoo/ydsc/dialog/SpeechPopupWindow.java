@@ -1,6 +1,5 @@
 package com.himoo.ydsc.dialog;
 
-import android.R.color;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;

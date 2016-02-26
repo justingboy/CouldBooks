@@ -31,14 +31,14 @@ import com.himoo.ydsc.animation.AnimationUtils;
 import com.himoo.ydsc.base.BaseActivity;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.bookdl.DownloadManager;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.download.BaiduBookDownload;
-import com.himoo.ydsc.fragment.BookShelfFragment;
-import com.himoo.ydsc.fragment.BookShelfFragment.BookDownloadReceiver;
 import com.himoo.ydsc.fragment.bookmark.BookMarkFragment;
 import com.himoo.ydsc.fragment.bookmark.CatalogFragment;
 import com.himoo.ydsc.http.BookDetailsTask;
 import com.himoo.ydsc.http.HttpConstant;
+import com.himoo.ydsc.listener.NoDoubleClickListener;
 import com.himoo.ydsc.notification.DownlaodNotification;
 import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.reader.dao.BookMarkDb;
@@ -53,7 +53,6 @@ import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.MyLogger;
 import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.SP;
-import com.himoo.ydsc.util.SharedPreferences;
 import com.ios.dialog.AlertDialog;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.exception.DbException;
@@ -107,10 +106,9 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	private DownlaodNotification downNotification;
 
 	private CatalogFragment.BookUpdateReceiver receiver;
-	/** 广播通知已经下载了 */
-	private BookDownloadReceiver downloadReceiver;
 
 	private String gid;
+	private String bookId;
 	private String lastUrl;
 
 	private int currentPosition;
@@ -123,13 +121,13 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 		ViewUtils.inject(this);
 		initView();
 		initEvent();
-		registeBookShelfBroadcast();
 	}
 
 	private void initView() {
 		Intent intent = getIntent();
 		bookName = intent.getStringExtra("bookName");
 		gid = intent.getStringExtra("gid");
+		bookId = intent.getStringExtra("bookId");
 		lastUrl = intent.getStringExtra("lastUrl");
 		isDownload = isDownlaod(bookName);
 		type = intent.getIntExtra("type", 1);
@@ -143,7 +141,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 		setRightLogo();
 		downLoadfresh();
 		book_close.setOnClickListener(this);
-		book_refresh.setOnClickListener(this);
+		book_refresh.setOnClickListener(noDoubleClickListener);
 
 	}
 
@@ -154,7 +152,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	 * @return
 	 */
 	private boolean isDownlaod(String bookName) {
-		return BaiduBookDownload.getInstance(this).isDownload(bookName);
+		return BaiduBookDownload.getInstance(this).isDownload(bookName, bookId);
 	}
 
 	/**
@@ -184,7 +182,8 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 					public void onTabReselected(int position) {
 						// TODO Auto-generated method stub
 						if (position == 0) {
-							if (!SP.getInstance().getBoolean(bookName, true)) {
+							if (DownloadManager.getInstance().isExistTask(
+									bookName, bookId)) {
 								book_refresh
 										.setImageResource(R.drawable.refresh_book);
 								book_refresh.setEnabled(false);
@@ -222,13 +221,13 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 		public Fragment getItem(int position) {
 
 			if (fragmentList.get(position) == null && position == 0) {
-				catalogFragment = CatalogFragment.newInstance(bookName, type,
-						bookType,currentPosition);
+				catalogFragment = CatalogFragment.newInstance(bookName, bookId,
+						type, bookType, currentPosition);
 				fragmentList.add(catalogFragment);
 				return catalogFragment;
 			} else if (fragmentList.get(position) == null && position == 1) {
 				bookmarkFragment = BookMarkFragment.newInstance(bookName,
-						bookType);
+						bookId, bookType);
 				fragmentList.add(bookmarkFragment);
 				return bookmarkFragment;
 			} else
@@ -248,70 +247,69 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 
 	}
 
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		switch (v.getId()) {
-		case R.id.book_close:
-			finish();
-			overridePendingTransition(0, R.anim.dialog_exit_bottom);
-			break;
-		case R.id.book_refresh:
+	public NoDoubleClickListener noDoubleClickListener = new NoDoubleClickListener() {
+
+		@Override
+		public void onNoDoubleClick(View v) {
+			// TODO Auto-generated method stub
 			if (book_refresh.getTag().equals("刷新")) {
 				if (type == 1) {
-					Toast.showShort(this, "下载整本书！");
+					Toast.showShort(BookMarkActivity.this, "下载整本书！");
 				} else if (type == 2) {
-					int updateType = SharedPreferences.getInstance().getInt(
-							"book_update_type", 2);
-					if (updateType == 1) {
-						new AlertDialog(this)
-								.builder()
-								.setTitle("提醒")
-								.setMsg("您现在选择的是整本更新模式，我们会更新您的整本书，这将会把您本地的书籍全部重新下载,是否继续。")
-								.setNegativeButton("取消", new OnClickListener() {
-
-									@Override
-									public void onClick(View v) {
-										// TODO Auto-generated method stub
-
-									}
-								})
-								.setPositiveButton("确定", new OnClickListener() {
-
-									@Override
-									public void onClick(View v) {
-										// TODO Auto-generated method stub
-										if (NetWorkUtils
-												.isNetConnected(BookMarkActivity.this)) {
-											registeBroadcast();
-											sendToBookMarkBroadcast(true);
-											sendToBookShelfBroadcastSucess(true);
-											new DeleteFileTask(
-													BookMarkActivity.this,
-													bookName)
-													.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-										} else {
-											Toast.show(BookMarkActivity.this,
-													"未连接网络!");
-										}
-
-									}
-								}).show();
+					// int updateType = SharedPreferences.getInstance().getInt(
+					// "book_update_type", 2);
+					// if (updateType == 1) {
+					// new AlertDialog(BookMarkActivity.this)
+					// .builder()
+					// .setTitle("提醒")
+					// .setMsg("您现在选择的是整本更新模式，我们会更新您的整本书，这将会把您本地的书籍全部重新下载,是否继续。")
+					// .setNegativeButton("取消", new OnClickListener() {
+					//
+					// @Override
+					// public void onClick(View v) {
+					// // TODO Auto-generated method stub
+					//
+					// }
+					// })
+					// .setPositiveButton("确定", new OnClickListener() {
+					//
+					// @Override
+					// public void onClick(View v) {
+					// // TODO Auto-generated method stub
+					// if (NetWorkUtils
+					// .isNetConnected(BookMarkActivity.this)) {
+					// registeBroadcast();
+					// sendToBookMarkBroadcast();
+					// sendToBookShelfBroadcastSucess(true);
+					// DeleteFileTask task = new DeleteFileTask(
+					// BookMarkActivity.this,bookName);
+					// DownloadManager.getInstance().addTask(bookName, bookId,
+					// task);
+					// task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+					// } else {
+					// Toast.show(BookMarkActivity.this,
+					// "未连接网络!");
+					// }
+					//
+					// }
+					// }).show();
+					// } else {
+					if (NetWorkUtils.isNetConnected(BookMarkActivity.this)) {
+						AnimationUtils.setViewRotating(BookMarkActivity.this,
+								book_refresh);
+						registeBroadcast();
+						BookUpdateTask task = new BookUpdateTask(
+								BookMarkActivity.this, bookName, bookId, 1);
+						task.setOnNewChapterListener(BookMarkActivity.this);
+						task.execute();
 					} else {
-						if (NetWorkUtils.isNetConnected(BookMarkActivity.this)) {
-							AnimationUtils.setViewRotating(this, book_refresh);
-							BookUpdateTask task = new BookUpdateTask(this,
-									bookName, 1);
-							task.setOnNewChapterListener(this);
-							task.execute();
-						} else {
-							Toast.show(BookMarkActivity.this, "未连接网络!");
-						}
+						Toast.show(BookMarkActivity.this, "未连接网络!");
 					}
+					// }
 				}
 
 			} else if (book_refresh.getTag().equals("删除")) {
-				new AlertDialog(this).builder().setTitle("提示")
+				new AlertDialog(BookMarkActivity.this).builder().setTitle("提示")
 						.setMsg("您现在可以向右滑动某个条目,出现删除按钮,点击删除即可删除该书签,赶快去试试吧！")
 						.setNegativeButton("取消", new OnClickListener() {
 
@@ -329,25 +327,40 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 							}
 						}).show();
 			} else if (book_refresh.getTag().equals("下载")) {
-				Toast.show(this, "开始下载《" + bookName + "》");
+				if (DownloadManager.getInstance().isExistTask(bookName, bookId))
+					return;
 				book_refresh.setImageResource(R.drawable.refresh_book);
-				AnimationUtils.setViewRotating(this, book_refresh);
-				downNotification = new DownlaodNotification(this);
+				AnimationUtils.setViewRotating(BookMarkActivity.this,
+						book_refresh);
+				downNotification = new DownlaodNotification(
+						BookMarkActivity.this);
 				try {
-					BaiduBookDownload.getInstance(this).addBaiduBookDownload(
-							IOHelper.getBaiduBook());
+					BaiduBookDownload.getInstance(BookMarkActivity.this)
+							.addBaiduBookDownload(IOHelper.getBaiduBook());
 				} catch (DbException e) {
 					// TODO Auto-generated catch block
 					Log.e("插入数据库失败" + e.getMessage());
 				}
 				List<BaiduBookChapter> list = IOHelper.getBookChapter();
-				new SaveAsyncTask(list, lastUrl, false)
-						.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+				SaveAsyncTask task = new SaveAsyncTask(list, lastUrl, false);
+				DownloadManager.getInstance().addTask(bookName, bookId, task);
+				task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				sendToBookShelfBroadcast();
+				type = 2;
+				book_refresh.setTag("刷新");
 			}
 
-			break;
+		}
+	};
 
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		switch (v.getId()) {
+		case R.id.book_close:
+			finish();
+			overridePendingTransition(0, R.anim.dialog_exit_bottom);
+			break;
 		default:
 			break;
 		}
@@ -364,14 +377,14 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 		return super.onKeyDown(keyCode, event);
 	}
 
-
-
 	/**
 	 * 设置右边的图片
 	 */
 	private void setRightLogo() {
+
 		if (type == 1) {
 			if (isDownload) {
+				type = 2;
 				BaiduBook book = IOHelper.getBaiduBook();
 				if (book != null) {
 					String statue = book.getStatus();
@@ -401,29 +414,18 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 
 		}
 	}
-	
+
 	/**
 	 * 刷新正在下载状态
 	 */
 	private void downLoadfresh() {
-		if (!SP.getInstance().getBoolean(bookName, true)) {
+		if (DownloadManager.getInstance().isExistTask(bookName, bookId)) {
 			book_refresh.setImageResource(R.drawable.refresh_book);
 			book_refresh.setEnabled(false);
 			book_refresh.setClickable(false);
 			book_refresh.setTag("刷新");
 			AnimationUtils.setViewRotating(BookMarkActivity.this, book_refresh);
 		}
-	}
-
-	/**
-	 * 注册书架的广播
-	 */
-	private void registeBookShelfBroadcast() {
-		downloadReceiver = new BookShelfFragment.BookDownloadReceiver();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(BOOKSHELF_ACTION);
-		registerReceiver(downloadReceiver, filter);
-
 	}
 
 	/**
@@ -441,9 +443,8 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	 * 
 	 * @param isDown
 	 */
-	private void sendToBookMarkBroadcast(boolean isDown) {
+	private void sendToBookMarkBroadcast() {
 		Intent intent = new Intent(ACTION);
-		intent.putExtra("isDownloading", isDown);
 		sendBroadcast(intent);
 	}
 
@@ -455,6 +456,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	private void sendToBookShelfBroadcast() {
 		Intent intent = new Intent(BOOKSHELF_ACTION);
 		intent.putExtra("bookName", bookName);
+		intent.putExtra("bookId", bookId);
 		String url = HttpConstant.BAIDU_BOOK_DETAILS_URL + "appui=alaxs&gid="
 				+ gid + "&dir=1&ajax=1";
 		intent.putExtra("dowloadUrl", url);
@@ -462,14 +464,16 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	}
 
 	/**
-	 * 保存是否正在下载
-	 * 
-	 * @param isDown
+	 * 下载成功发送广播
 	 */
-	private void sendToBookShelfBroadcastSucess(boolean isDown) {
-		SP.getInstance().putBoolean("isDown", !isDown);
-		SP.getInstance().putBoolean(bookName, !isDown);
+	private void sendDownloadSuccessReceiver() {
+		Intent intent = new Intent(BOOKSHELF_ACTION);
+		intent.putExtra("success", true);
+		intent.putExtra("bookName", bookName);
+		intent.putExtra("bookId", bookId);
+		sendBroadcast(intent);
 	}
+
 
 	@Override
 	protected void onDestroy() {
@@ -477,8 +481,6 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 		super.onDestroy();
 		if (receiver != null)
 			unregisterReceiver(receiver);
-		if (downloadReceiver != null)
-			unregisterReceiver(downloadReceiver);
 	}
 
 	/**
@@ -508,7 +510,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 		@Override
 		protected void onPreExecute() {
 			dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-					+ File.separator + bookName + File.separator);
+					+ File.separator + bookName + "_" + bookId + File.separator);
 			if (!dirFile.exists())
 				dirFile.mkdirs();
 		}
@@ -538,7 +540,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 
 			if (downNotification != null) {
 				downNotification.creatNotification(bookName, "开始下载");
-				SP.getInstance().putBoolean(bookName, false);
+				SP.getInstance().putBookDownSuccess(bookName + bookId, false);
 				downNotification.setProgressAndNetSpeed(progress,
 						downNotification.getNetSpeed());
 			}
@@ -547,6 +549,13 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 				int allChapterLength = list.size();
 				float partProgress = (float) allChapterLength / 100;
 				for (int i = 0; i < allChapterLength; i++) {
+					if (isCancelled()) {
+						downNotification.notifiManger
+								.cancel(downNotification.NOTIFI_ID);
+						SP.getInstance().remove(bookName, bookId);
+						return null;
+					}
+
 					BaiduBookChapter chapter = list.get(i);
 					String url = getChapterUrl(chapter);
 					String chapterName = chapter.getText().trim()
@@ -613,11 +622,12 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 					IOHelper.getBook(
 							BookMarkActivity.this,
 							bookName,
+							bookId,
 							LocalReaderUtil.getInstance().parseLocalBook(
-									bookName, 2));
+									bookName, bookId, 2));
 					BookMark bookMark = BookMarkDb.getInstance(
 							BookMarkActivity.this, "book").querryReaderPos(
-							bookName);
+							bookName, bookId);
 					if (list != null && bookMark != null
 							&& list.size() - 1 > bookMark.getPosition()) {
 						bookMark.setPosition(list.size() - 1);
@@ -629,9 +639,9 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 				}
 			} catch (Exception e) {
 				MyLogger.kLog().e(e);
-				SP.getInstance().putBoolean(bookName, true);
+				SP.getInstance().putBookDownSuccess(bookName + bookId, true);
 			} finally {
-				SP.getInstance().getBoolean(bookName, true);
+				SP.getInstance().putBookDownSuccess(bookName + bookId, true);
 			}
 			return null;
 		}
@@ -640,22 +650,23 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 		protected void onPostExecute(String result) {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
-			Toast.show(BookMarkActivity.this, "《" + bookName + "》下载完成");
-			SP.getInstance().remove(bookName);
+			Toast.showLong("《" + bookName + "》下载完成");
+			SP.getInstance().remove(bookName, bookId);
 			isDownload = true;
 			AnimationUtils.cancelAnim(book_refresh);
-			sendToBookMarkBroadcast(false);
-			sendToBookShelfBroadcastSucess(false);
+			sendToBookMarkBroadcast();
+			sendDownloadSuccessReceiver();
 			BaiduBookDownload.getInstance(BookMarkActivity.this)
-					.updateDownSuccess(bookName);
+					.updateDownSuccess(bookName, bookId);
 			new Handler().postDelayed(new Runnable() {
 
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-					downNotification.notifiManger.cancelAll();
+					downNotification.notifiManger
+							.cancel(downNotification.NOTIFI_ID);
 				}
-			}, 3000);
+			}, 2000);
 
 		}
 
@@ -735,10 +746,10 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 			downNotification = new DownlaodNotification(context);
 			AnimationUtils.setViewRotating(context, book_refresh);
 			Toast.show(context, "正在删除《" + bookName + "》");
-			SP.getInstance().putBoolean(bookName, false);
+			SP.getInstance().putBookDownSuccess(bookName + bookId, false);
 			fileUtils = new FileUtils(context);
 			dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-					+ File.separator + bookName + File.separator);
+					+ File.separator + bookName + "_" + bookId + File.separator);
 		}
 
 		@Override
@@ -756,9 +767,10 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			Toast.show(context, "删除《" + bookName + "》成功");
-
-			new SaveAsyncTask(null, lastUrl, true)
-					.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+			DownloadManager.getInstance().deleteTask(bookName, bookId);
+			SaveAsyncTask task = new SaveAsyncTask(null, lastUrl, true);
+			DownloadManager.getInstance().addTask(bookName, bookId, task);
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			new Handler().postDelayed(new Runnable() {
 
 				@Override
@@ -800,7 +812,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	@Override
 	public void onUpdateSuccess(LastChapter chapter) {
 		// TODO Auto-generated method stub
-		registeBroadcast();
+		sendToBookMarkBroadcast();
 		Toast.show(this, "最新章节更新成功 ");
 		AnimationUtils.cancelAnim(book_refresh);
 	}
@@ -825,4 +837,5 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	}
 
 	
+
 }

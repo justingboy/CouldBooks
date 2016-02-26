@@ -59,6 +59,7 @@ public class BaiduBookDownload {
 		try {
 			List<BaiduInfo> list = db.findAll(Selector.from(BaiduInfo.class)
 					.where("bookName", "=", book.getTitle())
+					.and("bookId", "=", book.getGid())
 					.and("bookAuthor", "=", book.getAuthor()));
 			if (list != null && !list.isEmpty()) {
 				BaiduInfo bookinfo = list.get(0);
@@ -67,6 +68,7 @@ public class BaiduBookDownload {
 				db.update(bookinfo);
 			} else {
 				BaiduInfo bookDownloadInfo = new BaiduInfo();
+				bookDownloadInfo.setBookId(book.getGid());
 				bookDownloadInfo.setSerialize(!book.getStatus().equals("完结"));
 				bookDownloadInfo.setBookSourceType(2);
 				bookDownloadInfo.setBookName(book.getTitle());
@@ -101,10 +103,10 @@ public class BaiduBookDownload {
 	/**
 	 * 更新下载状态
 	 */
-	public void updateDownlaodstatue(String bookName) {
+	public void updateDownlaodstatue(String bookName,String bookId) {
 		try {
 			List<BaiduInfo> list = db.findAll(Selector.from(BaiduInfo.class)
-					.where("bookName", "=", bookName));
+					.where("bookName", "=", bookName).and("bookId", "=", bookId));
 			if (list != null && !list.isEmpty()) {
 				BaiduInfo book = list.get(0);
 				book.setAutoResume(true);// 下载完成
@@ -123,10 +125,10 @@ public class BaiduBookDownload {
 	 * @param bookName
 	 * @return
 	 */
-	public boolean queryBookDownloadStatue(String bookName) {
+	public boolean queryBookDownloadStatue(String bookName,String bookId) {
 		try {
 			List<BaiduInfo> list = db.findAll(Selector.from(BaiduInfo.class)
-					.where("bookName", "=", bookName));
+					.where("bookName", "=", bookName).and("bookId", "=", bookId));
 			if (list != null && !list.isEmpty()) {
 				BaiduInfo book = list.get(0);
 				return book.isAutoResume();
@@ -164,11 +166,12 @@ public class BaiduBookDownload {
 	 * 
 	 * @param bookName
 	 */
-	public void updateDownSuccess(String bookName) {
+	public void updateDownSuccess(String bookName, String bookId) {
 
 		try {
 			List<BaiduInfo> list = db.findAll(Selector.from(BaiduInfo.class)
-					.where("bookName", "=", bookName));
+					.where("bookName", "=", bookName)
+					.and("bookId", "=", bookId));
 			if (list != null && !list.isEmpty()) {
 				BaiduInfo book = list.get(0);
 				book.setAutoResume(true);
@@ -205,16 +208,29 @@ public class BaiduBookDownload {
 	 * @param bookName
 	 * @return
 	 */
-	public BaiduInfo queryNeedUpdate(String bookName) {
+	public BaiduInfo queryNeedUpdate(String bookName, String bookId) {
 		try {
-			List<BaiduInfo> list = db.findAll(Selector.from(BaiduInfo.class)
-					.where("isSerialize", "=", true)
-					.and("bookName", "=", bookName)
-					.and("bookSourceType", "=", 2));
-			if (list != null && !list.isEmpty()) {
-				return list.get(0);
+			if (bookId == null) {
+				List<BaiduInfo> list = db.findAll(Selector
+						.from(BaiduInfo.class).where("isSerialize", "=", true)
+						.and("bookName", "=", bookName)
+						.and("bookSourceType", "=", 2));
+				if (list != null && !list.isEmpty()) {
+					return list.get(0);
+				} else {
+					return null;
+				}
 			} else {
-				return null;
+				List<BaiduInfo> list = db.findAll(Selector
+						.from(BaiduInfo.class).where("isSerialize", "=", true)
+						.and("bookName", "=", bookName)
+						.and("bookId", "=", bookId)
+						.and("bookSourceType", "=", 2));
+				if (list != null && !list.isEmpty()) {
+					return list.get(0);
+				} else {
+					return null;
+				}
 			}
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
@@ -231,7 +247,7 @@ public class BaiduBookDownload {
 	public void updateChapterName(BaiduInfo book, String newChapterName) {
 		try {
 			book.setLastChapterName(newChapterName);
-			book.setBookLastUpdateTime(System.currentTimeMillis()+"");
+			book.setBookLastUpdateTime(System.currentTimeMillis() + "");
 			db.update(book);
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
@@ -245,10 +261,11 @@ public class BaiduBookDownload {
 	 * @param bookName
 	 * @return
 	 */
-	public boolean isDownload(String bookName) {
+	public boolean isDownload(String bookName, String bookId) {
 		try {
 			List<BaiduInfo> list = db.findAll(Selector.from(BaiduInfo.class)
-					.where("bookName", "=", bookName));
+					.where("bookName", "=", bookName)
+					.and("bookId", "=", bookId));
 			if (list == null || list.isEmpty())
 				return false;
 			else

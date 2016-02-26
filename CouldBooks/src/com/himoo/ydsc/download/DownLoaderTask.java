@@ -37,11 +37,12 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 	private ProgressReportingOutputStream mOutputStream;
 	private Activity mContext;
 	private String bookName;
+	private String bookId;
 	private OnAfreshDownloadListener listener;
 	private boolean isFullWidth;
 	private boolean isHasToast = false;
 
-	public DownLoaderTask(String url, String bookName, String out,
+	public DownLoaderTask(String url, String bookName, String bookId,String out,
 			Activity context, OnAfreshDownloadListener listener,
 			boolean isFullWidth) {
 		super();
@@ -49,6 +50,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 		this.listener = listener;
 		this.isFullWidth = isFullWidth;
 		this.bookName = bookName;
+		this.bookId = bookId;
 		if (context != null) {
 			if (isFullWidth)
 				mDialog = new BookDownloadDialog(context, isFullWidth);
@@ -92,10 +94,10 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 									// TODO Auto-generated method stub
 									DownLoaderTask.this.cancel(true);
 									mDialog.dismiss();
-									SP.getInstance().remove(bookName);
+									SP.getInstance().remove(bookName,bookId);
 									BookDownloadService.getDownloadManager(
 											mContext).updateDownSuccess(
-											bookName,false);
+											bookName,bookId,false);
 									if(listener!=null)
 										listener.onCancelDownload();
 								}
@@ -247,7 +249,7 @@ public class DownLoaderTask extends AsyncTask<Void, Integer, Long> {
 	 */
 	public void doZipExtractorWork(Activity activity, String inPath,
 			String outPath) {
-		ZipExtractorTask task = new ZipExtractorTask(bookName, inPath, outPath,
+		ZipExtractorTask task = new ZipExtractorTask(bookName,bookId, inPath, outPath,
 				activity, true, listener, isFullWidth);
 		task.execute();
 	}

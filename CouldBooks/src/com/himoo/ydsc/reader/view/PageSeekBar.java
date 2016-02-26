@@ -3,6 +3,7 @@ package com.himoo.ydsc.reader.view;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -79,8 +80,13 @@ public class PageSeekBar extends SeekBar {
 	@Override
 	protected synchronized void onDraw(Canvas canvas) {
 		// TODO Auto-generated method stub
-		int thumb_x = this.getProgress() * (this.getWidth() - mThumbWidth)
-				/ this.getMax();
+		int thumb_x =0;
+		try {
+			thumb_x =  this.getProgress() * (this.getWidth() - mThumbWidth)
+					/ this.getMax();
+		} catch (Exception e) {
+			Log.e("msg", e.getMessage());
+		}
 		super.onDraw(canvas);
 
 		if (mPopupWindow != null) {

@@ -146,7 +146,7 @@ public class BookUpdateService extends Service {
 								// 下载最新章节
 								ArrayList<BaiduBookChapter> listChapter = praseBaiduBookChapter(content);
 								if (list != null && !list.isEmpty()) {
-									updateNewChapter(book.getBookName(),
+									updateNewChapter(book.getBookName(),book.getBookId(),
 											listChapter);
 								}
 								if (index_Notic != 3) {
@@ -247,16 +247,16 @@ public class BookUpdateService extends Service {
 	 * @param list
 	 * @return
 	 */
-	private void updateNewChapter(String bookName,
+	private void updateNewChapter(String bookName,String bookId,
 			ArrayList<BaiduBookChapter> list) {
 		// TODO Auto-generated method stub
 		int allChapterLength = list.size();
 		File dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-				+ File.separator + bookName + File.separator);
+				+ File.separator + bookName+"_"+bookId + File.separator);
 		if (!dirFile.exists())
 			dirFile.mkdirs();
 		ArrayList<BaiduBookChapter> localList = LocalReaderUtil.getInstance()
-				.parseLocalBook(bookName, 2);
+				.parseLocalBook(bookName,bookId, 2);
 		ArrayList<String> chapterNameList = new ArrayList<String>();
 		int localSize = localList.size();
 		int localStartLen = 0;

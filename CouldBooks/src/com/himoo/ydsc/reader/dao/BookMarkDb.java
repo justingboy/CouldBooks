@@ -1,5 +1,6 @@
 package com.himoo.ydsc.reader.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -38,7 +39,7 @@ public class BookMarkDb {
 	public void saveReaderPosition(BookMark mark) {
 		try {
 			List<BookMark> list = db.findAll(Selector.from(BookMark.class)
-					.where("bookName", "=", mark.getBookName())
+					.where("bookName", "=", mark.getBookName()).and("bookId", "=", mark.getBookId())
 					.and("type", "=", 1));
 			if (list != null && !list.isEmpty()) {
 				BookMark bookMark = list.get(0);
@@ -65,6 +66,7 @@ public class BookMarkDb {
 		try {
 			List<BookMark> list = db.findAll(Selector.from(BookMark.class)
 					.where("bookName", "=", mark.getBookName())
+					.and("bookId", "=", mark.getBookId())
 					.and("chapterName", "=", mark.getChapterName())
 					.and("type", "=", 2)
 					.and("currentPage", "=", mark.getCurrentPage()));
@@ -88,11 +90,11 @@ public class BookMarkDb {
 	 * @param bookName
 	 * @return
 	 */
-	public boolean isExist(String bookName) {
+	public boolean isExist(String bookName,String bookId) {
 
 		try {
 			List<BookMark> list = db.findAll(Selector.from(BookMark.class)
-					.where("bookName", "=", bookName));
+					.where("bookName", "=", bookName).and("bookId", "=", bookId));
 			if (list != null && !list.isEmpty()) {
 				return true;
 			} else {
@@ -111,10 +113,10 @@ public class BookMarkDb {
 	 * @param bookName
 	 * @return
 	 */
-	public BookMark querryReaderPos(String bookName) {
+	public BookMark querryReaderPos(String bookName,String bookId) {
 		try {
 			List<BookMark> list = db.findAll(Selector.from(BookMark.class)
-					.where("bookName", "=", bookName).and("type", "=", 1));
+					.where("bookName", "=", bookName).and("bookId", "=", bookId).and("type", "=", 1));
 			if (list != null && !list.isEmpty()) {
 				return list.get(0);
 			} else {
@@ -132,18 +134,18 @@ public class BookMarkDb {
 	 * @param bookName
 	 * @return
 	 */
-	public List<BookMark> querryReaderMark(String bookName) {
+	public List<BookMark> querryReaderMark(String bookName,String bookId) {
 		try {
 			List<BookMark> list = db.findAll(Selector.from(BookMark.class)
-					.where("bookName", "=", bookName).and("type", "=", 2));
+					.where("bookName", "=", bookName).and("bookId", "=", bookId).and("type", "=", 2));
 			if (list != null && !list.isEmpty()) {
 				return list;
 			} else {
-				return null;
+				return new ArrayList<BookMark>();
 			}
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
-			return null;
+			return new ArrayList<BookMark>();
 		}
 	}
 
@@ -169,9 +171,9 @@ public class BookMarkDb {
 	 * 
 	 * @param bookMarko
 	 */
-	public void deletBookMark(String bookName) {
+	public void deletBookMark(String bookName,String bookId) {
 		try {
-			db.delete(BookMark.class, WhereBuilder.b("bookName", "=", bookName));
+			db.delete(BookMark.class, WhereBuilder.b("bookName", "=", bookName).and("bookId", "=", bookId));
 		} catch (DbException e) {
 			// TODO Auto-generated catch block
 			MyLogger.kLog().e(e);

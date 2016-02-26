@@ -15,6 +15,7 @@ import android.os.Handler;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.bookdl.DownloadManager;
 import com.himoo.ydsc.download.BaiduBookDownload;
 import com.himoo.ydsc.notification.DownlaodNotification;
 import com.himoo.ydsc.reader.dao.BookMark;
@@ -22,6 +23,7 @@ import com.himoo.ydsc.reader.dao.BookMarkDb;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.MyLogger;
+import com.himoo.ydsc.util.SP;
 
 /**
  * 开启线程删除本地书籍
@@ -29,6 +31,7 @@ import com.himoo.ydsc.util.MyLogger;
  */
 public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 	private String bookName;
+	private String bookId;
 	private File dirFile;
 	private Context context;
 	private FileUtils fileUtils;
@@ -37,8 +40,9 @@ public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 	private String lastChapterUrl;
 
 	public AfreshDownloadTask(Context context, String lastChapterUrl,
-			String bookName, OnAfreshDownloadListener listener) {
+			String bookName, String bookId,OnAfreshDownloadListener listener) {
 		this.bookName = bookName;
+		this.bookId = bookId;
 		this.context = context;
 		this.mListener = listener;
 		this.lastChapterUrl = lastChapterUrl;
@@ -50,12 +54,12 @@ public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 		super.onPreExecute();
 		downNotification = new DownlaodNotification(context);
 		if (mListener != null) {
-			mListener.onPreDeleted(bookName);
+			mListener.onPreDeleted(bookName,bookId);
 		}
 		Toast.show(context, "正在删除 《" + bookName + "》");
 		fileUtils = new FileUtils(context);
 		dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-				+ File.separator + bookName + File.separator);
+				+ File.separator + bookName+"_"+bookId + File.separator);
 	}
 
 	@Override
@@ -73,7 +77,9 @@ public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 		// TODO Auto-generated method stub
 		super.onPostExecute(result);
 		Toast.show(context, "删除 《" + bookName + "》成功");
-		new SaveAsyncTask(null, lastChapterUrl).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		SaveAsyncTask downloadTask = new SaveAsyncTask(null, lastChapterUrl);
+		DownloadManager.getInstance().addTask(bookName,bookId, downloadTask);
+		downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		new Handler().postDelayed(new Runnable() {
 
 			@Override
@@ -110,7 +116,7 @@ public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 		@Override
 		protected void onPreExecute() {
 			dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-					+ File.separator + bookName + File.separator);
+					+ File.separator + bookName+"_"+bookId + File.separator);
 			if (!dirFile.exists())
 				dirFile.mkdirs();
 			if (mListener != null) {
@@ -143,6 +149,13 @@ public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 			int allChapterLength = list.size();
 			float partProgress = (float) allChapterLength / 100;
 			for (int i = 0; i < allChapterLength; i++) {
+				if (isCancelled()) {
+					downNotification.notifiManger.cancel(downNotification.NOTIFI_ID);
+					SP.getInstance().remove(bookName,bookId);
+					if(mListener!=null)
+						mListener.onCancelDownload();
+					return null;
+				}
 				BaiduBookChapter chapter = list.get(i);
 				String url = getChapterUrl(chapter);
 				String chapterName = chapter.getText().trim()
@@ -201,7 +214,7 @@ public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 			}
 			// 记录的阅读位置可能大于章节总数，会报数组越界异常，故在此处理
 			BookMark bookMark = BookMarkDb.getInstance(context, "book")
-					.querryReaderPos(bookName);
+					.querryReaderPos(bookName,bookId);
 			if (list != null && bookMark != null
 					&&   bookMark.getPosition()>list.size() - 1&&bookMark.getPosition()>0) {
 				bookMark.setPosition(list.size() - 1);
@@ -218,16 +231,17 @@ public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 			// TODO Auto-generated method stub
 			super.onPostExecute(result);
 			Toast.show(context, "《" + bookName + "》下载完成");
-			BaiduBookDownload.getInstance(context).updateDownSuccess(bookName);
+			BaiduBookDownload.getInstance(context).updateDownSuccess(bookName,bookId);
 			if (mListener != null) {
-				mListener.onPostDownloadSuccess(bookName);
+				mListener.onPostDownloadSuccess(bookName,bookId);
 			}
+			DownloadManager.getInstance().deleteTask(bookName, bookId);
 			new Handler().postDelayed(new Runnable() {
 
 				@Override
 				public void run() {
 					// TODO Auto-generated method stub
-					downNotification.notifiManger.cancelAll();
+					downNotification.notifiManger.cancel(downNotification.NOTIFI_ID);
 				}
 			}, 3000);
 

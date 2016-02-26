@@ -232,7 +232,7 @@ public class SubChoiceFragment extends BaseFragment implements
 			public void onFailure(HttpException error, String msg) {
 				// TODO Auto-generated method stub
 				try {
-				Toast.showLong(context, "获取详情失败：" + msg);
+				Toast.showLong(context, "打开失败，请重试");
 				dismissRefreshDialog();
 				mCurrentClickPosition = -1;
 				} catch (Exception e) {

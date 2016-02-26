@@ -15,6 +15,9 @@ import com.lidroid.xutils.http.HttpHandler;
 @Table(name = "book_BookDownloadInfo")
 public class BookDownloadInfo extends EntityBase {
 
+	@Column(column = "bookId")
+	private String bookId;
+	
 	@Column(column = "bookName")
 	private String bookName;
 
@@ -304,6 +307,14 @@ public class BookDownloadInfo extends EntityBase {
 	@Override
 	public int hashCode() {
 		return (int) (id ^ (id >>> 32));
+	}
+
+	public String getBookId() {
+		return bookId;
+	}
+
+	public void setBookId(String bookId) {
+		this.bookId = bookId;
 	}
 
 }

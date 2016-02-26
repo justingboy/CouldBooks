@@ -15,6 +15,9 @@ import com.himoo.ydsc.bean.BaiduBookChapter;
  * 
  */
 public class BookOperation {
+	
+	/** 书名 */
+	private String bookId;
 	/** 书名 */
 	private String bookName;
 	/** 作者 */
@@ -75,6 +78,14 @@ public class BookOperation {
 
 	public void setBaiduBook(BaiduBook baiduBook) {
 		this.baiduBook = baiduBook;
+	}
+
+	public String getBookId() {
+		return bookId;
+	}
+
+	public void setBookId(String bookId) {
+		this.bookId = bookId;
 	}
 
 	

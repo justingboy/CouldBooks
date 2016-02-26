@@ -44,7 +44,7 @@ public class SP {
 		return def;
 	}
 
-	public void putBoolean(String key, boolean val) {
+	public void putBookDownSuccess(String key, boolean val) {
 		try {
 			android.content.SharedPreferences sp = getSp();
 			if (sp != null) {
@@ -75,11 +75,11 @@ public class SP {
 	 * 
 	 * @param bookName
 	 */
-	public void remove(String bookName) {
+	public void remove(String bookName,String bookId) {
 		android.content.SharedPreferences sp = getSp();
 		if (sp != null) {
 			Editor editor = sp.edit();
-			editor.remove(bookName);
+			editor.remove(bookName+bookId);
 			editor.commit();
 
 		}

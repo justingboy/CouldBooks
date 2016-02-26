@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import android.content.Context;
-
 import com.himoo.ydsc.aescrypt.AESCrypt;
 import com.himoo.ydsc.bean.BaiduBookChapter;
-import com.himoo.ydsc.db.ChapterDb;
 import com.himoo.ydsc.util.FileUtils;
 
 public class LocalReaderUtil {
@@ -29,15 +26,15 @@ public class LocalReaderUtil {
 		return mInstance;
 	}
 
+
 	/**
-	 * 解析本地章节
 	 * 
-	 * @param bookName
-	 * @param bookType
-	 *            1:自己服务器上的书 2:是百度书籍
+	 * @param bookName  书名
+	 * @param bookId    书的Id,主要区别书名相同的情况
+	 * @param bookType  1:自己服务器上的书 2:是百度书籍
 	 * @return
 	 */
-	public ArrayList<BaiduBookChapter> parseLocalBook(String bookName,
+	public ArrayList<BaiduBookChapter> parseLocalBook(String bookName,String bookId,
 			int bookType) {
 		ArrayList<BaiduBookChapter> list = new ArrayList<BaiduBookChapter>();
 		
@@ -45,7 +42,7 @@ public class LocalReaderUtil {
 //			ChapterDb.getInstance().createDb(context, bookName);
 			ArrayList<File> chapterFile = new ArrayList<File>();
 			File bookFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-					+ File.separator + bookName + File.separator);
+					+ File.separator + bookName+"_"+bookId + File.separator);
 			if (bookFile != null && bookFile.exists()) {
 				File[] chapters = bookFile.listFiles();
 				for (int i = 0; i < chapters.length; i++) {
@@ -88,7 +85,7 @@ public class LocalReaderUtil {
 			try {
 		
 			File bookFile = new File(FileUtils.mSdRootPath
-					+ "/CouldBook/download" + File.separator + bookName
+					+ "/CouldBook/download" + File.separator + bookName+"_"+bookId
 					+ File.separator + "index.txt");
 				if (bookFile != null && bookFile.exists()) {
 					String bookContent = AESCrypt.readBookFile(bookFile

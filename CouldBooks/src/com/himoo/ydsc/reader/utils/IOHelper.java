@@ -44,7 +44,7 @@ public class IOHelper {
 	 *            由于从文件中读取资源，则需要通过Activity 来提供。因此在Activity调用此函数的时候，会传入 this。
 	 * @return
 	 */
-	public static BookOperation getBook(Context context, String bookName,
+	public static BookOperation getBook(Context context, String bookName,String bookId,
 			ArrayList<BaiduBookChapter> chapterList) {
 		book = BookOperation.getInstance();
 		mContext = context;
@@ -57,6 +57,7 @@ public class IOHelper {
 		// // 设置Book 对象的信息
 		// book.setAuthor(res.getString(R.string.author));
 		book.setBookname(bookName);
+		book.setBookId(bookId);
 		//
 		// // 下面這個if语句是因为出现个bug而写的，它其实不应该存在。
 		// // 猜测的原因可能是在软件退出的时候，Book类对象没有被销毁，则再次启动软件的时候
@@ -75,11 +76,12 @@ public class IOHelper {
 	 *            由于从文件中读取资源，则需要通过Activity 来提供。因此在Activity调用此函数的时候，会传入 this。
 	 * @return
 	 */
-	public static BookOperation getBook(Context context, String bookName,
+	public static BookOperation getBook(Context context, String bookName,String bookId,
 			ArrayList<BaiduBookChapter> chapterList, BaiduBook baiduBook) {
 		book = BookOperation.getInstance();
 		mContext = context;
 		book.setBaiduBook(baiduBook);
+		book.setBookId(bookId);
 		book.setChapterList(chapterList);
 
 		// res = context.getResources();
@@ -144,7 +146,7 @@ public class IOHelper {
 				chapter.setJumpType(2);
 				File dirFile = new File(FileUtils.mSdRootPath
 						+ "/CouldBook/baidu" + File.separator
-						+ book.getBookname() + File.separator);
+						+ book.getBookname()+"_"+book.getBookId() + File.separator);
 
 				File file = new File(dirFile, chapterName.replaceAll("/", "|")
 						+ "-|" + book.getChapterList().get(position).getIndex()
@@ -181,7 +183,7 @@ public class IOHelper {
 		} else if (bookType == 1) {
 			File dirFile = new File(FileUtils.mSdRootPath
 					+ "/CouldBook/download" + File.separator
-					+ book.getBookname() + File.separator
+					+ book.getBookname()+"_"+book.getBookId() + File.separator
 					+ bookChapter.getIndex() + ".txt");
 			if (dirFile != null && dirFile.exists()) {
 				String bookContent = AESCrypt.readBookFile(dirFile

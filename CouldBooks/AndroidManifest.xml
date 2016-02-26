@@ -183,6 +183,11 @@
         <service android:name="com.himoo.ydsc.service.LockService" >
         </service>
 
+        <receiver android:name="com.himoo.ydsc.fragment.BookShelfFragment$BookDownloadReceiver" >
+            <intent-filter>
+                <action android:name="com.himoo.ydsc.shelf.receiver" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name="com.himoo.ydsc.update.BootBroadcastReceiver"
             android:exported="false" >

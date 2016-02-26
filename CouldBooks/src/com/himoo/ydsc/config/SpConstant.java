@@ -108,4 +108,7 @@ public interface SpConstant {
 	public static final String BOOK_READER_SPEED= "book_reader_speed";
 	
 	public static final String MOGOAD_SHOW= "mogoad_show";
+	
+	
+	public static final String DIALOG_INDICATE_SHELF= "dialog_indicate_shelf";
 }

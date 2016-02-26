@@ -9,6 +9,7 @@ import java.util.List;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Handler;
 
@@ -28,15 +29,17 @@ public class BookDownloadTask extends AsyncTask<Void, String, String> {
 	private List<BaiduBookChapter> list = null;
 	private String lastUrl;
 	private String bookName;
+	private String bookId;
 	private Context context;
 	private DownlaodNotification downNotification;
 	private OnBookDownloadListener listener;
 
 	public BookDownloadTask(Context context, List<BaiduBookChapter> list,
-			String bookName, String lastUrl, OnBookDownloadListener listener) {
+			String bookName,String bookId, String lastUrl, OnBookDownloadListener listener) {
 		this.context = context;
 		this.lastUrl = lastUrl;
 		this.bookName = bookName;
+		this.bookId = bookId; 
 		this.listener = listener;
 		if (list != null) {
 			String index = list.get(0).getIndex();
@@ -52,7 +55,7 @@ public class BookDownloadTask extends AsyncTask<Void, String, String> {
 	protected void onPreExecute() {
 		downNotification = new DownlaodNotification(context);
 		dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-				+ File.separator + bookName + File.separator);
+				+ File.separator + bookName+"_"+bookId + File.separator);
 		if (!dirFile.exists())
 			dirFile.mkdirs();
 		if (listener != null)
@@ -90,6 +93,12 @@ public class BookDownloadTask extends AsyncTask<Void, String, String> {
 			int allChapterLength = list.size();
 			float partProgress = (float) allChapterLength / 100;
 			for (int i = 0; i < allChapterLength; i++) {
+				
+				if (isCancelled()) {
+					downNotification.notifiManger.cancel(downNotification.NOTIFI_ID);
+					SP.getInstance().remove(bookName,bookId);
+					return null;
+				}
 				BaiduBookChapter chapter = list.get(i);
 				String url = getChapterUrl(chapter);
 				String chapterName = chapter.getText().trim()
@@ -149,7 +158,7 @@ public class BookDownloadTask extends AsyncTask<Void, String, String> {
 		} catch (Exception e) {
 
 			MyLogger.kLog().e(e);
-			SP.getInstance().putBoolean(bookName, true);
+			SP.getInstance().putBookDownSuccess(bookName+bookId, true);
 		}
 
 		return null;
@@ -161,13 +170,14 @@ public class BookDownloadTask extends AsyncTask<Void, String, String> {
 		super.onPostExecute(result);
 		if (listener != null)
 			listener.onCompleteDownlaod();
-		BaiduBookDownload.getInstance(context).updateDownSuccess(bookName);
+		sendDownloadSuccessReceiver(bookName);
+		BaiduBookDownload.getInstance(context).updateDownSuccess(bookName,bookId);
 		new Handler().postDelayed(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				downNotification.notifiManger.cancelAll();
+				downNotification.notifiManger.cancel(downNotification.NOTIFI_ID);
 			}
 		}, 1000);
 
@@ -249,6 +259,22 @@ public class BookDownloadTask extends AsyncTask<Void, String, String> {
 		}
 		return null;
 
+	}
+	
+	/**
+	 * 下载成功发送广播
+	 */
+	private void sendDownloadSuccessReceiver(String bookName) {
+		try {
+		String BOOKSHELF_ACTION = "com.himoo.ydsc.shelf.receiver";
+		Intent intent = new Intent(BOOKSHELF_ACTION);
+		intent.putExtra("success", true);
+		intent.putExtra("bookName",bookName);
+		intent.putExtra("bookId",bookId);
+		context.sendBroadcast(intent);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
 
 	public interface OnBookDownloadListener {

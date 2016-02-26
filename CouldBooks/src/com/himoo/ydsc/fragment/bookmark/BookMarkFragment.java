@@ -38,6 +38,7 @@ public class BookMarkFragment extends BaseFragment {
 	@ViewInject(R.id.listview_bookmak)
 	private SwipeMenuListView listView;
 	private String bookName;
+	private String bookId;
 	/** 当前点击的Item位置 */
 	private int mCurrentClickPosition = -1;
 	/** 书签的集合list */
@@ -47,10 +48,11 @@ public class BookMarkFragment extends BaseFragment {
 
 	private BookMarkDb db;
 
-	public static BookMarkFragment newInstance(String bookName, int bookType) {
+	public static BookMarkFragment newInstance(String bookName,String bookId,int bookType) {
 		BookMarkFragment fragment = new BookMarkFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString("bookName", bookName);
+		bundle.putString("bookId", bookId);
 		bundle.putInt("bookType", bookType);
 		fragment.setArguments(bundle);
 		return fragment;
@@ -70,7 +72,8 @@ public class BookMarkFragment extends BaseFragment {
 	public void initData() {
 		db = BookMarkDb.getInstance(getActivity(), "book");
 		bookName = getArguments().getString("bookName");
-		bookMarklist = db.querryReaderMark(bookName);
+		bookId = getArguments().getString("bookId");
+		bookMarklist = db.querryReaderMark(bookName,bookId);
 
 		if (bookMarklist != null && !bookMarklist.isEmpty()) {
 			mAdapter = new BookMarkAdapter(getActivity(),

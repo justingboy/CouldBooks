@@ -40,11 +40,7 @@ public class BookMarkUtils {
 	public List<BookMark> getBookMark(Context context, String bookName,
 			String bookId) {
 		BookMarkDb db = BookMarkDb.getInstance(context, "book");
-		bookMarkList = db.querryReaderMark(bookName);
-		if (bookMarkList == null) {
-			bookMarkList = new ArrayList<BookMark>();
-		}
-
+		bookMarkList = db.querryReaderMark(bookName,bookId);
 		return bookMarkList;
 	}
 
@@ -55,8 +51,9 @@ public class BookMarkUtils {
 	 * @return
 	 */
 	public boolean isExistBookMark(BookMark mark) {
+		if(bookMarkList!=null)
 		return bookMarkList.contains(mark);
-
+		return false;
 	}
 
 	/**

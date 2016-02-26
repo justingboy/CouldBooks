@@ -11,6 +11,10 @@ import com.lidroid.xutils.db.annotation.Table;
 @Table(name = "book_BookDownloadInfo")
 public class BaiduInfo extends EntityBase {
 
+	
+	@Column(column = "bookId")
+	private String bookId;
+	
 	@Column(column = "bookName")
 	private String bookName;
 
@@ -266,6 +270,14 @@ public class BaiduInfo extends EntityBase {
 
 	public void setDownSuccess(boolean isDownSuccess) {
 		this.isDownSuccess = isDownSuccess;
+	}
+
+	public String getBookId() {
+		return bookId;
+	}
+
+	public void setBookId(String bookId) {
+		this.bookId = bookId;
 	}
 
 }

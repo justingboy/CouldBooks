@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
-import com.himoo.ydsc.R;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.Animator.AnimatorListener;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -119,8 +118,8 @@ public class BookView extends RelativeLayout implements AnimatorListener {
 	// });
 	// }
 
-	public synchronized void startOpenBookAnimation(Drawable drawable) {
-		startOpenBookAnimation(null, getParent(), drawable);
+	public synchronized void startOpenBookAnimation(Drawable drawable,int ImageViewId) {
+		startOpenBookAnimation(null, getParent(), drawable,ImageViewId);
 	}
 
 	/**
@@ -133,7 +132,7 @@ public class BookView extends RelativeLayout implements AnimatorListener {
 	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	public synchronized void startOpenBookAnimation(OpenBookAnimEndListener l,
-			ViewParent parent, Drawable readerBg) {
+			ViewParent parent, Drawable readerBg,int ImageViewId) {
 		bg = readerBg;
 		mOpenBookAnimEndListener = l;
 		// try {
@@ -143,7 +142,7 @@ public class BookView extends RelativeLayout implements AnimatorListener {
 		// }
 
 		if (!mIsOpen.get()) {
-			mCover = (ImageView) findViewById(R.id.shelf_book_image);
+			mCover = (ImageView) findViewById(ImageViewId);
 			if (mCover == null/* || mBackground == null */) {
 				return;
 			}

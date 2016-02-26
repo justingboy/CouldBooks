@@ -48,12 +48,12 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 				SpConstant.BOOK_SHELF_DIRECTION, true);
 		String imageUrl = RegularUtil.converUrl(item.getBookCoverImageUrl());
 		helper.setImageUrl(R.id.shelf_book_image, imageUrl, option);
-//		boolean isSuccess = item.isAutoResume();
-//		if (!isSuccess) {
-//			helper.setVisible(R.id.shelf_book_undown, false);
-//		} else {
-//			helper.setVisible(R.id.shelf_book_undown, true);
-//		}
+		boolean isSuccess = item.isAutoResume();
+		if (!isSuccess) {
+			helper.setAlpha(R.id.shelf_book_image, 0.3f);
+		} else {
+			helper.setAlpha(R.id.shelf_book_image, 1f);
+		}
 
 		helper.setVisible(R.id.book_new_label, item.getBookIsRead() ? false
 				: true);
@@ -94,12 +94,15 @@ public class BookDownloadAdapter extends QuickAdapter<BookDownloadInfo> {
 							.getBookLastUpdateTime()) + "前更新");
 			if (item.getBookReadHository().equals("此书您还没有阅读!")) {
 				helper.setTextColor(R.id.shelf_book_current_chapter, Color.RED);
+				helper.setText(R.id.shelf_book_current_chapter,
+						item.getBookReadHository());
 			} else {
 				helper.setTextColor(R.id.shelf_book_current_chapter,
 						Color.BLACK);
+				helper.setText(R.id.shelf_book_current_chapter,
+						"读至:" + item.getBookReadHository());
 			}
-			helper.setText(R.id.shelf_book_current_chapter,
-					"读至:" + item.getBookReadHository());
+			
 			helper.setText(R.id.shelf_book_current_progress,
 					item.getLastReaderProgress());
 

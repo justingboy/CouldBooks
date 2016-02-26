@@ -27,6 +27,7 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 	private Context mContext;
 
 	private String mBookName;
+	private String bookId;
 
 	private OnNewChapterUpdateListener mListener;
 
@@ -49,9 +50,10 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 	 * @param updateType
 	 *            更新模式 1单本书更新，2所有书都更新
 	 */
-	public BookUpdateTask(Context context, String bookName, int updateType) {
+	public BookUpdateTask(Context context, String bookName, String bookId,int updateType) {
 		this.mContext = context;
 		this.mBookName = bookName;
+		this.bookId = bookId;
 		this.mUpdateType = updateType;
 	}
 
@@ -69,7 +71,7 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 		// TODO Auto-generated method stub
 		if (mUpdateType == 1) {
 			BaiduInfo book = BaiduBookDownload.getInstance(mContext)
-					.queryNeedUpdate(mBookName);
+					.queryNeedUpdate(mBookName,this.bookId);
 			if (book != null) {
 				String lastChapter = book.getLastChapterName();
 				String content = BookDetailsTask.getInstance()
@@ -81,14 +83,14 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 						if (!newChapter.equals(lastChapter)) {
 							ArrayList<BaiduBookChapter> list = praseBaiduBookChapter(content);
 							if (list != null && !list.isEmpty()) {
-								updateNewChapter(mBookName, list);
+								updateNewChapter(mBookName,book.getBookId(),list);
 							}
 
 							BaiduBookDownload.getInstance(mContext)
 									.updateChapterName(book, newChapter);
-							IOHelper.getBook(mContext, mBookName,
+							IOHelper.getBook(mContext, mBookName,book.getBookId(),
 									LocalReaderUtil.getInstance()
-											.parseLocalBook(mBookName, 2));
+											.parseLocalBook(mBookName, book.getBookId(),2));
 							LastChapter chapter = new LastChapter(
 									book.getBookName(), newChapter);
 							return chapter;
@@ -129,7 +131,7 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 								isAllNewChapter = false;
 								ArrayList<BaiduBookChapter> listChapter = praseBaiduBookChapter(content);
 								if (list != null && !list.isEmpty()) {
-									updateNewChapter(book.getBookName(),
+									updateNewChapter(book.getBookName(),book.getBookId(),
 											listChapter);
 								}
 								BaiduBookDownload.getInstance(mContext)
@@ -248,16 +250,16 @@ public class BookUpdateTask extends AsyncTask<Void, String, LastChapter> {
 	 * @param list
 	 * @return
 	 */
-	private void updateNewChapter(String bookName,
+	private void updateNewChapter(String bookName,String bookId,
 			ArrayList<BaiduBookChapter> list) {
 		// TODO Auto-generated method stub
 		int allChapterLength = list.size();
 		dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
-				+ File.separator + bookName + File.separator);
+				+ File.separator + bookName+"_"+bookId + File.separator);
 		if (!dirFile.exists())
 			dirFile.mkdirs();
 		ArrayList<BaiduBookChapter> localList = LocalReaderUtil.getInstance()
-				.parseLocalBook(bookName, 2);
+				.parseLocalBook(bookName,bookId, 2);
 		ArrayList<String> chapterNameList = new ArrayList<String>();
 		int localSize = localList.size();
 		int localStartLen = 0;

@@ -50,8 +50,8 @@ public class FileUtils {
 	 * 
 	 * @param bookName
 	 */
-	public void deleteBaiduBook(String bookName) {
-		File file = new File(mSdRootPath+FOLDER_DOWNLOAD_BOOK_BAIDU, bookName);
+	public void deleteBaiduBook(String bookName,String bookId) {
+		File file = new File(mSdRootPath+FOLDER_DOWNLOAD_BOOK_BAIDU, bookName+"_"+bookId);
 		deleteFile(file);
 	}
 
@@ -60,10 +60,10 @@ public class FileUtils {
 	 * 
 	 * @param bookName
 	 */
-	public void deleteMeBook(String bookName) {
+	public void deleteMeBook(String bookName,String bookId) {
 
-		File file1 = new File(mSdRootPath+FOLDER_DOWNLOAD_BOOK, bookName);
-		File file2 = new File(mSdRootPath+FOLDER_DOWNLOAD_BOOK, bookName + ".zip");
+		File file1 = new File(mSdRootPath+FOLDER_DOWNLOAD_BOOK, bookName+"_"+bookId);
+		File file2 = new File(mSdRootPath+FOLDER_DOWNLOAD_BOOK, bookName +"_"+bookId+".zip");
 		deleteFile(file1);
 		deleteFile(file2);
 	}

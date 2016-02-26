@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.himoo.ydsc.R;
+import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.util.DeviceUtil;
 
@@ -62,6 +63,19 @@ public class Toast {
 		if (isShow)
 			android.widget.Toast.makeText(context, message,
 					android.widget.Toast.LENGTH_LONG).show();
+	}
+
+	/**
+	 * 长时间显示Toast
+	 * 
+	 * @param context
+	 * @param message
+	 */
+	public static void showLong(CharSequence message) {
+		if (isShow)
+			android.widget.Toast.makeText(
+					BaseApplication.getInstance().getApplicationContext(),
+					message, android.widget.Toast.LENGTH_LONG).show();
 	}
 
 	/**
@@ -142,7 +156,7 @@ public class Toast {
 			layout_toast.setBackgroundDrawable(context.getResources()
 					.getDrawable(R.drawable.bg_toast));
 			tvBg = (TextView) layout.findViewById(R.id.tv_toast_msg);
-//			tvBg.setCompoundDrawables(null, null, null, null);
+			// tvBg.setCompoundDrawables(null, null, null, null);
 			toastBg.setGravity(Gravity.CENTER, 0,
 					-DeviceUtil.dip2px(context, 35));
 			toastBg.setDuration(android.widget.Toast.LENGTH_SHORT);

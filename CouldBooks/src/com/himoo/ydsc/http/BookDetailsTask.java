@@ -281,7 +281,7 @@ public class BookDetailsTask {
 	 * @param urlString
 	 * @param callBack
 	 */
-	public void send(final String urlString, final String bookName,
+	public void send(final String urlString, final String bookName,final String bookId,
 			final String index, final OnRequestCallBack callBack) {
 		new Thread(new Runnable() {
 
@@ -289,7 +289,7 @@ public class BookDetailsTask {
 			public void run() {
 				// TODO Auto-generated method stub
 				File dirFile = new File(FileUtils.mSdRootPath
-						+ "/CouldBook/baidu" + File.separator + bookName
+						+ "/CouldBook/baidu" + File.separator + bookName+"_"+bookId
 						+ File.separator);
 
 				File file = new File(dirFile, index + ".txt");

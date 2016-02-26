@@ -18,6 +18,7 @@ import com.himoo.ydsc.base.BaseFragment;
 import com.himoo.ydsc.base.quickadapter.BaseAdapterHelper;
 import com.himoo.ydsc.base.quickadapter.QuickAdapter;
 import com.himoo.ydsc.bean.BaiduBookChapter;
+import com.himoo.ydsc.bookdl.DownloadManager;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.reader.ReaderActivity;
@@ -33,6 +34,7 @@ public class CatalogFragment extends BaseFragment {
 	@ViewInject(R.id.listview_catalog)
 	private ListView listView;
 	private String bookName;
+	private String bookId;
 	private BookMark bookMark;
 	/** 标记当前点击Item的位置 */
 	private int mCurrentClickPosition = -1;
@@ -43,11 +45,12 @@ public class CatalogFragment extends BaseFragment {
 	private int position;
 	private int type;
 
-	public static CatalogFragment newInstance(String bookName, int type,
-			int bookType, int position) {
+	public static CatalogFragment newInstance(String bookName, String bookId,
+			int type, int bookType, int position) {
 		CatalogFragment fragment = new CatalogFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString("bookName", bookName);
+		bundle.putString("bookId", bookId);
 		bundle.putInt("type", type);
 		bundle.putInt("bookType", bookType);
 		bundle.putInt("position", position);
@@ -70,9 +73,9 @@ public class CatalogFragment extends BaseFragment {
 		// TODO Auto-generated method stub
 		List<BaiduBookChapter> list = IOHelper.getBookChapter();
 		bookName = getArguments().getString("bookName");
-
+		bookId = getArguments().getString("bookId");
 		bookMark = BookMarkDb.getInstance(getActivity(), "book")
-				.querryReaderPos(bookName);
+				.querryReaderPos(bookName, bookId);
 		mAdapter = new BookCatalogdapter(getActivity(),
 				R.layout.adapter_catalog_item, list);
 		listView.setAdapter(mAdapter);
@@ -92,7 +95,7 @@ public class CatalogFragment extends BaseFragment {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		if (!isDownloading) {
+		if (!DownloadManager.getInstance().isExistTask(bookName, bookId)) {
 			if (mCurrentClickPosition != -1)
 				return;
 			mCurrentClickPosition = position;
@@ -119,7 +122,8 @@ public class CatalogFragment extends BaseFragment {
 			helper.setText(R.id.tv_bookCatalog, item.getText().trim());
 
 			if (bookMark != null
-					&& bookMark.getChapterName().equals(item.getText().trim())||(type==1&&position==helper.getPosition())) {
+					&& bookMark.getChapterName().equals(item.getText().trim())
+					|| (type == 1 && position == helper.getPosition())) {
 				helper.setTextRightDrawable(R.id.tv_bookCatalog,
 						R.drawable.book_mark);
 				helper.setTextColor(R.id.tv_bookCatalog, Color.RED);
@@ -185,12 +189,9 @@ public class CatalogFragment extends BaseFragment {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
-
 			if (intent.getAction().equals(ACTION)) {
-				isDownloading = intent.getBooleanExtra("isDownloading", false);
-				if (!isDownloading) {
-					initData();
-				}
+				initData();
+				DownloadManager.getInstance().deleteTask(bookName, bookId);
 			}
 
 		}

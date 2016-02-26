@@ -21,8 +21,10 @@ import java.util.List;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.util.Linkify;
@@ -41,6 +43,7 @@ import android.widget.TextView;
 
 import com.himoo.ydsc.animation.BookView;
 import com.himoo.ydsc.animation.BookView.OpenBookAnimEndListener;
+import com.himoo.ydsc.util.BitmapGrayUtils;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
@@ -319,6 +322,26 @@ public class BaseAdapterHelper {
 		final ImageView view = retrieveView(viewId);
 		ImageLoader.getInstance().displayImage(imageUrl, view, option);
 
+		return this;
+	}
+
+	/**
+	 * 加载图片通过 设置参数DisplayImageOptions
+	 * 
+	 * @param viewId
+	 *            The view id.
+	 * @param imageUrl
+	 *            The image URL.
+	 * @param option
+	 *            The image DisplayImageOptions
+	 * @return BaseAdapterHelper for chaining.
+	 */
+	public BaseAdapterHelper setImageToGray(int viewId) {
+		final ImageView view = retrieveView(viewId);
+		Drawable drawable = view.getDrawable();
+		BitmapDrawable bd = (BitmapDrawable) drawable;
+		Bitmap bitmap = bd.getBitmap();
+		view.setImageBitmap(BitmapGrayUtils.convertGreyImg(bitmap));
 		return this;
 	}
 

@@ -95,5 +95,5 @@
             app:pageColor="#7C7C7C"
             app:radius="6dp" />
     </LinearLayout>
-
+    
 </RelativeLayout>

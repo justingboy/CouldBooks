@@ -7,6 +7,9 @@ import com.lidroid.xutils.db.annotation.Table;
 @Table(name = "book_mark")
 public class BookMark extends EntityBase{
 	
+	@Column(column = "bookId")
+	private String bookId;
+	
 	@Column(column = "bookName")
 	private String bookName;
 	
@@ -74,10 +77,19 @@ public class BookMark extends EntityBase{
 		this.type = type;
 	}
 
+	public String getBookId() {
+		return bookId;
+	}
+
+	public void setBookId(String bookId) {
+		this.bookId = bookId;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((bookId == null) ? 0 : bookId.hashCode());
 		result = prime * result
 				+ ((bookName == null) ? 0 : bookName.hashCode());
 		result = prime * result
@@ -98,6 +110,11 @@ public class BookMark extends EntityBase{
 		if (getClass() != obj.getClass())
 			return false;
 		BookMark other = (BookMark) obj;
+		if (bookId == null) {
+			if (other.bookId != null)
+				return false;
+		} else if (!bookId.equals(other.bookId))
+			return false;
 		if (bookName == null) {
 			if (other.bookName != null)
 				return false;
@@ -118,6 +135,7 @@ public class BookMark extends EntityBase{
 			return false;
 		return true;
 	}
+
 	
 	
 
