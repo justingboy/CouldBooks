@@ -41,7 +41,6 @@ import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.dialog.ColorPickerDialog;
 import com.himoo.ydsc.dialog.SpeechPopupWindow;
 import com.himoo.ydsc.download.BaiduBookDownload;
-import com.himoo.ydsc.download.BaiduInfo;
 import com.himoo.ydsc.download.BookDownloadManager;
 import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.download.BookDownloadTask;
@@ -96,6 +95,8 @@ public class ReaderActivity extends BaseReaderActivity implements
 		OnTouchListener {
 	/** 通知广播的Action */
 	private BookDownloadManager downloadManager;
+	/** 语音播报的位置 */
+	private int readPos = 0;
 	private PageWidget pageWidget;
 	private Bitmap curBitmap, nextBitmap;
 	private Canvas curCanvas, nextCanvas;
@@ -258,19 +259,22 @@ public class ReaderActivity extends BaseReaderActivity implements
 			// TODO Auto-generated method stub
 			switch (v.getId()) {
 			case R.id.booksetting_source:
-				
-				
-			/*	BaiduInfo book = BaiduBookDownload
-				.getInstance(ReaderActivity.this)
-				.queryNeedUpdate(bookpage.chapter.getBookName(), bookId);
-		BaiduBookDownload.getInstance(ReaderActivity.this).updateChapterName(book,
-				"连夜启程");
-		Toast.show(ReaderActivity.this, "插入最新章节成功!");*/
+
+				/*
+				 * BaiduInfo book = BaiduBookDownload.getInstance(
+				 * ReaderActivity.this).queryNeedUpdate(
+				 * bookpage.chapter.getBookName(), bookId);
+				 * BaiduBookDownload.getInstance(ReaderActivity.this)
+				 * .updateChapterName(book, "连夜启程");
+				 * Toast.show(ReaderActivity.this, "插入最新章节成功!");
+				 */
+
 				if (NetWorkUtils.isNetConnected(ReaderActivity.this)) {
 					startToActivity();
 				} else {
 					Toast.show(ReaderActivity.this, "未连接网络");
 				}
+
 				break;
 			case R.id.booksetting_update:
 				if (DownloadManager.getInstance().isExistTask(
@@ -374,6 +378,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 		boolean ret = false;
 		if (v == pageWidget) {
 			if (e.getAction() == MotionEvent.ACTION_DOWN) {
+
 				if (isClickable(e)) {
 					startAnimation(250);
 					return false;
@@ -382,11 +387,16 @@ public class ReaderActivity extends BaseReaderActivity implements
 						startAnimation(250);
 						isUp = false;
 					}
-
 				}
 				pageWidget.abortAnimation();
 				pageWidget.calcCornerXY(e.getX(), e.getY());
 				bookpage.draw(ReaderActivity.this, curCanvas);
+				if (isSpeech) {
+					isSpeech = false;
+					booksetting_speech
+							.setImageResource(R.drawable.iphone_yuyin);
+					SpeechReader.getInstance().clear();
+				}
 				if (!isLeftHanderMode) {
 					if (pageWidget.DragToRight()) {
 
@@ -677,12 +687,16 @@ public class ReaderActivity extends BaseReaderActivity implements
 	@Override
 	public void onTextTypeChange() {
 		// TODO Auto-generated method stub
-		int pageNum = bookpage.pageNum;
-		int pageCount = bookpage.pagesVe.size();
-		bookpage.setTextType();
-		bookpage.updateCurrentpageNum(pageNum, pageCount);
-		bookpage.draw(this, isFilp ? nextCanvas : curCanvas);
-		pageWidget.invalidate();
+		try {
+			int pageNum = bookpage.pageNum;
+			int pageCount = bookpage.pagesVe.size();
+			bookpage.setTextType();
+			bookpage.updateCurrentpageNum(pageNum, pageCount);
+			bookpage.draw(this, isFilp ? nextCanvas : curCanvas);
+			pageWidget.invalidate();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
 	}
 
@@ -757,6 +771,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 						popupWindow = new SpeechPopupWindow(this, speech_view);
 					popupWindow.showAtLocation(parentView, Gravity.TOP, 0,
 							DeviceUtil.dip2px(this, 50));
+					readPos = 0;
 					SpeechReader.getInstance().speechChapter(
 							bookpage.getCurPage(), mSynListener);
 				} else {
@@ -783,17 +798,21 @@ public class ReaderActivity extends BaseReaderActivity implements
 	 * 保存阅读进度
 	 */
 	private void saveBookReaderProgress() {
-		if (isNeedSaveProgress) {
-			BookMarkDb db = BookMarkDb.getInstance(this, "book");
-			BookMark mark = new BookMark();
-			mark.setBookId(bookId);
-			mark.setBookName(bookpage.chapter.getBookName());
-			mark.setChapterName(bookpage.chapter.getChapterName());
-			mark.setPosition(bookpage.chapter.getPosition());
-			mark.setCurrentPage(bookpage.pageNum - 1);
-			mark.setPageCount(bookpage.pagesVe.size());
-			mark.setType(1);
-			db.saveReaderPosition(mark);
+		try {
+			if (isNeedSaveProgress) {
+				BookMarkDb db = BookMarkDb.getInstance(this, "book");
+				BookMark mark = new BookMark();
+				mark.setBookId(bookId);
+				mark.setBookName(bookpage.chapter.getBookName());
+				mark.setChapterName(bookpage.chapter.getChapterName());
+				mark.setPosition(bookpage.chapter.getPosition());
+				mark.setCurrentPage(bookpage.pageNum - 1);
+				mark.setPageCount(bookpage.pagesVe.size());
+				mark.setType(1);
+				db.saveReaderPosition(mark);
+			}
+		} catch (Exception e) {
+			Log.i("msg", e.getMessage());
 		}
 
 	}
@@ -1089,11 +1108,6 @@ public class ReaderActivity extends BaseReaderActivity implements
 		// TODO Auto-generated method stub
 		if (jumpType == 2) {
 			if (keyCode == KeyEvent.KEYCODE_BACK) {
-				/*
-				 * String filePath = Environment.getExternalStorageDirectory() +
-				 * "/DCIM/" + "aaaa.png"; ScreenShot.shoot(this, new
-				 * File(filePath));
-				 */
 				finish();
 				overridePendingTransition(0, R.anim.fade_out);
 			}
@@ -1181,11 +1195,8 @@ public class ReaderActivity extends BaseReaderActivity implements
 			this.chapter = chapter;
 			bookpage.initChapter(chapter, currentPage, pageCount, bookType);
 			pageWidget.setOnTouchListener(this);
-			Log.i("msg", "currentPage = " + currentPage + "pageCount = "
-					+ pageCount);
 			isFirstloading = false;
 		} else {
-			Log.i("msg", "第二次加载");
 			this.chapter = chapter;
 			bookpage.currentAsyncChapter(this.chapter);
 			// 恢复时记录的当前页数
@@ -1280,7 +1291,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 
 		// 开始播放
 		public void onSpeakBegin() {
-			Toast.show(ReaderActivity.this, "开始播报语音");
+			// Toast.show(ReaderActivity.this, "开始播报语音");
 		}
 
 		// 暂停播放
@@ -1291,8 +1302,17 @@ public class ReaderActivity extends BaseReaderActivity implements
 		// 播放进度回调
 		// percent为播放进度0~100,beginPos为播放音频在文本中开始位置，endPos表示播放音频在文本中结束位置.
 		public void onSpeakProgress(int percent, int beginPos, int endPos) {
-			Log.i("msg", "percent =" + percent + "|beginPos = " + beginPos
-					+ "|endPos=" + endPos);
+			int leng = bookpage.pagesVe.get(bookpage.pageNum).toString()
+					.length();
+			if ((endPos - readPos) > leng) {
+				pageWidget.startAnimationByParam();
+				bookpage.nextPage();
+				bookpage.draw(ReaderActivity.this, isFilp ? nextCanvas
+						: curCanvas);
+				pageWidget.invalidate();
+				readPos += leng;
+			}
+
 		}
 
 		// 恢复播放回调接口
@@ -1307,9 +1327,22 @@ public class ReaderActivity extends BaseReaderActivity implements
 		@Override
 		public void onCompleted(SpeechError error) {
 			// TODO Auto-generated method stub
+
 			if (error == null) {
-				Toast.show(ReaderActivity.this, "语音结束时发生错误");
+				// bookpage.initNextChapter();
+				if (bookpage.nextPage()) {
+					readPos = 0;
+					bookpage.draw(ReaderActivity.this, isFilp ? nextCanvas
+							: curCanvas);
+					pageWidget.invalidate();
+					SpeechReader.getInstance().speechChapter(
+							bookpage.getCurPage().toString(), mSynListener);
+				} else {
+					readPos = 0;
+					Toast.show(ReaderActivity.this, "语音播报完成");
+				}
 			} else {
+				readPos = 0;
 				Toast.show(ReaderActivity.this, "语音播报完成");
 			}
 
@@ -1386,6 +1419,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 				task);
 		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		sendToBookShelfBroadcast();
+		isDownload = true;
 
 	}
 
@@ -1517,7 +1551,6 @@ public class ReaderActivity extends BaseReaderActivity implements
 				fragment.currentPosition = bookpage.chapter.getPosition();
 			fragment.chapterPageCount = bookpage.pagesVe.size() - 1;
 			fragment.currentPage = bookpage.pageNum;
-			Log.e("msg", e.getMessage());
 		}
 	}
 
@@ -1545,15 +1578,19 @@ public class ReaderActivity extends BaseReaderActivity implements
 	 * @return
 	 */
 	private BookMark getCurrentBookMark() {
-		BookMark mark = new BookMark();
-		mark.setBookName(bookpage.chapter.getBookName());
-		mark.setBookId(bookId);
-		mark.setChapterName(bookpage.chapter.getChapterName());
-		mark.setPosition(bookpage.chapter.getPosition());
-		mark.setCurrentPage(bookpage.pageNum - 1);
-		mark.setPageCount(bookpage.pagesVe.size());
-		mark.setType(2);
-		return mark;
+		try {
+			BookMark mark = new BookMark();
+			mark.setBookName(bookpage.chapter.getBookName());
+			mark.setBookId(bookId);
+			mark.setChapterName(bookpage.chapter.getChapterName());
+			mark.setPosition(bookpage.chapter.getPosition());
+			mark.setCurrentPage(bookpage.pageNum - 1);
+			mark.setPageCount(bookpage.pagesVe.size());
+			mark.setType(2);
+			return mark;
+		} catch (Exception e) {
+			return null;
+		}
 
 	}
 

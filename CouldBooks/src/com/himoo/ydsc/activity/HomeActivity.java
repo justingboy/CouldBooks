@@ -105,14 +105,14 @@ public class HomeActivity extends BaseActivity implements
 
 		Log.d(SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST));
-		if (!SharedPreferences.getInstance().getBoolean(
-				SpConstant.DIALOG_INDICATE_SHELF, false)) {
-			
-			IndicateDialog dialog = new IndicateDialog(this, this);
-			dialog.create();
-			dialog.setIndicateDrawable(R.drawable.book_shelf_indicate);
-			dialog.show();
-		}
+//		if (!SharedPreferences.getInstance().getBoolean(
+//				SpConstant.DIALOG_INDICATE_SHELF, false)) {
+//			
+//			IndicateDialog dialog = new IndicateDialog(this, this);
+//			dialog.create();
+//			dialog.setIndicateDrawable(R.drawable.book_shelf_indicate);
+//			dialog.show();
+//		}
 
 	}
 

@@ -9,13 +9,11 @@ import org.apache.http.message.BasicNameValuePair;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.himoo.ydsc.http.OkHttpClientManager.Param;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.squareup.okhttp.Request;
 
 /**
  * 关键字搜索
@@ -65,84 +63,88 @@ public class BookSearchTask {
 	 * @param context
 	 * @param bookId
 	 */
+	@SuppressWarnings("static-access")
 	public void executeMe(String keyWord, String page,
 			final PullToRefreshListView listView, final boolean isFirst) {
-		if (httpMe == null)
-			httpMe = new HttpUtils(5000);
-		String url = SharedPreferences.getInstance().getString("host",
-				HttpConstant.HOST_URL_TEST)
-				+ "getBooksSearch.asp";
+		try {
+			String url = SharedPreferences.getInstance().getString("host",
+					HttpConstant.HOST_URL_TEST)
+					+ "getBooksSearch.asp";
+			Param[] params = createParam(keyWord, page);
+			OkHttpClientManager.getInstance().postAsyn(url,
+					new OkHttpClientManager.ResultCallback<String>() {
 
-		// post的键值对
-		RequestParams params = createNameValuePair(keyWord, page);
+						@Override
+						public void onError(Request request, Exception e) {
+							// TODO Auto-generated method stub
+							if (mSearchListener != null)
+								 mSearchListener.onSearcFailure(e, e.getMessage(), BAIDU);
+						}
 
-		httpBaidu.send(HttpMethod.POST, url, params,
-				new RequestCallBack<String>() {
+						@Override
+						public void onResponse(String response) {
+							// TODO Auto-generated method stub
+							if (mSearchListener != null)
+								if (listView.getCurrentMode() == Mode.PULL_FROM_START
+										|| isFirst)
+									mSearchListener.onSearchSucess(
+											response, OWN,
+											TYPE_PULL_DOWN_UPDATE, isFirst);
+								else if (listView.getCurrentMode() == Mode.PULL_FROM_END)
+									mSearchListener.onSearchSucess(
+											response, OWN,
+											TYPE_PULL_UP_LOAD, isFirst);
 
-					@Override
-					public void onSuccess(ResponseInfo<String> responseInfo) {
-						// TODO Auto-generated method stub
+						}
+					}, params);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
-						if (mSearchListener != null)
-
-							if (listView.getCurrentMode() == Mode.PULL_FROM_START
-									|| isFirst)
-								mSearchListener.onSearchSucess(
-										responseInfo.result, OWN,
-										TYPE_PULL_DOWN_UPDATE, isFirst);
-							else if (listView.getCurrentMode() == Mode.PULL_FROM_END)
-								mSearchListener.onSearchSucess(
-										responseInfo.result, OWN,
-										TYPE_PULL_UP_LOAD, isFirst);
-
-					}
-
-					@Override
-					public void onFailure(HttpException error, String msg) {
-						if (mSearchListener != null)
-							mSearchListener.onSearcFailure(error, msg, BAIDU);
-					}
-
-				});
+		
 	}
+
 
 	/**
 	 * 
 	 * @param context
 	 * @param bookId
 	 */
+	@SuppressWarnings("static-access")
 	public void executeBaidu(String keyWord, String page) {
-		if (httpBaidu == null)
-			httpBaidu = new HttpUtils(5000);
-
 		String url = null;
 		try {
 			url = HttpConstant.BAIDU_BOOK_SEARCH_URL + "pageno="
 					+ (20 * Integer.valueOf(page)) + "&keyword="
 					+ URLEncoder.encode(keyWord, "utf-8");
+
+			OkHttpClientManager.getInstance().getAsyn(url,
+					new OkHttpClientManager.ResultCallback<String>() {
+
+						@Override
+						public void onError(Request request, Exception e) {
+							// TODO Auto-generated method stub
+							if (mSearchListener != null)
+								mSearchListener.onSearcFailure(e,
+										e.getMessage(), BAIDU);
+						}
+
+						@Override
+						public void onResponse(String response) {
+							// TODO Auto-generated method stub
+							if (mSearchListener != null)
+								mSearchListener.onSearchSucess(response, BAIDU,
+										TYPE_PULL_DOWN_UPDATE, true);
+						}
+
+					});
+
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			if (mSearchListener != null)
 				mSearchListener.onSearcFailure(e, "转码错误", BAIDU);
 		}
-		httpBaidu.send(HttpMethod.GET, url, new RequestCallBack<String>() {
-
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
-				if (mSearchListener != null)
-					mSearchListener.onSearchSucess(responseInfo.result, BAIDU,
-							TYPE_PULL_DOWN_UPDATE, true);
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				if (mSearchListener != null)
-					mSearchListener.onSearcFailure(error, msg, BAIDU);
-			}
-
-		});
 	}
 
 	/**
@@ -152,7 +154,7 @@ public class BookSearchTask {
 	 * @param page
 	 * @return
 	 */
-	private RequestParams createNameValuePair(String keyWord, String page) {
+	public RequestParams createNameValuePair(String keyWord, String page) {
 		RequestParams params = new RequestParams();
 		NameValuePair nameValuePair1 = new BasicNameValuePair("desc", "1");
 		NameValuePair nameValuePair2 = new BasicNameValuePair("keyword",
@@ -170,6 +172,23 @@ public class BookSearchTask {
 		pairs.add(nameValuePair5);
 
 		params.addBodyParameter(pairs);
+		return params;
+	}
+
+	/**
+	 * 配置请求参数
+	 * 
+	 * @param keyWord
+	 * @param page
+	 * @return
+	 */
+	private Param[] createParam(String keyWord, String page) {
+		Param[] params = new Param[5];
+		String[] keys = { "desc", "keyword", "order", "page", "size" };
+		String[] values = { "1", keyWord, "Book_Popularity", page, "40" };
+		for (int i = 0; i < params.length; i++) {
+			params[i] = new Param(keys[i], values[i]);
+		}
 		return params;
 	}
 

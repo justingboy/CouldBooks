@@ -62,6 +62,7 @@ public class BookMarkUtils {
 	 * @param mark
 	 */
 	public void addBookMark(BookMark mark) {
+		if(mark!=null)
 		bookMarkList.add(mark);
 	}
 
@@ -71,6 +72,7 @@ public class BookMarkUtils {
 	 * @param mark
 	 */
 	public void deleteBookMark(BookMark mark) {
+		if(mark!=null)
 		bookMarkList.remove(mark);
 	}
 

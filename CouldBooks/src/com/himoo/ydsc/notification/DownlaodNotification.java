@@ -50,7 +50,7 @@ public class DownlaodNotification {
 			notifiManger.notify(NOTIFI_ID, notification);
 		}
 		remoteViews.setTextViewText(R.id.download_notication_title, bookName.length()>8?bookName.substring(0, 7)+"...":bookName
-				+ "   " + progress + "%");
+				+ "   " + ((progress>=100)?100:progress) + "%");
 		// 在sdk版本0之前的背景是白色的，使得白色的字体无法显示
 		if (android.os.Build.VERSION.SDK_INT <= 9) {
 			remoteViews.setTextColor(R.id.download_notication_title, mContext
@@ -89,7 +89,7 @@ public class DownlaodNotification {
 	 */
 	public void setProgressAndNetSpeed(int progress, long netSpeed) {
 		remoteViews.setTextViewText(R.id.download_notication_title, (bookName.length()>8?bookName.substring(0, 7)+"...":bookName)
-				+ "   " + progress + "%");
+				+ "   " + ((progress>=100)?100:progress) + "%");
 		remoteViews.setProgressBar(R.id.progress, 100, progress, false);
 		remoteViews.setTextViewText(R.id.tv_progress, netSpeed + "kb/s");
 		notifiManger.notify(NOTIFI_ID, notification);

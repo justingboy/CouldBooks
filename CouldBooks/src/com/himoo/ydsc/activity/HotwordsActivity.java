@@ -22,24 +22,18 @@ import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.db.bean.BookSearchRecords;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.http.HttpOperator;
+import com.himoo.ydsc.http.OkHttpClientManager;
 import com.himoo.ydsc.ui.swipebacklayout.SwipeBackActivity;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.NetWorkUtils;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.squareup.okhttp.Request;
 
 public class HotwordsActivity extends SwipeBackActivity implements
 		OnItemClickListener, OnRefreshListener2<GridView> {
 
 	@ViewInject(R.id.gridView_hotword)
 	private PullToRefreshGridView gridView_hotword;
-
-	/** HttpUtils */
-	private HttpUtils http;
 
 	/** 请求关键字的的页数 */
 	private int mCurrentPage = 1;
@@ -92,71 +86,75 @@ public class HotwordsActivity extends SwipeBackActivity implements
 	 * @param size
 	 *            请求的个数
 	 */
+	@SuppressWarnings("static-access")
 	private void getKeyWordRequest(int page, int size) {
-		if (http == null)
-			http = new HttpUtils();
 		String url = HttpConstant.BASE_URL_KEYWORD
 				+ HttpOperator.getKeyWordRequestHeard(page, size);
-		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
-				Gson gson = new Gson();
-				ArrayList<BookKeyWord> list = gson.fromJson(
-						responseInfo.result,
-						new TypeToken<ArrayList<BookKeyWord>>() {
-						}.getType());
-				if (list != null && !list.isEmpty()) {
-					List<String> data = new ArrayList<String>();
-					for (int i = 0; i < list.size(); i++) {
-						data.add(list.get(i).getKeyword());
-					}
-					if (isRefresh) {
-						if (mAdapter != null) {
-							mAdapter.clear();
-							mAdapter.addAll(data);
-							notifyDataAndRefreshComplete();
-						}
-						isRefresh = false;
-					} else {
-						if (mAdapter == null) {
-							initAdapter(data);
-							dismissRefreshDialog();
+
+		OkHttpClientManager.getInstance().getAsyn(url,
+				new OkHttpClientManager.ResultCallback<String>() {
+
+					@Override
+					public void onError(Request request, Exception e) {
+						// TODO Auto-generated method stub
+						Log.e(e);
+						dismissRefreshDialog();
+						if (NetWorkUtils.isNetConnected(HotwordsActivity.this)) {
+							Toast.showBg(HotwordsActivity.this, "加载关键字失败 ");
 						} else {
-							loadMore(data);
+							Toast.showBg(HotwordsActivity.this, "未连接网络");
+						}
 
+					}
+
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						Gson gson = new Gson();
+						ArrayList<BookKeyWord> list = gson.fromJson(response,
+								new TypeToken<ArrayList<BookKeyWord>>() {
+								}.getType());
+						if (list != null && !list.isEmpty()) {
+							List<String> data = new ArrayList<String>();
+							for (int i = 0; i < list.size(); i++) {
+								data.add(list.get(i).getKeyword());
+							}
+							if (isRefresh) {
+								if (mAdapter != null) {
+									mAdapter.clear();
+									mAdapter.addAll(data);
+									notifyDataAndRefreshComplete();
+								}
+								isRefresh = false;
+							} else {
+								if (mAdapter == null) {
+									initAdapter(data);
+									dismissRefreshDialog();
+								} else {
+									loadMore(data);
+
+								}
+							}
+							mCurrentPage++;
+
+						} else {
+							notifyDataAndRefreshComplete();
+							Toast.showBg(HotwordsActivity.this, "加载关键字失败");
 						}
 					}
-					mCurrentPage++;
 
-				} else {
-					Toast.showBg(HotwordsActivity.this, "加载关键字失败");
-				}
-			}
+				});
 
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				// TODO Auto-generated method stub
-				Log.e(error);
-				dismissRefreshDialog();
-				if (NetWorkUtils.isNetConnected(HotwordsActivity.this)) {
-					Toast.showBg(HotwordsActivity.this, "加载关键字失败 ");
-				} else {
-					Toast.showBg(HotwordsActivity.this, "未连接网络");
-				}
-
-			}
-		});
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
 		// TODO Auto-generated method stub
-		if(mCurrentPosition!=-1)
+		if (mCurrentPosition != -1)
 			return;
 		mCurrentPosition = position;
-		
+
 		if (NetWorkUtils.isNetConnected(this)) {
 			String keyWord = (String) parent.getItemAtPosition(position);
 			save(keyWord);

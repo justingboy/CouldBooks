@@ -558,7 +558,7 @@ public class BookShelfFragment extends BaseFragment implements
 					if (book.getBookSourceType() == 1) {
 						AfreshDownMeBookTask task = new AfreshDownMeBookTask(
 								getActivity(), book.getBookName(),
-								book.getBookId(), book.getDownloadUrl(), false,
+								book.getBookId(), book.getDownloadUrl(),(book.isAutoResume()? false:true),
 								BookShelfFragment.this);
 						task.execute();
 
@@ -852,6 +852,7 @@ public class BookShelfFragment extends BaseFragment implements
 				if (DownloadManager.getInstance().isExistTask(
 						book.getBookName(), book.getBookId())) {
 					Toast.showBg(getActivity(), "整本更新中,请稍后打开");
+					mCurrentClickPosition = -1;
 					return;
 				}
 
@@ -1131,12 +1132,16 @@ public class BookShelfFragment extends BaseFragment implements
 	 * 更新阅读进度
 	 */
 	private void updateReadProgress() {
-		BookDownloadInfo oldBook = mAdapter.getItem(mCurrentClickPosition);
-		BookDownloadInfo newBook = downloadManager.querryByBookName(
-				oldBook.getBookName(), oldBook.getBookId());
-		mAdapter.set(oldBook, newBook);
-		mGridView.setSelection(mCurrentClickPosition);
-		mAdapter.notifyDataSetChanged();
+		try {
+			BookDownloadInfo oldBook = mAdapter.getItem(mCurrentClickPosition);
+			BookDownloadInfo newBook = downloadManager.querryByBookName(
+					oldBook.getBookName(), oldBook.getBookId());
+			mAdapter.set(oldBook, newBook);
+			mGridView.setSelection(mCurrentClickPosition);
+			mAdapter.notifyDataSetChanged();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
 
 	@Override

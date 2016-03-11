@@ -103,7 +103,7 @@ public class AfreshDownMeBookTask extends AsyncTask<Void, Void, Void> {
 		String filePath = fileUtils.getStorageDirectory() + bookName + "_"
 				+ bookId + ".zip";
 		DownLoaderTask2 task = new DownLoaderTask2(downloadUrl, bookName,
-				bookId, filePath, (Activity) context,false, listener);
+				bookId, filePath, (Activity) context,isNeedSendReceiver, listener);
 		DownloadManager.getInstance().addTask(bookName, bookId, task);
 		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}

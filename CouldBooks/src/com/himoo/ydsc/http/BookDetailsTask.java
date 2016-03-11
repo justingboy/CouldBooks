@@ -11,8 +11,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -23,18 +21,14 @@ import com.google.gson.reflect.TypeToken;
 import com.himoo.ydsc.bean.BaiduBookChapter;
 import com.himoo.ydsc.bean.BookDetails;
 import com.himoo.ydsc.dialog.BookDetailsDialog;
+import com.himoo.ydsc.http.OkHttpClientManager.Param;
 import com.himoo.ydsc.listener.OnParseChapterListener;
 import com.himoo.ydsc.listener.OnRequestCallBack;
 import com.himoo.ydsc.reader.utils.ChapterParseUtil;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.FileUtils;
 import com.himoo.ydsc.util.SharedPreferences;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.squareup.okhttp.Request;
 
 /**
  * 
@@ -43,8 +37,6 @@ import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 public class BookDetailsTask {
 
 	private static BookDetailsTask mInstance = null;
-	/** 　Xutils 网络请求工具类 */
-	public HttpUtils http;
 
 	private OnParseChapterListener mListener;
 
@@ -73,82 +65,80 @@ public class BookDetailsTask {
 	 * @param context
 	 * @param bookId
 	 */
+	@SuppressWarnings("static-access")
 	public void excute(final Context context, int bookId) {
-		if (http == null) {
-			http = new HttpUtils();
-		}
-		RequestParams params = new RequestParams();
-		NameValuePair nameValuePair = new BasicNameValuePair("bookID",
-				String.valueOf(bookId));
-		params.addBodyParameter(nameValuePair);
 		String url = SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST)
 				+ "getBooksDetail.asp";
-		http.send(HttpMethod.POST, url, params, new RequestCallBack<String>() {
+		Param params = new Param();
+		params.key = "bookID";
+		params.value = String.valueOf(bookId);
+		
+		OkHttpClientManager.getInstance().postAsyn(url, new OkHttpClientManager.ResultCallback<String>() {
 
 			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
+			public void onError(Request request, Exception e) {
+				// TODO Auto-generated method stub
+				Toast.showLong(context, "打开失败，请重试");
+			}
+
+			@Override
+			public void onResponse(String response) {
 				// TODO Auto-generated method stub
 				Gson gson = new Gson();
 				BookDetails bookDetalis = gson.fromJson(
-						responseInfo.result.substring(1,
-								responseInfo.result.length() - 1),
+						response.substring(1,
+								response.length() - 1),
 						BookDetails.class);
 				new BookDetailsDialog.Builder(context)
 						.setBookDetails(bookDetalis).create().show();
 			}
-
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				// TODO Auto-generated method stub
-				Toast.showLong(context, "获取详情失败：" + msg);
-			}
-
-		});
+			
+		}, params);
+		
 	}
-
 	
+
 	/**
 	 * 百度章节列表
+	 * 
 	 * @param context
 	 * @param gid
 	 */
+	@SuppressWarnings("static-access")
 	public void executeBaidu(final Context context, String gid) {
-		if (http == null) {
-			http = new HttpUtils();
-			http.configTimeout(3000);
-			http.configSoTimeout(3000);
-		}
 
 		String url = HttpConstant.BAIDU_BOOK_DETAILS_URL + "appui=alaxs&gid="
 				+ gid + "&dir=1&ajax=1";
-		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
+		OkHttpClientManager.getInstance().getAsyn(url,
+				new OkHttpClientManager.ResultCallback<String>() {
 
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
-				ArrayList<BaiduBookChapter> list = praseBaiduBookChapter(responseInfo.result);
-				if (list != null && !list.isEmpty()) {
-//					ArrayList<BaiduBookChapter> newList = getNewList(list);
-					if (mListener != null) {
-						mListener.onParseSuccess(list);
-//						list.clear();
-//						list = null;
+					@Override
+					public void onError(Request request, Exception e) {
+						// TODO Auto-generated method stub
+						if (mListener != null)
+							mListener.onParseFailure(e, e.getMessage());
 					}
-				} else {
-					if (mListener != null)
-						mListener.onParseFailure(null, "获取数据为空");
-				}
-			}
 
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				// TODO Auto-generated method stub
-				if (mListener != null)
-					mListener.onParseFailure(error, msg);
-			}
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						ArrayList<BaiduBookChapter> list = praseBaiduBookChapter(response);
+						if (list != null && !list.isEmpty()) {
+							// ArrayList<BaiduBookChapter> newList =
+							// getNewList(list);
+							if (mListener != null) {
+								mListener.onParseSuccess(list);
+								// list.clear();
+								// list = null;
+							}
+						} else {
+							if (mListener != null)
+								mListener.onParseFailure(null, "获取数据为空");
+						}
+					}
+				});
 
-		});
 	}
 
 	/**
@@ -281,16 +271,17 @@ public class BookDetailsTask {
 	 * @param urlString
 	 * @param callBack
 	 */
-	public void send(final String urlString, final String bookName,final String bookId,
-			final String index, final OnRequestCallBack callBack) {
+	public void send(final String urlString, final String bookName,
+			final String bookId, final String index,
+			final OnRequestCallBack callBack) {
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
 				File dirFile = new File(FileUtils.mSdRootPath
-						+ "/CouldBook/baidu" + File.separator + bookName+"_"+bookId
-						+ File.separator);
+						+ "/CouldBook/baidu" + File.separator + bookName + "_"
+						+ bookId + File.separator);
 
 				File file = new File(dirFile, index + ".txt");
 				if (file.exists() || file.length() > 0) {
@@ -339,7 +330,7 @@ public class BookDetailsTask {
 	 * 
 	 * @return
 	 */
-	public String getChapterFormService(Context context,String urlString) {
+	public String getChapterFormService(Context context, String urlString) {
 		try {
 			URL url = new URL(urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -367,7 +358,7 @@ public class BookDetailsTask {
 	 * 
 	 * @return
 	 */
-	public String geLasttChapterFormService(Context context,String urlString) {
+	public String geLasttChapterFormService(Context context, String urlString) {
 		try {
 			URL url = new URL(urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -378,7 +369,7 @@ public class BookDetailsTask {
 			int code = conn.getResponseCode();
 			if (code == 200) {
 				InputStream is = conn.getInputStream();
-				return  streamToString(is);
+				return streamToString(is);
 			} else {
 				return null;
 			}
@@ -389,12 +380,12 @@ public class BookDetailsTask {
 	}
 
 	/**
-	 * get方式获取String 
+	 * get方式获取String
+	 * 
 	 * @param urlString
 	 * @return
 	 */
-	public String getStringFormServe(String urlString)
-	{
+	public String getStringFormServe(String urlString) {
 		try {
 			URL url = new URL(urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -406,7 +397,7 @@ public class BookDetailsTask {
 			int code = conn.getResponseCode();
 			if (code == 200) {
 				InputStream is = conn.getInputStream();
-				return  streamToString(is);
+				return streamToString(is);
 			} else {
 				return null;
 			}
@@ -415,9 +406,7 @@ public class BookDetailsTask {
 		}
 
 	}
-	
-	
-	
+
 	/**
 	 * 将流转换成String
 	 * 
@@ -462,5 +451,4 @@ public class BookDetailsTask {
 		return chapterList; // 返回集合
 	}
 
-	
 }

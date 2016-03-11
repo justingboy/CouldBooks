@@ -188,6 +188,12 @@
                 <action android:name="com.himoo.ydsc.shelf.receiver" />
             </intent-filter>
         </receiver>
+        <receiver android:name="com.himoo.ydsc.activity.BookMarkActivity$BookMarkReceiver" >
+            <intent-filter>
+                <action android:name="com.himoo.ydsc.activity.bookmarkreceiver" />
+            </intent-filter>
+        </receiver>
+      
         <receiver
             android:name="com.himoo.ydsc.update.BootBroadcastReceiver"
             android:exported="false" >

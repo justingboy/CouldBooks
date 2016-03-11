@@ -2,9 +2,6 @@ package com.himoo.ydsc.fragment.subfragment;
 
 import java.util.ArrayList;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -31,18 +28,16 @@ import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.http.HttpOperator;
+import com.himoo.ydsc.http.OkHttpClientManager;
+import com.himoo.ydsc.http.OkHttpClientManager.Param;
 import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.utils.UIHelper;
+import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.squareup.okhttp.Request;
 
 /**
  * 精选小说Fragment
@@ -144,6 +139,7 @@ public class SubChoiceFragment extends BaseFragment implements
 	/**
 	 * 通过get方式获取服务器的书库信息
 	 */
+	@SuppressWarnings("static-access")
 	private void getCouldBookInfoByGet() {
 		mAdapter = new BookAdapter(getActivity(), R.layout.gridview_book_item,
 				mBookList);
@@ -154,41 +150,46 @@ public class SubChoiceFragment extends BaseFragment implements
 				HttpConstant.HOST_URL_TEST)
 				+ "getBooksList.asp" + heardParams;
 		Log.i("请求地址：" + url);
-		HttpUtils http = new HttpUtils();
-		http.configTimeout(3000);
-		http.configSoTimeout(3000);
-		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
 
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
-				try {
+		OkHttpClientManager.getInstance().getAsyn(url,
+				new OkHttpClientManager.ResultCallback<String>() {
 
-					Gson gson = new Gson();
-					ArrayList<Book> list = gson.fromJson(responseInfo.result,
-							new TypeToken<ArrayList<Book>>() {
-							}.getType());
-					dismissRefreshDialog();
-					mAdapter.addAll(list);
-					mGridView.setAdapter(mAdapter);
-					mAdapter.notifyDataSetChanged();
-					currentPage++;
-				} catch (Exception e) {
-					dismissRefreshDialog();
-					stub = (ViewStub) findViewById(R.id.viewstub);
-					stub.inflate();
-				}
-			}
+					@Override
+					public void onError(Request request, Exception e) {
+						// TODO Auto-generated method stub
+						dismissRefreshDialog();
+						stub = (ViewStub) findViewById(R.id.viewstub);
+						stub.inflate();
+						if (!NetWorkUtils.isNetConnected(getActivity())) {
+							Toast.showLong(getActivity(), "网络未连接");
+						} else {
 
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				// TODO Auto-generated method stub
-				dismissRefreshDialog();
-				stub = (ViewStub) findViewById(R.id.viewstub);
-				stub.inflate();
+							Toast.showLong(getActivity(), "服务器繁忙,请重试");
+						}
+					}
 
-			}
-		});
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						try {
+
+							Gson gson = new Gson();
+							ArrayList<Book> list = gson.fromJson(response,
+									new TypeToken<ArrayList<Book>>() {
+									}.getType());
+							dismissRefreshDialog();
+							mAdapter.addAll(list);
+							mGridView.setAdapter(mAdapter);
+							mAdapter.notifyDataSetChanged();
+							currentPage++;
+						} catch (Exception e) {
+							dismissRefreshDialog();
+							stub = (ViewStub) findViewById(R.id.viewstub);
+							stub.inflate();
+						}
+					}
+
+				});
 
 	}
 
@@ -198,49 +199,50 @@ public class SubChoiceFragment extends BaseFragment implements
 	 * @param context
 	 * @param bookId
 	 */
+	@SuppressWarnings("static-access")
 	private void getBookDetailsInfo(final Context context, int bookId) {
-		HttpUtils http = new HttpUtils();
-		http.configTimeout(3000);
-		http.configSoTimeout(3000);
-		RequestParams params = new RequestParams();
-		NameValuePair nameValuePair = new BasicNameValuePair("bookID",
-				String.valueOf(bookId));
-		params.addBodyParameter(nameValuePair);
+
 		String url = SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST)
 				+ "getBooksDetail.asp";
-		http.send(HttpMethod.POST, url, params, new RequestCallBack<String>() {
+		Param params = new Param();
+		params.key = "bookID";
+		params.value = String.valueOf(bookId);
 
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
-				try {
-				Gson gson = new Gson();
-				BookDetails bookDetalis = gson.fromJson(
-						responseInfo.result.substring(1,
-								responseInfo.result.length() - 1),
-						BookDetails.class);
-				dismissRefreshDialog();
-				UIHelper.startToActivity(getActivity(), bookDetalis,
-						BookDialogActivity.class);
-				} catch (Exception ex) {
-					Log.e(ex);
-				}
-			}
+		OkHttpClientManager.getInstance().postAsyn(url,
+				new OkHttpClientManager.ResultCallback<String>() {
 
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				// TODO Auto-generated method stub
-				try {
-				Toast.showLong(context, "打开失败，请重试");
-				dismissRefreshDialog();
-				mCurrentClickPosition = -1;
-				} catch (Exception e) {
-					// TODO: handle exception
-				}
-			}
+					@Override
+					public void onError(Request request, Exception e) {
+						// TODO Auto-generated method stub
+						try {
+							Toast.showLong(context, "打开失败，请重试");
+							dismissRefreshDialog();
+							mCurrentClickPosition = -1;
+						} catch (Exception ex) {
+							// TODO: handle exception
+						}
+					}
 
-		});
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						try {
+							Gson gson = new Gson();
+							BookDetails bookDetalis = gson.fromJson(response
+									.substring(1, response.length() - 1),
+									BookDetails.class);
+							dismissRefreshDialog();
+							UIHelper.startToActivity(getActivity(),
+									bookDetalis, BookDialogActivity.class);
+						} catch (Exception ex) {
+							Log.e(ex);
+							mCurrentClickPosition = -1;
+						}
+					}
+
+				}, params);
+
 	}
 
 	/**

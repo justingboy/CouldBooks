@@ -28,6 +28,7 @@ import com.himoo.ydsc.config.SpConstant;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.http.HttpOperator;
+import com.himoo.ydsc.http.OkHttpClientManager;
 import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.ui.utils.Toast;
@@ -35,11 +36,7 @@ import com.himoo.ydsc.ui.utils.UIHelper;
 import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.himoo.ydsc.util.TimestampUtils;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.squareup.okhttp.Request;
 
 public class BaiduBookClassFragment extends BaseFragment implements
 		OnTaskRefreshListener<BaiduBook> {
@@ -148,6 +145,7 @@ public class BaiduBookClassFragment extends BaseFragment implements
 	/**
 	 * 通过get方式获取服务器的书库信息
 	 */
+	@SuppressWarnings("static-access")
 	private void getCouldBookInfoByGet() {
 		if (getArguments() != null) {
 			cateid = getArguments().getString("cateid");
@@ -158,56 +156,53 @@ public class BaiduBookClassFragment extends BaseFragment implements
 		String heardParams = HttpOperator.getBaiduClassifyRequestHeard(
 				currentPage, cateid);
 		String url = HttpConstant.BAIDU_BOOK_CATE_URL + heardParams;
-		HttpUtils http = new HttpUtils();
-		http.configTimeout(3000);
-		http.configSoTimeout(3000);
-		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
+		OkHttpClientManager.getInstance().getAsyn(url,
+				new OkHttpClientManager.ResultCallback<String>() {
 
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
-				try {
-					JSONObject jsonObject = new JSONObject(responseInfo.result);
-					if (jsonObject.getInt("errno") == 0
-							&& jsonObject.get("errmsg").equals("ok")) {
-						JSONObject subJsonObject = jsonObject
-								.getJSONObject("result");
-						String json = subJsonObject.getString("cate");
-						Gson gson = new Gson();
-						ArrayList<BaiduBook> list = gson.fromJson(json,
-								new TypeToken<ArrayList<BaiduBook>>() {
-								}.getType());
+					@Override
+					public void onError(Request request, Exception e) {
+						// TODO Auto-generated method stub
 						dismissRefreshDialog();
-						mAdapter.addAll(list);
-						mGridView.setAdapter(mAdapter);
-						mAdapter.notifyDataSetChanged();
-						currentPage += 2;
-					} else {
-						dismissRefreshDialog();
-						if (getActivity() != null)
-							Toast.showLong(getActivity(), "数据库中暂无数据");
+						stub = (ViewStub) findViewById(R.id.viewstub);
+						stub.inflate();
 					}
 
-				} catch (Exception e) {
-					Log.e(e);
-					dismissRefreshDialog();
-					if (getActivity() != null)
-						Toast.showLong(getActivity(), "加载数据失败");
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						try {
+							JSONObject jsonObject = new JSONObject(response);
+							if (jsonObject.getInt("errno") == 0
+									&& jsonObject.get("errmsg").equals("ok")) {
+								JSONObject subJsonObject = jsonObject
+										.getJSONObject("result");
+								String json = subJsonObject.getString("cate");
+								Gson gson = new Gson();
+								ArrayList<BaiduBook> list = gson.fromJson(json,
+										new TypeToken<ArrayList<BaiduBook>>() {
+										}.getType());
+								dismissRefreshDialog();
+								mAdapter.addAll(list);
+								mGridView.setAdapter(mAdapter);
+								mAdapter.notifyDataSetChanged();
+								currentPage += 2;
+							} else {
+								dismissRefreshDialog();
+								if (getActivity() != null)
+									Toast.showLong(getActivity(), "数据库中暂无数据");
+							}
 
-				}
+						} catch (Exception e) {
+							Log.e(e);
+							dismissRefreshDialog();
+							if (getActivity() != null)
+								Toast.showLong(getActivity(), "加载数据失败");
 
-			}
+						}
 
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				// TODO Auto-generated method stub
-				Log.e(error + "msg=" + msg);
-				dismissRefreshDialog();
-				stub = (ViewStub) findViewById(R.id.viewstub);
-				stub.inflate();
+					}
 
-			}
-		});
+				});
 
 	}
 
@@ -272,8 +267,7 @@ public class BaiduBookClassFragment extends BaseFragment implements
 		// TODO Auto-generated method stub
 		mCurrentClickPosition = -1;
 		if (BookTheme.isThemeChange)
-			if (mAdapter != null)
-			{
+			if (mAdapter != null) {
 				mAdapter.afreshDisplayOption();
 				mAdapter.notifyDataSetChanged();
 			}

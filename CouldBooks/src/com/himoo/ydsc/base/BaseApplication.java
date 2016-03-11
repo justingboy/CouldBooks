@@ -145,8 +145,12 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 	 * @param activity
 	 */
 	public void delActivity(Activity activity) {
-		activitys.remove(activitys.keyAt(activitys.indexOfValue(activity)));
-		activity.finish();
+		try {
+			activitys.remove(activitys.keyAt(activitys.indexOfValue(activity)));
+			activity.finish();
+		} catch (Exception e) {
+			MyLogger.kLog().e(e);
+		}
 	}
 
 	@Override

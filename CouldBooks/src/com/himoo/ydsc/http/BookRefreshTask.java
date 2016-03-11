@@ -16,11 +16,7 @@ import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.Book;
 import com.himoo.ydsc.listener.OnTaskRefreshListener;
 import com.himoo.ydsc.util.SharedPreferences;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.squareup.okhttp.Request;
 
 public class BookRefreshTask<T> {
 
@@ -58,49 +54,50 @@ public class BookRefreshTask<T> {
 	 * @param bookRequestTyep
 	 *            请求的类型
 	 */
+	@SuppressWarnings("static-access")
 	public void execute(String classId, int nextPage, final int bookRequestTyep) {
 		// 请求书库地址
 		String url = getRequestBookUrl(classId, nextPage, bookRequestTyep);
 		Log.i("msg", url);
-		HttpUtils http = new HttpUtils();
-		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
+		OkHttpClientManager.getInstance().getAsyn(url,
+				new OkHttpClientManager.ResultCallback<String>() {
 
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
-				Gson gson = new Gson();
-				ArrayList<T> bookList = null;
-				if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_ME) {
-					bookList = gson.fromJson(responseInfo.result,
-							new TypeToken<ArrayList<Book>>() {
-							}.getType());
-				} else if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_BAIDU_RANKING) {
-					bookList = parseBaiduBook(gson, responseInfo, "rank");
+					@Override
+					public void onError(Request request, Exception e) {
+						// TODO Auto-generated method stub
+						if (mListener != null)
+							mListener.onPullToRefreshFailure(e, e.getMessage());
+					}
 
-				} else if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_BAIDU_HOTSEARCH) {
-					bookList = parseBaiduBook(gson, responseInfo, "recommend");
-				} else if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_BAIDU_CLASSIFY) {
-					bookList = parseBaiduBook(gson, responseInfo, "cate");
-				} else if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_BAIDU_SEARCH) {
-					bookList = parseBaiduBook(gson, responseInfo, "search");
-				}
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						Gson gson = new Gson();
+						ArrayList<T> bookList = null;
+						if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_ME) {
+							bookList = gson.fromJson(response,
+									new TypeToken<ArrayList<Book>>() {
+									}.getType());
+						} else if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_BAIDU_RANKING) {
+							bookList = parseBaiduBook(gson, response, "rank");
 
-				if (mListener != null)
-					if (mGridView != null
-							&& mGridView.getCurrentMode() == Mode.PULL_FROM_START)
-						mListener.onPullDownRefreshSucess(bookList);
-					else if (mGridView != null
-							&& mGridView.getCurrentMode() == Mode.PULL_FROM_END)
-						mListener.onPullUpRefreshSucess(bookList);
+						} else if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_BAIDU_HOTSEARCH) {
+							bookList = parseBaiduBook(gson, response, "recommend");
+						} else if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_BAIDU_CLASSIFY) {
+							bookList = parseBaiduBook(gson, response, "cate");
+						} else if (bookRequestTyep == HttpConstant.BOOK_REQUEST_TYPE_BAIDU_SEARCH) {
+							bookList = parseBaiduBook(gson, response, "search");
+						}
 
-			}
-
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				// TODO Auto-generated method stub
-				if (mListener != null)
-					mListener.onPullToRefreshFailure(error, msg);
-			}
+						if (mListener != null)
+							if (mGridView != null
+									&& mGridView.getCurrentMode() == Mode.PULL_FROM_START)
+								mListener.onPullDownRefreshSucess(bookList);
+							else if (mGridView != null
+									&& mGridView.getCurrentMode() == Mode.PULL_FROM_END)
+								mListener.onPullUpRefreshSucess(bookList);
+					}
+			
 		});
 
 	}
@@ -147,9 +144,9 @@ public class BookRefreshTask<T> {
 	 * @return
 	 */
 	public ArrayList<T> parseBaiduBook(Gson gson,
-			ResponseInfo<String> responseInfo, String keyRequest) {
+			String responseInfo, String keyRequest) {
 		try {
-			JSONObject jsonObject = new JSONObject(responseInfo.result);
+			JSONObject jsonObject = new JSONObject(responseInfo);
 			if (jsonObject.getInt("errno") == 0
 					&& jsonObject.get("errmsg").equals("ok")) {
 				JSONObject subJsonObject = jsonObject.getJSONObject("result");

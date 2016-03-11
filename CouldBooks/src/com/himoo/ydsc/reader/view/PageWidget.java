@@ -11,6 +11,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Region;
 import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -810,7 +811,6 @@ public class PageWidget extends View {
 		if (mScroller.computeScrollOffset()) {
 			float x = mScroller.getCurrX();
 			float y = mScroller.getCurrY();
-			// Log.i("mm", "x = " + x + "y = " + y);
 			mTouch.x = x;
 			mTouch.y = y;
 			postInvalidate();
@@ -886,6 +886,18 @@ public class PageWidget extends View {
 			if (!this.mScroller.isFinished())
 				this.mScroller.abortAnimation();
 			mScroller.startScroll(aniTouchX, aniTouchY, aniDx, aniDy, duration);
+			Log.i("msg", "aniTouchX = "+aniTouchX+"aniTouchY="+aniTouchX+"aniDx ="+aniDx+"aniDy="+aniDy);
+		}
+	}
+	
+	/**
+	 * 执行默认翻书动画
+	 */
+	public void startAnimationByParam() {
+		if (mScroller != null) {
+			if (!this.mScroller.isFinished())
+				this.mScroller.abortAnimation();
+			mScroller.startScroll(0, 0, -1303, 0, duration);
 		}
 	}
 

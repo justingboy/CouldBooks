@@ -25,7 +25,6 @@ import com.himoo.ydsc.reader.ReaderActivity;
 import com.himoo.ydsc.reader.dao.BookMark;
 import com.himoo.ydsc.reader.dao.BookMarkDb;
 import com.himoo.ydsc.reader.utils.IOHelper;
-import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.lidroid.xutils.view.annotation.ViewInject;
 
@@ -40,7 +39,6 @@ public class CatalogFragment extends BaseFragment {
 	private int mCurrentClickPosition = -1;
 	/** 通知广播的Action */
 	private static final String ACTION = "com.himoo.ydsc.catalog.receiver";
-	private boolean isDownloading;
 	private BookCatalogdapter mAdapter;
 	private int position;
 	private int type;
@@ -95,16 +93,12 @@ public class CatalogFragment extends BaseFragment {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		if (!DownloadManager.getInstance().isExistTask(bookName, bookId)) {
-			if (mCurrentClickPosition != -1)
-				return;
-			mCurrentClickPosition = position;
-			BaiduBookChapter chapter = (BaiduBookChapter) parent
-					.getItemAtPosition(position);
-			startToReaderActivity(chapter, position);
-		} else {
-			Toast.show(getActivity(), "下载中,请稍后打开");
-		}
+		if (mCurrentClickPosition != -1)
+			return;
+		mCurrentClickPosition = position;
+		BaiduBookChapter chapter = (BaiduBookChapter) parent
+				.getItemAtPosition(position);
+		startToReaderActivity(chapter, position);
 
 	}
 

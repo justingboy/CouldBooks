@@ -23,12 +23,9 @@ import com.himoo.ydsc.bean.BaiduBookClassify;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.http.HttpConstant;
+import com.himoo.ydsc.http.OkHttpClientManager;
 import com.himoo.ydsc.ui.utils.Toast;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.squareup.okhttp.Request;
 
 /**
  * 
@@ -75,32 +72,33 @@ public class BaiduBookListFragment extends ListFragment {
 	/**
 	 * 获取书库分类的列表数据
 	 */
+	@SuppressWarnings("static-access")
 	private void getBookClassList() {
-		HttpUtils http = new HttpUtils();
-		http.configTimeout(3000);
-		http.configSoTimeout(3000);
 		String url = HttpConstant.BAIDU_BOOK_CLASSIFY_URL;
-		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
+		OkHttpClientManager.getInstance().getAsyn(url,
+				new OkHttpClientManager.ResultCallback<String>() {
 
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
-				parseJson(responseInfo.result);
-			}
+					@Override
+					public void onError(Request request, Exception e) {
+						// TODO Auto-generated method stub
+						List<BaiduBookClassify> bookList = db
+								.queryBookClassify(BaiduBookClassify.class);
+						if (bookList == null) {
+							Toast.showLong(getActivity(),
+									"获取书籍分类错误,请检查网络状态是否正常！");
+							return;
+						}
+						list.addAll(bookList);
+						initAdapter(list);
+					}
 
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				// TODO Auto-generated method stub
-				List<BaiduBookClassify> bookList = db
-						.queryBookClassify(BaiduBookClassify.class);
-				if (bookList == null) {
-					Toast.showLong(getActivity(), "获取书籍分类错误,请检查网络状态是否正常！");
-					return;
-				}
-				list.addAll(bookList);
-				initAdapter(list);
-			}
-		});
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						parseJson(response);
+					}
+
+				});
 
 	}
 

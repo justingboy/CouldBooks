@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.json.JSONObject;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -67,13 +68,15 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	private ImageView book_close;
 
 	@ViewInject(R.id.book_refresh)
-	private ImageView book_refresh;
+	private static ImageView book_refresh;
 
 	/** Tab标题 */
 	private static final String[] TITLE = new String[] { "目录", "书签" };
 
 	/** 通知广播的Action */
 	private static final String ACTION = "com.himoo.ydsc.catalog.receiver";
+	/** 通知广播的Action */
+	private static final String BOOKMARK_ACTION = "com.himoo.ydsc.activity.bookmarkreceiver";
 
 	/** 通知广播的Action 书架 */
 	private static final String BOOKSHELF_ACTION = "com.himoo.ydsc.shelf.receiver";
@@ -453,6 +456,16 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 	 * 
 	 * @param isDown
 	 */
+	private void sendToMarkBroadcast() {
+		Intent intent = new Intent(BOOKMARK_ACTION);
+		sendBroadcast(intent);
+	}
+
+	/**
+	 * 发送广播到书签Fragment
+	 * 
+	 * @param isDown
+	 */
 	private void sendToBookShelfBroadcast() {
 		Intent intent = new Intent(BOOKSHELF_ACTION);
 		intent.putExtra("bookName", bookName);
@@ -473,7 +486,6 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 		intent.putExtra("bookId", bookId);
 		sendBroadcast(intent);
 	}
-
 
 	@Override
 	protected void onDestroy() {
@@ -655,6 +667,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 			isDownload = true;
 			AnimationUtils.cancelAnim(book_refresh);
 			sendToBookMarkBroadcast();
+			sendToMarkBroadcast();
 			sendDownloadSuccessReceiver();
 			BaiduBookDownload.getInstance(BookMarkActivity.this)
 					.updateDownSuccess(bookName, bookId);
@@ -664,7 +677,7 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 				public void run() {
 					// TODO Auto-generated method stub
 					downNotification.notifiManger
-							.cancel(downNotification.NOTIFI_ID);
+							.cancel(downNotification.NOTIFI_ID); 
 				}
 			}, 2000);
 
@@ -836,6 +849,20 @@ public class BookMarkActivity extends BaseActivity implements OnClickListener,
 
 	}
 
-	
+	public  static class BookMarkReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			try {
+				AnimationUtils.cancelAnim(book_refresh);
+				book_refresh.setEnabled(true);
+				book_refresh.setClickable(true);
+			} catch (Exception e) {
+				android.util.Log.e("msg", e.getMessage());
+			}
+			
+		}
+
+	}
 
 }

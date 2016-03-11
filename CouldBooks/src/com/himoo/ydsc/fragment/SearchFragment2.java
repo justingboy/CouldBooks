@@ -38,6 +38,7 @@ import com.himoo.ydsc.db.BookDb;
 import com.himoo.ydsc.db.bean.BookSearchRecords;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.http.HttpOperator;
+import com.himoo.ydsc.http.OkHttpClientManager;
 import com.himoo.ydsc.listener.NoDoubleClickListener;
 import com.himoo.ydsc.manager.PageManager;
 import com.himoo.ydsc.speech.JsonParser;
@@ -57,12 +58,8 @@ import com.ios.edittext.SearchEditText.OnEditTextFocuseChangListener;
 import com.ios.edittext.SearchEditText.OnSearchClickListener;
 import com.ios.tagview.TagGroup;
 import com.ios.tagview.TagGroup.OnTagClickListener;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 import com.lidroid.xutils.view.annotation.ViewInject;
+import com.squareup.okhttp.Request;
 
 /**
  * 
@@ -102,9 +99,10 @@ public class SearchFragment2 extends BaseFragment implements
 	/** 　默认的关键字 */
 	public static String[] keywords = { "玄界之门", "盗墓笔记", "完美世界", "绝世唐门", "武极天下",
 			"大道独行", "唐七公子", "斗罗大陆", "剑道独神" };
+	/** 　默认的关键字 */
+	public String[] keyword2s = { "花千骨", "盗墓笔记", "重生", "唐七公子", "桐华","大主宰",
+			"华胥引", "校花的贴身高手", "匪我思存", "顾漫", "唐家三少", "玄界之门" };
 
-	/** XUtils http 请求 */
-	private HttpUtils http;
 	/** 数据库 */
 	private BookDb bookDb;
 
@@ -140,7 +138,8 @@ public class SearchFragment2 extends BaseFragment implements
 	@Override
 	public void initData() {
 		// getKeyWordRequest((int) (Math.random() * 30), 9);
-		getKeyWordRequest(1, 9);
+		// getKeyWordRequest(1, 9);
+		getKeyWordsRequest(1, 12);
 		initSpeech(getActivity());
 
 		loadHistoryData();
@@ -158,7 +157,7 @@ public class SearchFragment2 extends BaseFragment implements
 	 */
 	private void initKeyWordFlow(String[] keys) {
 		bookTagView.setTagThemColor(BookTheme.THEME_COLOR);
-		bookTagView.setTags(keys == null ? keywords : keys);
+		bookTagView.setTags(keys == null ? keyword2s : sortKeyWords(keys));
 		bookTagView.setOnTagClickListener(this);
 		tv_hotwords.setOnClickListener(this);
 		tv_hotwords.setOnClickListener(new NoDoubleClickListener() {
@@ -192,16 +191,8 @@ public class SearchFragment2 extends BaseFragment implements
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		super.onClick(v);
-
 		switch (v.getId()) {
-		// case R.id.tv_hotwords:
-		// isAfresh = true;
-		// Intent intent = new Intent(getActivity(), HotwordsActivity.class);
-		// startActivity(intent);
-		//
-		// break;
 		case R.id.tv_delete:
-
 			new AlertDialog(getActivity()).builder().setTitle("删除")
 					.setMsg("您确定要删除历史记录吗?")
 					.setNegativeButton("取消", new OnClickListener() {
@@ -238,6 +229,29 @@ public class SearchFragment2 extends BaseFragment implements
 	}
 
 	/**
+	 * 排序，将关键字尽量铺满每行
+	 * @param keyWords
+	 * @return
+	 */
+	private String[] sortKeyWords(String[] keyWords) {
+		int textLength = 0;
+		for (int i = 0; i < keyWords.length; i++) {
+			textLength += keyWords[i].length();
+			if ((i+1) % 3 == 0) {
+				if (textLength <= 13)
+					textLength = 0;
+				else {
+					textLength = 0;
+					String temp = keyWords[i];
+					keyWords[i] = keyWords[i - 1];
+					keyWords[i-1] = temp;
+				}
+			}
+		}
+		return keyWords;
+	}
+
+	/**
 	 * 开启语音功能
 	 */
 	private void startSpeech() {
@@ -251,53 +265,50 @@ public class SearchFragment2 extends BaseFragment implements
 	 * @param page
 	 * @param size
 	 */
-	private void getKeyWordRequest(int page, int size) {
-		if (http == null) {
-			http = new HttpUtils();
-			http.configTimeout(3000);
-			http.configSoTimeout(3000);
-		}
+	@SuppressWarnings("static-access")
+	private void getKeyWordsRequest(int page, int size) {
 		showRefreshDialog(" 加载热词中 ");
 		String url = HttpConstant.BASE_URL_KEYWORD
 				+ HttpOperator.getKeyWordRequestHeard(page, size);
-		http.send(HttpMethod.GET, url, new RequestCallBack<String>() {
-			@Override
-			public void onSuccess(ResponseInfo<String> responseInfo) {
-				// TODO Auto-generated method stub
-				try {
+		OkHttpClientManager.getInstance().getAsyn(url,
+				new OkHttpClientManager.ResultCallback<String>() {
 
-					dismissRefreshDialog();
-					Gson gson = new Gson();
-					ArrayList<BookKeyWord> list = gson.fromJson(
-							responseInfo.result,
-							new TypeToken<ArrayList<BookKeyWord>>() {
-							}.getType());
-					if (list != null && !list.isEmpty()) {
-						for (int i = 0; i < list.size(); i++) {
-							keywords[i] = list.get(i).getKeyword();
-						}
-						initKeyWordFlow(keywords);
-
-					} else {
+					@Override
+					public void onError(Request request, Exception e) {
+						// TODO Auto-generated method stub
+						dismissRefreshDialog();
 						initKeyWordFlow(null);
+						if (getActivity() != null) {
+							Log.e(e.getMessage());
+						}
 					}
-				} catch (Exception e) {
-					initKeyWordFlow(null);
-				}
 
-			}
+					@Override
+					public void onResponse(String response) {
+						// TODO Auto-generated method stub
+						try {
+							Log.d("thread= " + Thread.currentThread().getName());
+							dismissRefreshDialog();
+							Gson gson = new Gson();
+							ArrayList<BookKeyWord> list = gson.fromJson(
+									response,
+									new TypeToken<ArrayList<BookKeyWord>>() {
+									}.getType());
+							if (list != null && !list.isEmpty()) {
+								for (int i = 0; i < list.size(); i++) {
+									keyword2s[i] = list.get(i).getKeyword();
+								}
+								initKeyWordFlow(keyword2s);
 
-			@Override
-			public void onFailure(HttpException error, String msg) {
-				// TODO Auto-generated method stub
-				dismissRefreshDialog();
-				if (getActivity() != null) {
-					Log.e(error);
-				}
-				initKeyWordFlow(null);
-			}
+							} else {
+								initKeyWordFlow(null);
+							}
+						} catch (Exception e) {
+							initKeyWordFlow(null);
+						}
+					}
+				});
 
-		});
 	}
 
 	@Override
