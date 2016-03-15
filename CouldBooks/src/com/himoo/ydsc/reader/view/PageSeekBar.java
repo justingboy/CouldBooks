@@ -1,5 +1,6 @@
 package com.himoo.ydsc.reader.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
@@ -28,12 +29,17 @@ public class PageSeekBar extends SeekBar {
 
 	public PageSeekBar(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		moffLeftX = DeviceUtil.dip2px(context, 52);
+		if (DeviceUtil.getDisplayDensity((Activity) context) >= 2.75) {
+			moffLeftX = DeviceUtil.dip2px(context, 52)+72;
+		} else
+			moffLeftX = DeviceUtil.dip2px(context, 52);
 		mInflater = LayoutInflater.from(context);
 		mView = mInflater.inflate(R.layout.popwindow_layout_page, null);
 		mTvProgress = (TextView) mView.findViewById(R.id.tvPop);
 		mPopupWindow = new PopupWindow(mView, mView.getWidth(),
 				mView.getHeight(), true);
+		mPopupWindow.setOutsideTouchable(true);
+		mPopupWindow.setFocusable(false);
 		mPosition = new int[2];
 	}
 
@@ -50,6 +56,9 @@ public class PageSeekBar extends SeekBar {
 			this.getLocationOnScreen(mPosition);
 			mPopupWindow.showAtLocation(this, Gravity.CENTER, 0, moffLeftX);
 
+			break;
+		case MotionEvent.ACTION_CANCEL:
+			mPopupWindow.dismiss();
 			break;
 		case MotionEvent.ACTION_UP:
 			mPopupWindow.dismiss();
@@ -80,12 +89,12 @@ public class PageSeekBar extends SeekBar {
 	@Override
 	protected synchronized void onDraw(Canvas canvas) {
 		// TODO Auto-generated method stub
-		int thumb_x =0;
+		int thumb_x = 0;
 		try {
-			thumb_x =  this.getProgress() * (this.getWidth() - mThumbWidth)
+			thumb_x = this.getProgress() * (this.getWidth() - mThumbWidth)
 					/ this.getMax();
 		} catch (Exception e) {
-			Log.e("msg", e.getMessage());
+			Log.e("msg", e.getMessage() + "");
 		}
 		super.onDraw(canvas);
 
@@ -95,7 +104,8 @@ public class PageSeekBar extends SeekBar {
 				mPopupWindow.update(thumb_x + mPosition[0] - (2 * moffLeftX)
 						- getViewWidth(mView) / 2 + mThumbWidth / 2, moffLeftX,
 						getViewWidth(mView), getViewHeight(mView));
-
+				Log.i("msg", "getViewHeight(mView) = " + getViewHeight(mView)
+						+ "");
 			} catch (Exception e) {
 
 			}

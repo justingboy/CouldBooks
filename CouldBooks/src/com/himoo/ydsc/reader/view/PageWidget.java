@@ -172,7 +172,7 @@ public class PageWidget extends View {
 			mCornerX = 0;
 		else
 			mCornerX = mWidth;
-		if (y <= mHeight )
+		if (y <= mHeight/2)
 			mCornerY = 0;
 		else
 			mCornerY = mHeight;

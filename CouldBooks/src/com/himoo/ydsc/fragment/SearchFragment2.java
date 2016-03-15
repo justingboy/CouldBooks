@@ -279,7 +279,7 @@ public class SearchFragment2 extends BaseFragment implements
 						dismissRefreshDialog();
 						initKeyWordFlow(null);
 						if (getActivity() != null) {
-							Log.e(e.getMessage());
+							Log.e(e.getMessage()+"");
 						}
 					}
 
@@ -287,7 +287,6 @@ public class SearchFragment2 extends BaseFragment implements
 					public void onResponse(String response) {
 						// TODO Auto-generated method stub
 						try {
-							Log.d("thread= " + Thread.currentThread().getName());
 							dismissRefreshDialog();
 							Gson gson = new Gson();
 							ArrayList<BookKeyWord> list = gson.fromJson(
@@ -322,12 +321,12 @@ public class SearchFragment2 extends BaseFragment implements
 	 * @param keyword
 	 */
 	private void save(String keyword) {
-		BookSearchRecords record = new BookSearchRecords();
-		record.setRecord(keyword);
+//		BookSearchRecords record = new BookSearchRecords();
+//		record.setRecord(keyword);
 		bookSearch.setText(keyword);
 		bookSearch.setSelection(keyword.length());
 		bookSearch.postInvalidate();
-		bookDb.saveBookSearch(record);
+//		bookDb.saveBookSearch(record);
 	}
 
 	@Override

@@ -48,10 +48,10 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 	private OnFragment2Listener mListener;
 
 	private Context mContext;
-	
+
 	@ViewInject(R.id.fragennt_top)
 	private RelativeLayout fragennt_top;
-	
+
 	@ViewInject(R.id.brightness_down)
 	private ImageView brightness_down;
 
@@ -181,33 +181,39 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 		booksetting_linespace_3.setOnClickListener(onLineSpaceListener);
 		booksetting_linespace_4.setOnClickListener(onLineSpaceListener);
 
-		seekBar_light.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+		seekBar_light.setOnSeekBarChangeListener(lightSeekBarListener);
 
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress,
-					boolean fromUser) {
-				// TODO Auto-generated method stub
-				if (progress < 5) {
-				} else {
-					setBrightness((Activity) mContext, progress);
-					SharedPreferences.getInstance().putInt(
-							SpConstant.BOOK_SETTING_LIGHT, progress);
-				}
-			}
-		});
 	}
+
+	private OnSeekBarChangeListener lightSeekBarListener = new OnSeekBarChangeListener() {
+
+		@Override
+		public void onStopTrackingTouch(SeekBar seekBar) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onStartTrackingTouch(SeekBar seekBar) {
+			// TODO Auto-generated method stub
+			ViewSelector.setButtonStrokeSelector(getActivity(), tv_SystemLight,
+					BookTheme.BOOK_GRAY);
+			SharedPreferences.getInstance().putBoolean(
+					SpConstant.BOOK_SETTING_LIGHT_SYSTEM, false);
+		}
+
+		@Override
+		public void onProgressChanged(SeekBar seekBar, int progress,
+				boolean fromUser) {
+			// TODO Auto-generated method stub
+			if (fromUser) {
+				isFollowSystem = false;
+				setBrightness((Activity) mContext, progress);
+				SharedPreferences.getInstance().putInt(
+						SpConstant.BOOK_SETTING_LIGHT, progress);
+			}
+		}
+	};
 
 	public interface OnFragment2Listener {
 		public void onTextSizChange(int textSize);
@@ -217,7 +223,7 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 		public void onTextLineSpaceChange();
 
 		public void onTextColorBgChange();
-		
+
 		public void onFrideDrag(RelativeLayout view);
 	}
 
@@ -229,14 +235,14 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 		case R.id.textsiz_reduce:
 			if (textSize < 30)
 				return;
-			textSize-=2;
+			textSize -= 2;
 			mListener.onTextSizChange(textSize);
 
 			break;
 		case R.id.textsiz_increase:
 			if (textSize > 120)
 				return;
-			textSize+=2;
+			textSize += 2;
 			mListener.onTextSizChange(textSize);
 
 			break;
@@ -246,6 +252,7 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 			SharedPreferences.getInstance().putBoolean(
 					SpConstant.BOOK_SETTING_LIGHT_SYSTEM, isFollowSystem);
 			if (isFollowSystem) {
+				seekBar_light.setProgress(0);
 				ViewSelector.setButtonStrokeSelector(getActivity(),
 						tv_SystemLight, BookTheme.THEME_COLOR);
 
@@ -623,8 +630,8 @@ public class BookSettingFragment2 extends Fragment implements OnClickListener,
 	 * 禁止滑动
 	 */
 	private void forbidDrag() {
-		if(mListener!=null)
-		mListener.onFrideDrag(fragennt_top);
+		if (mListener != null)
+			mListener.onFrideDrag(fragennt_top);
 
 	}
 }

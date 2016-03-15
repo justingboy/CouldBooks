@@ -18,8 +18,6 @@ import com.handmark.pulltorefresh.library.PullToRefreshGridView;
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.adapter.HotwordsAdapter;
 import com.himoo.ydsc.bean.BookKeyWord;
-import com.himoo.ydsc.db.BookDb;
-import com.himoo.ydsc.db.bean.BookSearchRecords;
 import com.himoo.ydsc.http.HttpConstant;
 import com.himoo.ydsc.http.HttpOperator;
 import com.himoo.ydsc.http.OkHttpClientManager;
@@ -47,14 +45,12 @@ public class HotwordsActivity extends SwipeBackActivity implements
 	/** 每次加载关键字的个数 */
 	private static final int KEYWORD_COUNT = 40;
 
-	private BookDb bookDb;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_hotwords);
-		bookDb = BookDb.getInstance(this, "Book");
 		showRefreshDialog("  正在加载  ");
 		getKeyWordRequest(mCurrentPage, KEYWORD_COUNT);
 	}
@@ -100,9 +96,9 @@ public class HotwordsActivity extends SwipeBackActivity implements
 						Log.e(e);
 						dismissRefreshDialog();
 						if (NetWorkUtils.isNetConnected(HotwordsActivity.this)) {
-							Toast.showBg(HotwordsActivity.this, "加载关键字失败 ");
+							Toast.showError(HotwordsActivity.this, "加载关键字失败 ");
 						} else {
-							Toast.showBg(HotwordsActivity.this, "未连接网络");
+							Toast.showError(HotwordsActivity.this, "未连接网络");
 						}
 
 					}
@@ -157,10 +153,9 @@ public class HotwordsActivity extends SwipeBackActivity implements
 
 		if (NetWorkUtils.isNetConnected(this)) {
 			String keyWord = (String) parent.getItemAtPosition(position);
-			save(keyWord);
 			startToActivity(keyWord);
 		} else {
-			Toast.show(this, "未连接网络");
+			Toast.showError(this, "未连接网络");
 		}
 
 	}
@@ -206,16 +201,6 @@ public class HotwordsActivity extends SwipeBackActivity implements
 
 	}
 
-	/**
-	 * 保存关键字到数据库
-	 * 
-	 * @param keyword
-	 */
-	private void save(String keyword) {
-		BookSearchRecords record = new BookSearchRecords();
-		record.setRecord(keyword);
-		bookDb.saveBookSearch(record);
-	}
 
 	@Override
 	protected void onDestroy() {

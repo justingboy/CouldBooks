@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import com.himoo.ydsc.R;
 import com.himoo.ydsc.activity.more.PasswordSettingActivity;
@@ -14,6 +15,7 @@ import com.himoo.ydsc.service.LockService;
 import com.himoo.ydsc.ui.utils.UIHelper;
 import com.himoo.ydsc.update.BookUpdateUtil;
 import com.himoo.ydsc.update.Constants;
+import com.himoo.ydsc.util.DeviceUtil;
 import com.himoo.ydsc.util.MyLogger;
 import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.SharedPreferences;
@@ -29,9 +31,9 @@ public class SplashActivity extends Activity implements OnLoadDbSuccessListener 
 		super.onCreate(savedInstanceState);
 		getWindow().setBackgroundDrawableResource(R.drawable.splash_bg);
 		SharedPreferences.getInstance().putInt("mCurrentSelected", 3);
-		// Log.i("msg",
-		// DeviceUtil.getWidth(this) + "*" + DeviceUtil.getHeight(this));
-		// Log.i("msg", "Density = " + DeviceUtil.getDisplayDensity(this));
+		 Log.i("msg",
+		 DeviceUtil.getWidth(this) + "*" + DeviceUtil.getHeight(this));
+		 Log.i("msg", "Density = " + DeviceUtil.getDisplayDensity(this));
 		if (SharedPreferences.getInstance().getBoolean("laoddb", true)) {
 			LoadLocalBookDb.getInstance().loadDb(this, this);
 		} else {

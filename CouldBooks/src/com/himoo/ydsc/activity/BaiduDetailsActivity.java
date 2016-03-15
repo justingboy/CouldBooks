@@ -195,7 +195,6 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 		// initDownlaodButtonStatue();
 		ViewSelector.setButtonSelector(this, bookDownload);
 		ViewSelector.setButtonSelector(this, bookEvaluation);
-		Log.i("CoverImage1 = " + book.getCoverImage());
 		String imageUrl = RegularUtil.converUrl(book.getCoverImage());
 		bookCoverImg.setImageResource(BookTheme.BOOK_COVER);
 		if (TextUtils.isEmpty(imageUrl)
@@ -205,7 +204,6 @@ public class BaiduDetailsActivity extends SwipeBackActivity implements
 
 			ImageLoader.getInstance().displayImage(imageUrl, bookCoverImg,
 					option);
-			Log.i("CoverImage2－－option = " + imageUrl);
 		}
 		bookAuthor.setText("作者 ：" + book.getAuthor());
 		bookStatue.setText("状态 ：" + book.getStatus());

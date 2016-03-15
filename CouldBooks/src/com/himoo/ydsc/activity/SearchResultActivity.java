@@ -24,6 +24,8 @@ import com.himoo.ydsc.adapter.SearchBookAdapter;
 import com.himoo.ydsc.animation.AnimationUtils;
 import com.himoo.ydsc.bean.BaiduBook;
 import com.himoo.ydsc.bean.BookSearch;
+import com.himoo.ydsc.db.BookDb;
+import com.himoo.ydsc.db.bean.BookSearchRecords;
 import com.himoo.ydsc.http.BookRefreshTask;
 import com.himoo.ydsc.http.BookSearchTask;
 import com.himoo.ydsc.http.BookSearchTask.OnSearchListener;
@@ -169,11 +171,20 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	 * 两个服务请求同时执行
 	 */
 	private void exeTask() {
+		save(title);
 		BookSearchTask.getInstance().setonSearchListener(this);
 		BookSearchTask.getInstance().executeBaidu(title, "0");
 		BookSearchTask.getInstance().executeMe(title, "1", mRefrshListView,
 				true);
 	}
+	
+	private void save(String keyword) {
+		BookDb bookDb = BookDb.getInstance(this, "Book");
+		BookSearchRecords record = new BookSearchRecords();
+		record.setRecord(keyword);
+		bookDb.saveBookSearch(record);
+	}
+	
 
 	@Override
 	protected void initTitleBar() {

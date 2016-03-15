@@ -19,7 +19,6 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseApplication;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.dialog.RefreshDialog;
-import com.himoo.ydsc.ui.utils.Toast;
 import com.himoo.ydsc.ui.view.BookTitleBar;
 import com.himoo.ydsc.util.MyLogger;
 import com.lidroid.xutils.ViewUtils;

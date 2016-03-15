@@ -23,6 +23,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
@@ -77,6 +78,7 @@ import com.himoo.ydsc.util.NetWorkUtils;
 import com.himoo.ydsc.util.SP;
 import com.himoo.ydsc.util.SharedPreferences;
 import com.ios.dialog.ActionSheetDialog;
+import com.ios.dialog.AlertDialog;
 import com.ios.dialog.ActionSheetDialog.OnSheetItemClickListener;
 import com.ios.edittext.SearchEditText;
 import com.ios.edittext.SearchEditText.OnEditTextFocuseChangListener;
@@ -138,6 +140,8 @@ public class BookShelfFragment extends BaseFragment implements
 	public static boolean isDownloading = false;
 	/** 是否正在刷新中，刷新中不可点击　 */
 	private boolean isRefresh = false;
+	/** 需要下载的书籍的个数，默认是1　 */
+	private int needDownBookCount = 1;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -160,6 +164,20 @@ public class BookShelfFragment extends BaseFragment implements
 		mDefaultSortList.clear();
 		mDefaultSortList.addAll(mDownloadList);
 
+	}
+
+	/**
+	 * 得到没有下载的书籍
+	 */
+	private ArrayList<BookDownloadInfo> getHasNoDownloadBook() {
+		ArrayList<BookDownloadInfo> list = new ArrayList<BookDownloadInfo>();
+		if (mDownloadList != null) {
+			for (BookDownloadInfo bookDownloadInfo : mDownloadList) {
+				if (!bookDownloadInfo.isAutoResume())
+					list.add(bookDownloadInfo);
+			}
+		}
+		return list;
 	}
 
 	/**
@@ -271,17 +289,17 @@ public class BookShelfFragment extends BaseFragment implements
 				return;
 			if (NetWorkUtils.isNetConnected(getActivity())) {
 				if (!DownloadManager.getInstance().isExistTask()) {
-					AnimationUtils.setViewRotating(getActivity(), imgRefresh);
-					isRefresh = true;
-					BookUpdateTask task = new BookUpdateTask(getActivity(),
-							null, null, 2);
-					task.setOnNewChapterListener(BookShelfFragment.this);
-					task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+					ArrayList<BookDownloadInfo> noDownloadBook = getHasNoDownloadBook();
+					if (noDownloadBook.size() > 0) {
+						downloadBook();
+					} else {
+						AfreshBookChapter();
+					}
 				} else {
 					Toast.show(getActivity(), "下载中请稍后更新");
 				}
 			} else {
-				Toast.show(getActivity(), "未连接网络!");
+				Toast.showError(getActivity(), "未连接网络");
 			}
 			break;
 
@@ -293,6 +311,96 @@ public class BookShelfFragment extends BaseFragment implements
 			break;
 		}
 
+	}
+
+	/**
+	 * 下载内置的书
+	 */
+	private void downloadBook() {
+		if (!NetWorkUtils.isWifiConnected(getActivity())) {
+			new AlertDialog(getActivity()).builder().setTitle("提醒")
+					.setMsg("当前为网络数据流量，下载需要消耗本地流量，是否继续下载？")
+					.setNegativeButton("取消", new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+							AfreshBookChapter();
+						}
+					}).setPositiveButton("确定", new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+							ArrayList<BookDownloadInfo> noDownloadBook = getHasNoDownloadBook();
+							needDownBookCount = noDownloadBook.size();
+							for (int i = 0; i < noDownloadBook.size(); i++) {
+								BookDownloadInfo book = noDownloadBook.get(i);
+								AfreshDownLoadBook(book);
+							}
+						}
+					}).show();
+		} else {
+			new AlertDialog(getActivity()).builder().setTitle("提醒")
+					.setMsg("当前网络为wifi状态，本地有书未下载，是否下载？")
+					.setNegativeButton("取消", new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+							AfreshBookChapter();
+						}
+					}).setPositiveButton("确定", new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							// TODO Auto-generated method stub
+							ArrayList<BookDownloadInfo> noDownloadBook = getHasNoDownloadBook();
+							needDownBookCount = noDownloadBook.size();
+							for (int i = 0; i < noDownloadBook.size(); i++) {
+								BookDownloadInfo book = noDownloadBook.get(i);
+								Log.i(book.getBookName());
+								AfreshDownLoadBook(book);
+							}
+						}
+					}).show();
+		}
+	}
+
+	/**
+	 * 更新最新章节
+	 */
+	private void AfreshBookChapter() {
+		AnimationUtils.setViewRotating(getActivity(), imgRefresh);
+		isRefresh = true;
+		BookUpdateTask task = new BookUpdateTask(getActivity(), null, null, 2);
+		task.setOnNewChapterListener(BookShelfFragment.this);
+		task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+	}
+
+	/**
+	 * 重新下載
+	 * 
+	 * @param book
+	 */
+	private void AfreshDownLoadBook(BookDownloadInfo book) {
+		if (book.getBookSourceType() == 1) {
+			AfreshDownMeBookTask task = new AfreshDownMeBookTask(getActivity(),
+					book.getBookName(), book.getBookId(),
+					book.getDownloadUrl(),
+					(book.isAutoResume() ? false : true),
+					BookShelfFragment.this);
+			task.execute();
+
+		} else if (book.getBookSourceType() == 2) {
+			DownloadManager.getInstance().deleteTask(book.getBookName(),
+					book.getBookId());
+			// 重新下载这本书,书是百度服务器上的
+			AfreshDownloadTask task = new AfreshDownloadTask(getActivity(),
+					book.getDownloadUrl(), book.getBookName(),
+					book.getBookId(), BookShelfFragment.this);
+			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		}
 	}
 
 	/**
@@ -555,25 +663,9 @@ public class BookShelfFragment extends BaseFragment implements
 			switch (which) {
 			case 1:
 				if (NetWorkUtils.isNetConnected(getActivity())) {
-					if (book.getBookSourceType() == 1) {
-						AfreshDownMeBookTask task = new AfreshDownMeBookTask(
-								getActivity(), book.getBookName(),
-								book.getBookId(), book.getDownloadUrl(),(book.isAutoResume()? false:true),
-								BookShelfFragment.this);
-						task.execute();
-
-					} else if (book.getBookSourceType() == 2) {
-						DownloadManager.getInstance().deleteTask(
-								book.getBookName(), book.getBookId());
-						// 重新下载这本书,书是百度服务器上的
-						AfreshDownloadTask task = new AfreshDownloadTask(
-								getActivity(), book.getDownloadUrl(),
-								book.getBookName(), book.getBookId(),
-								BookShelfFragment.this);
-						task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-					}
+					AfreshDownLoadBook(book);
 				} else {
-					Toast.show(getActivity(), "未连接网络!");
+					Toast.showError(getActivity(), "未连接网络");
 				}
 
 				break;
@@ -971,7 +1063,12 @@ public class BookShelfFragment extends BaseFragment implements
 	@Override
 	public void onPostDownloadSuccess(String bookName, String bookId) {
 		// TODO Auto-generated method stub
-		AnimationUtils.cancelAnim(imgRefresh);
+		if (needDownBookCount > 1) {
+			needDownBookCount--;
+		} else {
+			AnimationUtils.cancelAnim(imgRefresh);
+			needDownBookCount = 1;
+		}
 		haskMap.remove(bookId);
 	}
 

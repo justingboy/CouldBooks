@@ -1,6 +1,7 @@
 package com.himoo.ydsc.activity;
 
 import android.os.Bundle;
+import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -99,7 +100,8 @@ public class DoubanWebActivity extends SwipeBackActivity {
 		this.mWebView.setWebViewClient(null);
 		this.mWebView.clearCache(true);
 		this.mWebView.clearHistory();
-		this.mWebView.clearFormData();
+		this.mWebView.clearFormData();  
+		this.mWebView.setVisibility(View.GONE);
 		this.mWebView.destroy();
 		this.mWebView = null;
 

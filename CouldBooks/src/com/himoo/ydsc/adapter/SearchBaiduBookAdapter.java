@@ -41,8 +41,6 @@ public class SearchBaiduBookAdapter extends QuickAdapter<BaiduBook> {
 		// TODO Auto-generated method stub
 		
 		String imageUrl = RegularUtil.converUrl(item.getCoverImage());
-		Log.d(imageUrl);
-
 		helper.setImageUrl(R.id.search_book_image, imageUrl, option);
 		helper.setText(R.id.search_book_name, item.getTitle());
 		helper.setTextColor(R.id.search_book_name, BookTheme.THEME_COLOR);

@@ -19,7 +19,6 @@ import com.himoo.ydsc.R;
 import com.himoo.ydsc.base.BaseActivity;
 import com.himoo.ydsc.config.BookTheme;
 import com.himoo.ydsc.config.SpConstant;
-import com.himoo.ydsc.dialog.IndicateDialog;
 import com.himoo.ydsc.dialog.IndicateDialog.OnDialogDismissListener;
 import com.himoo.ydsc.download.BookDownloadService;
 import com.himoo.ydsc.fragment.BookShelfFragment;

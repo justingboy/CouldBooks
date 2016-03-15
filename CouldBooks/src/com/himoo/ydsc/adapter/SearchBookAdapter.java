@@ -39,7 +39,6 @@ public class SearchBookAdapter extends QuickAdapter<BookSearch> {
 	protected void convert(BaseAdapterHelper helper, BookSearch item) {
 		// TODO Auto-generated method stub
 
-		Log.d(item.getBook_Image());
 		helper.setImageUrl(R.id.search_book_image, item.getBook_Image(),option);
 		helper.setText(R.id.search_book_name, item.getBook_Name());
 		helper.setTextColor(R.id.search_book_name, BookTheme.THEME_COLOR);

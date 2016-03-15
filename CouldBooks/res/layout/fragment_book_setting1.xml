@@ -6,7 +6,7 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="55dp" >
+        android:layout_height="56.5dp" >
 
         <TextView
             android:id="@+id/tv_pre_chapter"
@@ -166,12 +166,7 @@
             android:id="@+id/booksetting_night"
             style="@style/book_setting_image_style"
             android:src="@drawable/iphone_daytime" />
-
-        <ImageView
-            style="@style/book_setting_image_style"
-            android:src="@drawable/iphone_reading" />
-
-        <ImageView
+        <ImageView
             android:id="@+id/booksetting_share"
             style="@style/book_setting_image_style"
             android:src="@drawable/iphone_share" />

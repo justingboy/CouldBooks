@@ -36,9 +36,9 @@ import com.nineoldandroids.view.ViewHelper;
 public class BookView extends RelativeLayout implements AnimatorListener {
 	public BookView sOpenedBookView;
 	// Opening book animation duration
-	private static final int OPEN_ANIMATION_DURATION = 800;
+	private static final int OPEN_ANIMATION_DURATION = 700;
 	// Closing book animation duration
-	public static final int CLOSE_ANIMATION_DURATION = 800;
+	public static final int CLOSE_ANIMATION_DURATION = 700;
 	// Animation background scales
 	private float mBgScaleX;
 	private float mBgScaleY;

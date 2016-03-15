@@ -84,7 +84,7 @@ public class BaseApplication extends Application implements DbUpgradeListener {
 				SpConstant.BOOK_COVER_INDEX, 1));
 		// 设置阅读背景
 		BookTheme.setReaderBookTextBg(SharedPreferences.getInstance().getInt(
-				SpConstant.BOOK_SETTING_TEXT_BG, 3));
+				SpConstant.BOOK_SETTING_TEXT_BG, 2));
 
 		// 初始化科大讯飞语音功能5638453a 5638453a 	 
 		SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5638453a");

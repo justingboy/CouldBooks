@@ -653,7 +653,7 @@ public class BookPage {
 			break;
 		case 2:
 			typeface = Typeface.createFromAsset(mContext.getResources()
-					.getAssets(), "texttype/jian.ttf");
+					.getAssets(), "texttype/song.ttf");
 			break;
 		case 3:
 			typeface = Typeface.createFromAsset(mContext.getResources()

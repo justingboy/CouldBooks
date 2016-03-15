@@ -130,7 +130,6 @@ public class BookListFragment extends ListFragment {
 
 		mAdapter = new BookClassifyAdapter(getActivity(),
 				R.layout.fragment_list_texti_item, list);
-
 		setListAdapter(mAdapter);
 	}
 

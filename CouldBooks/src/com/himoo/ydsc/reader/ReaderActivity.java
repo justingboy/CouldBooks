@@ -272,7 +272,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 				if (NetWorkUtils.isNetConnected(ReaderActivity.this)) {
 					startToActivity();
 				} else {
-					Toast.show(ReaderActivity.this, "未连接网络");
+					Toast.showError(ReaderActivity.this, "未连接网络");
 				}
 
 				break;
@@ -285,7 +285,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 					if (NetWorkUtils.isNetConnected(ReaderActivity.this)) {
 						updateBook();
 					} else {
-						Toast.show(ReaderActivity.this, "未连接网络!");
+						Toast.showError(ReaderActivity.this, "未连接网络");
 					}
 				}
 				break;
@@ -377,107 +377,112 @@ public class ReaderActivity extends BaseReaderActivity implements
 	public boolean onTouch(View v, MotionEvent e) {
 		boolean ret = false;
 		if (v == pageWidget) {
-			if (e.getAction() == MotionEvent.ACTION_DOWN) {
+			try {
 
-				if (isClickable(e)) {
-					startAnimation(250);
-					return false;
-				} else {
-					if (isUp) {
+				if (e.getAction() == MotionEvent.ACTION_DOWN) {
+
+					if (isClickable(e)) {
 						startAnimation(250);
-						isUp = false;
+						return false;
+					} else {
+						if (isUp) {
+							startAnimation(250);
+							isUp = false;
+						}
 					}
-				}
-				pageWidget.abortAnimation();
-				pageWidget.calcCornerXY(e.getX(), e.getY());
-				bookpage.draw(ReaderActivity.this, curCanvas);
-				if (isSpeech) {
-					isSpeech = false;
-					booksetting_speech
-							.setImageResource(R.drawable.iphone_yuyin);
-					SpeechReader.getInstance().clear();
-				}
-				if (!isLeftHanderMode) {
-					if (pageWidget.DragToRight()) {
+					pageWidget.abortAnimation();
+					pageWidget.calcCornerXY(e.getX(), e.getY());
+					bookpage.draw(ReaderActivity.this, curCanvas);
+					if (isSpeech) {
+						isSpeech = false;
+						booksetting_speech
+								.setImageResource(R.drawable.iphone_yuyin);
+						SpeechReader.getInstance().clear();
+					}
+					if (!isLeftHanderMode) {
+						if (pageWidget.DragToRight()) {
 
-						if (jumpType == 1 && !isAutoLoad) {
-							if (bookpage.isFirstPage()) {
-								isToNextPage = false;
-								IOHelper.getChapter(1, chapter.getIndex(),
-										chapter.getPosition() - 1, bookType);
+							if (jumpType == 1 && !isAutoLoad) {
+								if (bookpage.isFirstPage()) {
+									isToNextPage = false;
+									IOHelper.getChapter(1, chapter.getIndex(),
+											chapter.getPosition() - 1, bookType);
+									return false;
+								}
+							}
+							if (bookpage.prePage()) {
+								bookpage.draw(ReaderActivity.this, nextCanvas);
+								isFilp = true;
+							} else {
+								Toast.showShort(ReaderActivity.this, "已经是第一页了");
 								return false;
 							}
-						}
-						if (bookpage.prePage()) {
-							bookpage.draw(ReaderActivity.this, nextCanvas);
-							isFilp = true;
 						} else {
-							Toast.showShort(ReaderActivity.this, "已经是第一页了");
-							return false;
+							// 表示从百度详情界面跳转过来
+							if (jumpType == 1 && !isAutoLoad) {
+								if (bookpage.isLastPage()) {
+									isToNextPage = true;
+									IOHelper.getChapter(1, chapter.getIndex(),
+											chapter.getPosition() + 1, bookType);
+									return false;
+								}
+							}
+							if (bookpage.nextPage()) {
+								bookpage.draw(ReaderActivity.this, nextCanvas);
+								isFilp = true;
+							} else {
+								Toast.showShort(ReaderActivity.this, "已经是最后一页了");
+								return false;
+							}
 						}
 					} else {
-						// 表示从百度详情界面跳转过来
-						if (jumpType == 1 && !isAutoLoad) {
-							if (bookpage.isLastPage()) {
-								isToNextPage = true;
-								IOHelper.getChapter(1, chapter.getIndex(),
-										chapter.getPosition() + 1, bookType);
+
+						if (!pageWidget.DragToRight()) {
+							if (jumpType == 1 && !isAutoLoad) {
+								if (bookpage.isFirstPage()) {
+									isToNextPage = false;
+									IOHelper.getChapter(1, chapter.getIndex(),
+											chapter.getPosition() - 1, bookType);
+									return false;
+								}
+							}
+
+							if (bookpage.prePage()) {
+								bookpage.draw(ReaderActivity.this, nextCanvas);
+								isFilp = true;
+							} else {
+								Toast.showShort(ReaderActivity.this, "已经是第一页了");
 								return false;
 							}
-						}
-						if (bookpage.nextPage()) {
-							bookpage.draw(ReaderActivity.this, nextCanvas);
-							isFilp = true;
 						} else {
-							Toast.showShort(ReaderActivity.this, "已经是最后一页了");
-							return false;
+							// 表示从百度详情界面跳转过来
+							if (jumpType == 1 && !isAutoLoad) {
+								if (bookpage.isLastPage()) {
+									isToNextPage = true;
+									IOHelper.getChapter(1, chapter.getIndex(),
+											chapter.getPosition() + 1, bookType);
+									return false;
+								}
+							}
+							if (bookpage.nextPage()) {
+								MyLogger.kLog().d("执行翻页");
+								bookpage.draw(ReaderActivity.this, nextCanvas);
+								isFilp = true;
+							} else {
+								Toast.showShort(ReaderActivity.this, "已经是最后一页了");
+								return false;
+							}
 						}
 					}
-				} else {
 
-					if (!pageWidget.DragToRight()) {
-						if (jumpType == 1 && !isAutoLoad) {
-							if (bookpage.isFirstPage()) {
-								isToNextPage = false;
-								IOHelper.getChapter(1, chapter.getIndex(),
-										chapter.getPosition() - 1, bookType);
-								return false;
-							}
-						}
-
-						if (bookpage.prePage()) {
-							bookpage.draw(ReaderActivity.this, nextCanvas);
-							isFilp = true;
-						} else {
-							Toast.showShort(ReaderActivity.this, "已经是第一页了");
-							return false;
-						}
-					} else {
-						// 表示从百度详情界面跳转过来
-						if (jumpType == 1 && !isAutoLoad) {
-							if (bookpage.isLastPage()) {
-								isToNextPage = true;
-								IOHelper.getChapter(1, chapter.getIndex(),
-										chapter.getPosition() + 1, bookType);
-								return false;
-							}
-						}
-						if (bookpage.nextPage()) {
-							MyLogger.kLog().d("执行翻页");
-							bookpage.draw(ReaderActivity.this, nextCanvas);
-							isFilp = true;
-						} else {
-							Toast.showShort(ReaderActivity.this, "已经是最后一页了");
-							return false;
-						}
-					}
+					pageWidget.setBitmaps(curBitmap, nextBitmap);
 				}
-
-				pageWidget.setBitmaps(curBitmap, nextBitmap);
+				ret = pageWidget.doTouchEvent(e);
+				MyLogger.kLog().d("doTouchEvent = " + ret);
+				return ret;
+			} catch (Exception e2) {
+				// TODO: handle exception
 			}
-			ret = pageWidget.doTouchEvent(e);
-			MyLogger.kLog().d("doTouchEvent = " + ret);
-			return ret;
 		}
 		return false;
 
@@ -779,12 +784,12 @@ public class ReaderActivity extends BaseReaderActivity implements
 					popupWindow.dismiss();
 				}
 			} else {
-				Toast.show(this, "未连接网络!");
+				Toast.showError(ReaderActivity.this, "未连接网络");
 			}
 			break;
 		case R.id.booksetting_bookmark:
 			if (jumpType == 1) {
-				Toast.show(this, "在线看书，不可添加书签");
+				Toast.showError(this, "在线看书，不可添加书签");
 				return;
 			}
 			new SaveMarkAsyncTask(!isExistBookMark).execute();
@@ -812,7 +817,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 				db.saveReaderPosition(mark);
 			}
 		} catch (Exception e) {
-			Log.i("msg", e.getMessage());
+			Log.i("msg", e.getMessage()+"");
 		}
 
 	}
@@ -1464,7 +1469,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 		// TODO Auto-generated method stub
 		try {
 			outState.putString("bookName", chapter.getBookName());
-			outState.putString("bookId", chapter.getBookName());
+			outState.putString("bookId", bookId);
 			outState.putInt("jumpType", jumpType);
 			outState.putString("index", chapter.getIndex());
 			outState.putInt("position", chapter.getPosition());
@@ -1487,7 +1492,7 @@ public class ReaderActivity extends BaseReaderActivity implements
 	public void getSaveParm(Bundle savedInstanceState) {
 		jumpType = savedInstanceState.getInt("jumpType", 1);
 		String bookName = savedInstanceState.getString("bookName");
-		String bookId = savedInstanceState.getString("bookId");
+		bookId = savedInstanceState.getString("bookId");
 		// BaiduBook baiduBook = savedInstanceState.getParcelable("baiduBook");
 		ArrayList<BaiduBookChapter> chapterList = savedInstanceState
 				.getParcelableArrayList("list");

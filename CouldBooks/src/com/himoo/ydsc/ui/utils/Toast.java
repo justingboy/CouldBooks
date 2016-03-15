@@ -2,6 +2,7 @@
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ public class Toast {
 
 	public static boolean isShow = true;
 	private static android.widget.Toast toast;
+	private static android.widget.Toast toastError;
 	private static android.widget.Toast toastBg;
 	private static TextView tv;
 	private static TextView tvBg;
@@ -138,6 +140,34 @@ public class Toast {
 		toast.show();
 	}
 
+	/**
+	 * 带有图片的Toast
+	 * 
+	 * @param context
+	 * @param message
+	 */
+	public static void showError(Context context, String message) {
+		if (toastError == null) {
+			toastError = new android.widget.Toast(context);
+			LayoutInflater inflater = LayoutInflater.from(context);
+			View layout = inflater.inflate(R.layout.toast_custom_view, null,
+					false);
+			tv = (TextView) layout.findViewById(R.id.tv_toast_msg);
+			Drawable img = context.getResources().getDrawable(R.drawable.dialog_close);
+			img.setBounds(0, 0, img.getMinimumWidth(), img.getMinimumHeight());
+			tv.setCompoundDrawables(null, img, null, null);
+			toastError.setGravity(Gravity.CENTER, 0, -DeviceUtil.dip2px(context, 25));
+			toastError.setDuration(android.widget.Toast.LENGTH_SHORT);
+			toastError.setView(layout);
+		}
+		if (tv != null) {
+			tv.setText(message);
+			tv.setTextColor(BookTheme.THEME_COLOR);
+		}
+		toastError.show();
+	}
+
+	
 	/**
 	 * 带有图片的Toast
 	 * 

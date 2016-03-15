@@ -56,10 +56,11 @@ public class AfreshDownloadTask extends AsyncTask<Void, Void, Void> {
 		if (mListener != null) {
 			mListener.onPreDeleted(bookName,bookId);
 		}
-		Toast.show(context, "正在删除 《" + bookName + "》");
 		fileUtils = new FileUtils(context);
 		dirFile = new File(FileUtils.mSdRootPath + "/CouldBook/baidu"
 				+ File.separator + bookName+"_"+bookId + File.separator);
+		if(dirFile!=null&&dirFile.exists())
+			Toast.show(context, "正在删除 《" + bookName + "》");
 	}
 
 	@Override
