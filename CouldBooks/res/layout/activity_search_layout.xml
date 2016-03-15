@@ -35,6 +35,7 @@
             android:drawSelectorOnTop="false"
             android:fadingEdge="none"
             android:gravity="fill"
+            android:scrollbars="vertical"
             android:scrollbarStyle="outsideOverlay"
             ptr:ptrAnimationStyle="flip"
             ptr:ptrDrawable="@drawable/pullto_refresh_listview_arrow"

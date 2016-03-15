@@ -53,7 +53,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 
 	@ViewInject(R.id.pull_refresh_list)
 	private PullToRefreshListView mRefrshListView;
-	
+
 	/** 是否已经执行了错误 */
 	private boolean isHasFilure = false;
 
@@ -76,7 +76,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	private boolean isHasSearchBook = false;
 	/** 　返回的总的数 */
 	private int bookTotal;
-	
+
 	private int loadingBookCount = 0;
 
 	@Override
@@ -177,14 +177,13 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		BookSearchTask.getInstance().executeMe(title, "1", mRefrshListView,
 				true);
 	}
-	
+
 	private void save(String keyword) {
 		BookDb bookDb = BookDb.getInstance(this, "Book");
 		BookSearchRecords record = new BookSearchRecords();
 		record.setRecord(keyword);
 		bookDb.saveBookSearch(record);
 	}
-	
 
 	@Override
 	protected void initTitleBar() {
@@ -221,7 +220,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 						bookList = gosn.fromJson(json,
 								new TypeToken<ArrayList<BookSearch>>() {
 								}.getType());
-					
+
 						if (bookList != null && !bookList.isEmpty()) {
 							dismissRefreshDialog();
 							tv_search_empty.setVisibility(View.GONE);
@@ -233,14 +232,15 @@ public class SearchResultActivity extends SwipeBackActivity implements
 							mRefrshListView.setAdapter(mBookAdapter);
 							mCurrentMePage++;
 							isHasSearchBook = true;
-							
+
 						} else {
-							loadingBookCount ++;
+							loadingBookCount++;
 							firstReSuccess = -1;
 							isHasSearchBook = true;
-							if(loadingBookCount==2){
+							if (loadingBookCount == 2) {
 								dismissRefreshDialog();
-								Toast.showLong(SearchResultActivity.this,"未搜到该书");
+								Toast.showLong(SearchResultActivity.this,
+										"未搜到该书");
 							}
 						}
 					} catch (Exception e) {
@@ -260,12 +260,12 @@ public class SearchResultActivity extends SwipeBackActivity implements
 						mRefrshListView.setAdapter(mBaiduAdapter);
 						isHasSearchBook = true;
 					} else {
-						loadingBookCount ++;
+						loadingBookCount++;
 						firstReSuccess = -1;
 						isHasSearchBook = true;
-						if(loadingBookCount==2){
+						if (loadingBookCount == 2) {
 							dismissRefreshDialog();
-							Toast.showLong(SearchResultActivity.this,"未搜到该书");
+							Toast.showLong(SearchResultActivity.this, "未搜到该书");
 						}
 					}
 				}
@@ -310,9 +310,9 @@ public class SearchResultActivity extends SwipeBackActivity implements
 	@Override
 	public void onSearcFailure(Exception error, String msg, int whoservice) {
 		// TODO Auto-generated method stub
-		if(isHasFilure)
+		if (isHasFilure)
 			return;
-		if (isHasSearchBook||whoservice==1) {
+		if (isHasSearchBook || whoservice == 1) {
 			dismissRefreshDialog();
 			AnimationUtils.cancelAnim(imgRefersh);
 			mRefrshListView.onRefreshComplete();
@@ -393,7 +393,9 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		if (!NetWorkUtils.isNetConnected(this)) {
 			Toast.showBg(this, "未连接网络");
 		} else {
-			Toast.showBg(this, "获取数据失败");
+			loadingBookCount++;
+			if (loadingBookCount == 2)
+				Toast.showBg(this, "获取数据失败");
 		}
 		AnimationUtils.cancelAnim(imgRefersh);
 		notifyDataAndRefreshComplete();
