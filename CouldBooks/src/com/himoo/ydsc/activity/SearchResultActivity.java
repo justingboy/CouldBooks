@@ -137,7 +137,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 							BookRefreshTask<BaiduBook> task = new BookRefreshTask<BaiduBook>(
 									mRefrshListView);
 							task.setOnRefreshListener(SearchResultActivity.this);
-							task.execute(title, 20,
+							task.execute(title, 0,
 									HttpConstant.BOOK_REQUEST_TYPE_BAIDU_SEARCH);
 						}
 
@@ -319,7 +319,9 @@ public class SearchResultActivity extends SwipeBackActivity implements
 			if (!NetWorkUtils.isNetConnected(this)) {
 				Toast.showBg(this, "未连接网络");
 			} else {
-				Toast.showBg(this, "获取数据失败");
+				loadingBookCount++;
+				if (loadingBookCount == 2)
+					Toast.showBg(this, "获取数据失败");
 			}
 		}
 		isHasFilure = true;
@@ -393,9 +395,7 @@ public class SearchResultActivity extends SwipeBackActivity implements
 		if (!NetWorkUtils.isNetConnected(this)) {
 			Toast.showBg(this, "未连接网络");
 		} else {
-			loadingBookCount++;
-			if (loadingBookCount == 2)
-				Toast.showBg(this, "获取数据失败");
+			Toast.showBg(this, "获取数据失败");
 		}
 		AnimationUtils.cancelAnim(imgRefersh);
 		notifyDataAndRefreshComplete();

@@ -9,6 +9,7 @@
     <include layout="@layout/titlebar_layout" />
 
     <RelativeLayout
+        android:paddingRight="2dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
@@ -32,6 +33,7 @@
             android:layout_height="match_parent"
             android:background="@android:color/white"
             android:cacheColorHint="@android:color/transparent"
+            android:scrollbarThumbVertical="@drawable/scrollbar_vertical_thumb"
             android:drawSelectorOnTop="false"
             android:fadingEdge="none"
             android:gravity="fill"

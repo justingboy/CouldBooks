@@ -96,9 +96,9 @@ public class HotwordsActivity extends SwipeBackActivity implements
 						Log.e(e);
 						dismissRefreshDialog();
 						if (NetWorkUtils.isNetConnected(HotwordsActivity.this)) {
-							Toast.showError(HotwordsActivity.this, "加载关键字失败 ");
+							Toast.showBg(HotwordsActivity.this, "加载关键字失败 ");
 						} else {
-							Toast.showError(HotwordsActivity.this, "未连接网络");
+							Toast.showBg(HotwordsActivity.this, "未连接网络");
 						}
 
 					}
@@ -155,7 +155,7 @@ public class HotwordsActivity extends SwipeBackActivity implements
 			String keyWord = (String) parent.getItemAtPosition(position);
 			startToActivity(keyWord);
 		} else {
-			Toast.showError(this, "未连接网络");
+			Toast.showBg(this, "未连接网络");
 		}
 
 	}
