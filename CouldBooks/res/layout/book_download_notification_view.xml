@@ -59,12 +59,12 @@
         </ImageView>
 
         <TextView
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:id="@+id/tv_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="0kb/s" />
+            android:text="1024kb/s" />
     </LinearLayout>
 
 </RelativeLayout>
