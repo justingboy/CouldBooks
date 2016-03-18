@@ -11,7 +11,6 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Region;
 import android.graphics.drawable.GradientDrawable;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -832,7 +831,8 @@ public class PageWidget extends View {
 			dx = (int) (mWidth - mTouch.x + mWidth);
 		}
 		if (mCornerY > 0) {
-			dy = (int) (mHeight - mTouch.y);
+//			dy = (int) (mHeight - mTouch.y);
+			dy =(int)(mHeight-mTouch.y) -1 ;
 		} else {
 			dy = (int) (1 - mTouch.y); // 防止mTouch.y最终变为0
 		}
@@ -886,7 +886,6 @@ public class PageWidget extends View {
 			if (!this.mScroller.isFinished())
 				this.mScroller.abortAnimation();
 			mScroller.startScroll(aniTouchX, aniTouchY, aniDx, aniDy, duration);
-			Log.i("msg", "aniTouchX = "+aniTouchX+"aniTouchY="+aniTouchX+"aniDx ="+aniDx+"aniDy="+aniDy);
 		}
 	}
 	

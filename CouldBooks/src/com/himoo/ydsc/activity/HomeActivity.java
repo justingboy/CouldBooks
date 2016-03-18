@@ -27,7 +27,6 @@ import com.himoo.ydsc.fragment.ClassifyFragment;
 import com.himoo.ydsc.fragment.MoreFragment;
 import com.himoo.ydsc.fragment.SearchFragment2;
 import com.himoo.ydsc.http.HttpConstant;
-import com.himoo.ydsc.listener.NoDoubleChangeListener;
 import com.himoo.ydsc.reader.config.BitmapConfig;
 import com.himoo.ydsc.service.LockService;
 import com.himoo.ydsc.ui.utils.ViewSelector;
@@ -104,14 +103,14 @@ public class HomeActivity extends BaseActivity implements
 
 		Log.d(SharedPreferences.getInstance().getString("host",
 				HttpConstant.HOST_URL_TEST));
-//		if (!SharedPreferences.getInstance().getBoolean(
-//				SpConstant.DIALOG_INDICATE_SHELF, false)) {
-//			
-//			IndicateDialog dialog = new IndicateDialog(this, this);
-//			dialog.create();
-//			dialog.setIndicateDrawable(R.drawable.book_shelf_indicate);
-//			dialog.show();
-//		}
+		// if (!SharedPreferences.getInstance().getBoolean(
+		// SpConstant.DIALOG_INDICATE_SHELF, false)) {
+		//
+		// IndicateDialog dialog = new IndicateDialog(this, this);
+		// dialog.create();
+		// dialog.setIndicateDrawable(R.drawable.book_shelf_indicate);
+		// dialog.show();
+		// }
 
 	}
 
@@ -147,13 +146,13 @@ public class HomeActivity extends BaseActivity implements
 	/**
 	 * RadioGroup点击实现类
 	 */
-	private class OnRadioGroupCheckedChangeListener extends
-			NoDoubleChangeListener {
+	private class OnRadioGroupCheckedChangeListener implements
+			RadioGroup.OnCheckedChangeListener {
 
 		@Override
-		public void onNoDoubleCheckedChanged(RadioGroup radiogroup, int i) {
+		public void onCheckedChanged(RadioGroup group, int checkedId) {
 			// TODO Auto-generated method stub
-			switch (i) {
+			switch (checkedId) {
 			case R.id.main_bottom_choice:
 				setCurrentClickPoint(0);
 				break;
